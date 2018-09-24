@@ -66,7 +66,7 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
      // VARIABLES PARA INTERACCIONAR CON LA ENTRADA SALIDA
      // Pregunta: ¿hay que hacer algo con ellas para que esto funcione bien?
      // (por ejemplo añadir alguna palabra clave para garantizar que la sincronización a través de esa variable funcione)
-  char fila=0, columna=0, ready = 0;
+  volatile unsigned char fila=0, columna=0, ready = 0;
 
 
 
@@ -132,7 +132,7 @@ void init_table(char tablero[][DIM], char candidatas[][DIM])
 // CUIDADO: si el compilador coloca esta variable en un registro, no funcionará.
 // Hay que definirla como "volatile" para forzar a que antes de cada uso la cargue de memoria
 
-void esperar_mov(char *ready)
+void esperar_mov(volatile unsigned char *ready)
 {
     while (*ready == 0) {};  // bucle de espera de respuestas hasta que el se modifique el valor de ready (hay que hacerlo manualmente)
 
@@ -159,7 +159,7 @@ void esperar_mov(char *ready)
 // Además informa si la posición es válida y contiene alguna ficha.
 // Esto lo hace por referencia (en *posicion_valida)
 // Si devuelve un 0 no es válida o está vacia.
-char ficha_valida(char tablero[][DIM], char f, char c, int *posicion_valida)
+char ficha_valida(char tablero[][DIM], unsigned char f, unsigned char c, int *posicion_valida)
 {
     char ficha;
 
@@ -232,7 +232,7 @@ int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF,
 // SF y SC son las cantidades a sumar para movernos en la dirección que toque
 // color indica el color de la pieza que se acaba de colocar
 // FA y CA son la fila y columna a analizar
-void voltear(char tablero[][DIM], char FA, char CA, char SF, char SC, int n, char color)
+void voltear(char tablero[][DIM], unsigned char FA, unsigned char CA, unsigned char SF, unsigned char SC, int n, char color)
 {
     int i;
 
@@ -280,7 +280,7 @@ int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
 // NO    0
 // SI    1
 // CASILLA_OCUPADA 2
-int elegir_mov(char candidatas[][DIM], char tablero[][DIM], char *f, char *c)
+int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, unsigned char *c)
 {
     int i, j, k, found;
     int mf = -1; // almacena la fila del mejor movimiento encontrado
@@ -362,7 +362,7 @@ void contar(char tablero[][DIM], int *b, int *n)
     }
 }
 
-void actualizar_candidatas(char candidatas[][DIM], char f, char c)
+void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned char c)
 {
     // donde ya se ha colocado no se puede volver a colocar
     // En las posiciones alrededor sí
@@ -435,7 +435,7 @@ void reversi8()
     int fin = 0;  // fin vale 1 si el humano no ha podido mover
                   // (ha introducido un valor de movimiento con algún 8)
                   // y luego la máquina tampoco puede
-    char f, c;    // fila y columna elegidas por la máquina para su movimiento
+    unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
 
     init_table(tablero, candidatas);
     while (fin == 0)
