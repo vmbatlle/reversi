@@ -1,9 +1,9 @@
-/*********************************************************************************************
-* Fichero:		timer.h
-* Autor:        Victor M. Batlle <736478@unizar.es>
-* Descrip:		funciones de control del timer2 del s3c44b0x
-* Version:		1.0.0
-*********************************************************************************************/
+/**
+ * @file    timer.h
+ * @author  Victor M. Batlle <736478@unizar.es>
+ * @brief   Funciones de control del timer2 del s3c44b0x
+ * @version 1.0.0
+ */
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
