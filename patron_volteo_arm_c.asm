@@ -1,5 +1,5 @@
-.text
-.arm
+.section .text
+.globl patron_volteo_asm_c
 .extern ficha_valida
 
 patron_volteo_asm_c:
@@ -86,6 +86,5 @@ patron_volteo_asm_c:
   sub sp, r11, #12
   ldm sp, {r11, sp, lr}
   bx lr
-  .data
 
   .end
