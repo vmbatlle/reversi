@@ -1,8 +1,8 @@
 /*********************************************************************************************
 * Fichero:		timer.c
-* Autor:
-* Descrip:		funciones de control del timer0 del s3c44b0x
-* Version:
+* Autor:		Victor M. Batlle <736478@unizar.es>
+* Descrip:		funciones de control del timer2 del s3c44b0x
+* Version:		1.0.0
 *********************************************************************************************/
 
 /*--- ficheros de cabecera ---*/
@@ -11,7 +11,9 @@
 #include "44blib.h"
 
 /*--- variables globales ---*/
-int switch_leds = 0;
+/* static -> duración igual a la duración del programa, ámbito restringido al fichero.
+ * */
+static volatile uint32_t ticks = 0; // Número de ciclos completos
 
 /* declaración de función que es rutina de servicio de interrupción
  * https://gcc.gnu.org/onlinedocs/gcc/ARM-Function-Attributes.html */
@@ -20,30 +22,35 @@ void timer_ISR(void) __attribute__((interrupt("IRQ")));
 /*--- codigo de las funciones ---*/
 void timer_ISR(void)
 {
-	switch_leds = 1;
+	ticks++;
 
 	/* borrar bit en I_ISPC para desactivar la solicitud de interrupción*/
-	rI_ISPC |= BIT_TIMER0; // BIT_TIMER0 está definido en 44b.h y pone un uno en el bit 13 que correponde al Timer0
+	rI_ISPC |= BIT_TIMER2; // BIT_TIMER2 está definido en 44b.h y pone un uno en el bit 11 que correponde al Timer2
 }
 
 void timer_init(void)
 {
 	/* Configuraion controlador de interrupciones */
-	rINTMOD = 0x0; // Configura las linas como de tipo IRQ
-	rINTCON = 0x1; // Habilita int. vectorizadas y la linea IRQ (FIQ no)
-	rINTMSK &= ~(BIT_TIMER0); // habilitamos en vector de mascaras de interrupcion el Timer0 (bits 26 y 13, BIT_GLOBAL y BIT_TIMER0 están definidos en 44b.h)
+	rINTMOD &= ~(BIT_TIMER2); // Configura la linea INT_TIMER2 como de tipo IRQ (bit 11 = 0)
+	/* TODO: Comprobar si es necesario desactivar explicitamente la linea FIQ */
+	rINTCON &= 0b001; // Habilita int. vectorizadas (bit 3 = 0) y la linea IRQ (bit 2 = 0)
+	rINTMSK &= ~(BIT_TIMER2); // habilitamos en vector de mascaras de interrupcion el Timer2 (bits 26 y 11, BIT_GLOBAL y BIT_TIMER2 están definidos en 44b.h)
 
-	/* Establece la rutina de servicio para TIMER0 */
-	pISR_TIMER0 = (unsigned) timer_ISR;
+	/* Establece la rutina de servicio para TIMER2 */
+	pISR_TIMER2 = (unsigned) timer_ISR;
 
-	/* Configura el Timer0 */
-	rTCFG0 = 255; // ajusta el preescalado
-	rTCFG1 = 0x0; // selecciona la entrada del mux que proporciona el reloj. La 00 corresponde a un divisor de 1/2.
-	rTCNTB0 = 65535;// valor inicial de cuenta (la cuenta es descendente)
-	rTCMPB0 = 12800;// valor de comparación
-	/* establecer update=manual (bit 1) + inverter=on (¿? será inverter off un cero en el bit 2 pone el inverter en off)*/
-	rTCON = 0x2;
-	/* iniciar timer (bit 0) con auto-reload (bit 3)*/
-	rTCON = 0x09;
+	/* Configura el Timer2 
+	 * Timer_input = MCLK / (preesclado + 1) / divisor */
+	/* TODO: ajustar precisión del temporizador */
+	rTCFG0 |= 255<<8; // ajusta el preescalado para Timer2 y Timer3 al máximo (bits 15:8)
+	rTCFG1 &= ~(0b1111<<8); // selecciona la entrada del MUX2 (bits 11:8) que proporciona el reloj. Estableciendo el divisor a 1/2
+							// 0000 -> 1/2, 0001 -> 1/4, 0010 -> 1/8, 0011 -> 1/16, 01xx -> 1/32.
+	rTCNTB2 = 0xFFFFFFFF;// valor inicial de cuenta (la cuenta es descendente) al máximo
+	rTCMPB2 = 0;// valor de comparación
+	/* establecer update=manual (bit 13 = 1) */
+	/* TODO: Comprobar si se necesita activar el inverter a la salida de TOUT2 */
+	rTCON |= 0x1<<13;
+	/* iniciar timer (bit 12 = 1) con auto-reload (bit 15 = 1) y desactivar manual update (bit 13 = 0) */
+	rTCON |= 0x1<<12 | 0x1<<15 & ~(0x1<<13);
 }
 
