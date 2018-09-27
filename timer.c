@@ -1,6 +1,6 @@
 /*********************************************************************************************
 * Fichero:		timer.c
-* Autor:		Victor M. Batlle <736478@unizar.es>
+* Autor:        Victor M. Batlle <736478@unizar.es>
 * Descrip:		funciones de control del timer2 del s3c44b0x
 * Version:		1.0.0
 *********************************************************************************************/
@@ -13,7 +13,7 @@
 /*--- variables globales ---*/
 /* static -> duración igual a la duración del programa, ámbito restringido al fichero.
  * */
-static volatile uint32_t ticks = 0; // Número de ciclos completos
+static volatile uint32_t timer2_num_int = 0; // Número de ciclos completos
 
 /* declaración de función que es rutina de servicio de interrupción
  * https://gcc.gnu.org/onlinedocs/gcc/ARM-Function-Attributes.html */
@@ -22,13 +22,13 @@ void timer_ISR(void) __attribute__((interrupt("IRQ")));
 /*--- codigo de las funciones ---*/
 void timer_ISR(void)
 {
-	ticks++;
+	timer2_num_int++;
 
 	/* borrar bit en I_ISPC para desactivar la solicitud de interrupción*/
 	rI_ISPC |= BIT_TIMER2; // BIT_TIMER2 está definido en 44b.h y pone un uno en el bit 11 que correponde al Timer2
 }
 
-void timer_init(void)
+void timer2_inicializar(void)
 {
 	/* Configuraion controlador de interrupciones */
 	rINTMOD &= ~(BIT_TIMER2); // Configura la linea INT_TIMER2 como de tipo IRQ (bit 11 = 0)
@@ -47,10 +47,25 @@ void timer_init(void)
 							// 0000 -> 1/2, 0001 -> 1/4, 0010 -> 1/8, 0011 -> 1/16, 01xx -> 1/32.
 	rTCNTB2 = 0xFFFFFFFF;// valor inicial de cuenta (la cuenta es descendente) al máximo
 	rTCMPB2 = 0;// valor de comparación
+}
+
+void timer2_empezar(void) {
+	timer2_num_int = 0;
 	/* establecer update=manual (bit 13 = 1) */
 	/* TODO: Comprobar si se necesita activar el inverter a la salida de TOUT2 */
 	rTCON |= 0x1<<13;
 	/* iniciar timer (bit 12 = 1) con auto-reload (bit 15 = 1) y desactivar manual update (bit 13 = 0) */
 	rTCON |= 0x1<<12 | 0x1<<15 & ~(0x1<<13);
+}
+
+void unsigned int timer2_leer(void) {
+	/* TODO: Implementar calculo del tiempo transcurrido */
+}
+
+unsigned int timer2_parar(void) {
+	/* detener timer (bit 12 = 0) */
+	rTCON &= ~(0x1<<12);
+	/* TODO: Comprobar que se puede llamar a timer2_leer() tras haber detenido el timer2 */
+	return timer2_leer();
 }
 
