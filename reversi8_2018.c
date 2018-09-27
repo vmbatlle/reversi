@@ -1,7 +1,7 @@
-// TamaÒo del tablero
+// Tama√±o del tablero
 enum { DIM=8 };
 
-// Valores que puede devolver la funciÛn patron_volteo())
+// Valores que puede devolver la funci√≥n patron_volteo())
 enum {
 	NO_HAY_PATRON = 0,
   PATRON_ENCONTRADO = 1
@@ -23,7 +23,7 @@ const char  CASILLA_OCUPADA = 2;
 
 /////////////////////////////////////////////////////////////////////////////
 // TABLAS AUXILIARES
-// declaramos las siguientes tablas como globales para que sean m·s f·ciles visualizarlas en el simulador
+// declaramos las siguientes tablas como globales para que sean m√°s f√°ciles visualizarlas en el simulador
 // __attribute__ ((aligned (8))): specifies a minimum alignment for the variable or structure field, measured in bytes, in this case 8 bytes
 
 static const char __attribute__ ((aligned (8))) tabla_valor[DIM][DIM] =
@@ -44,9 +44,9 @@ const char vSF[DIM] = {-1,-1, 0, 1, 1, 1, 0,-1};
 const char vSC[DIM] = { 0, 1, 1, 1, 0,-1,-1,-1};
 
 //////////////////////////////////////////////////////////////////////////////////////
-// Variables globales que no deberÌan serlo
-// tablero, fila, columna y ready son varibles que se deberÌan definir como locales dentro de reversi8.
-// Sin embargo, las hemos definido como globales para que sea m·s f·cil visualizar el tablero y las variables en la memoria
+// Variables globales que no deber√≠an serlo
+// tablero, fila, columna y ready son varibles que se deber√≠an definir como locales dentro de reversi8.
+// Sin embargo, las hemos definido como globales para que sea m√°s f√°cil visualizar el tablero y las variables en la memoria
 //////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 // Tablero sin inicializar
@@ -64,8 +64,8 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
 
   ////////////////////////////////////////////////////////////////////
      // VARIABLES PARA INTERACCIONAR CON LA ENTRADA SALIDA
-     // Pregunta: øhay que hacer algo con ellas para que esto funcione bien?
-     // (por ejemplo aÒadir alguna palabra clave para garantizar que la sincronizaciÛn a travÈs de esa variable funcione)
+     // Pregunta: ¬øhay que hacer algo con ellas para que esto funcione bien?
+     // (por ejemplo a√±adir alguna palabra clave para garantizar que la sincronizaci√≥n a trav√©s de esa variable funcione)
   volatile unsigned char fila=0, columna=0, ready = 0;
 
 
@@ -101,7 +101,7 @@ void init_table(char tablero[][DIM], char candidatas[][DIM])
 	}
     }
 #endif
-    // arriba hay versiÛn alternativa
+    // arriba hay versi√≥n alternativa
     tablero[3][3] = FICHA_BLANCA;
     tablero[4][4] = FICHA_BLANCA;
     tablero[3][4] = FICHA_NEGRA;
@@ -129,7 +129,7 @@ void init_table(char tablero[][DIM], char candidatas[][DIM])
 
 ////////////////////////////////////////////////////////////////////////////////
 // Espera a que ready valga 1.
-// CUIDADO: si el compilador coloca esta variable en un registro, no funcionar·.
+// CUIDADO: si el compilador coloca esta variable en un registro, no funcionar√°.
 // Hay que definirla como "volatile" para forzar a que antes de cada uso la cargue de memoria
 
 void esperar_mov(volatile unsigned char *ready)
@@ -155,17 +155,17 @@ void esperar_mov(volatile unsigned char *ready)
 //    NI GUARDARLAS EN PILA NI RESERVAR UN ESPACIO EN LA PILA PARA ELLAS
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ////////////////////////////////////////////////////////////////////////////////
-// Devuelve el contenido de la posiciÛn indicadas por la fila y columna actual.
-// Adem·s informa si la posiciÛn es v·lida y contiene alguna ficha.
+// Devuelve el contenido de la posici√≥n indicadas por la fila y columna actual.
+// Adem√°s informa si la posici√≥n es v√°lida y contiene alguna ficha.
 // Esto lo hace por referencia (en *posicion_valida)
-// Si devuelve un 0 no es v·lida o est· vacia.
+// Si devuelve un 0 no es v√°lida o est√° vacia.
 char ficha_valida(char tablero[][DIM], unsigned char f, unsigned char c, int *posicion_valida)
 {
     char ficha;
 
     // ficha = tablero[f][c];
     // no puede accederse a tablero[f][c]
-    // ya que alg˙n Ìndice puede ser negativo
+    // ya que alg√∫n √≠ndice puede ser negativo
 
     if ((f < DIM) && (f >= 0) && (c < DIM) && (c >= 0) && (tablero[f][c] != CASILLA_VACIA))
     {
@@ -181,22 +181,22 @@ char ficha_valida(char tablero[][DIM], unsigned char f, unsigned char c, int *po
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// La funciÛn patrÛn volteo es una funciÛn recursiva que busca el patrÛn de volteo
-// (n fichas del rival seguidas de una ficha del jugador actual) en una direcciÛn determinada
-// SF y SC son las cantidades a sumar para movernos en la direcciÛn que toque
+// La funci√≥n patr√≥n volteo es una funci√≥n recursiva que busca el patr√≥n de volteo
+// (n fichas del rival seguidas de una ficha del jugador actual) en una direcci√≥n determinada
+// SF y SC son las cantidades a sumar para movernos en la direcci√≥n que toque
 // color indica el color de la pieza que se acaba de colocar
-// la funciÛn devuelve PATRON_ENCONTRADO (1) si encuentra patrÛn y NO_HAY_PATRON (0) en caso contrario
+// la funci√≥n devuelve PATRON_ENCONTRADO (1) si encuentra patr√≥n y NO_HAY_PATRON (0) en caso contrario
 // FA y CA son la fila y columna a analizar
-// longitud es un par·metro por referencia. Sirve para saber la longitud del patrÛn que se est· analizando. Se usa para saber cuantas fichas habrÌa que voltear
+// longitud es un par√°metro por referencia. Sirve para saber la longitud del patr√≥n que se est√° analizando. Se usa para saber cuantas fichas habr√≠a que voltear
 int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color)
 {
-    int posicion_valida; // indica si la posiciÛn es valida y contiene una ficha de alg˙n jugador
-    int patron; //indica si se ha encontrado un patrÛn o no
+    int posicion_valida; // indica si la posici√≥n es valida y contiene una ficha de alg√∫n jugador
+    int patron; //indica si se ha encontrado un patr√≥n o no
     char casilla;   // casilla es la casilla que se lee del tablero
     FA = FA + SF;
     CA = CA + SC;
     casilla = ficha_valida(tablero, FA, CA, &posicion_valida);
-    // mientras la casilla est· en el tablero, no est· vacÌa,
+    // mientras la casilla est√° en el tablero, no est√° vac√≠a,
     // y es del color rival seguimos buscando el patron de volteo
     if ((posicion_valida == 1) && (casilla != color))
     {
@@ -206,21 +206,21 @@ int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF,
         //printf("fila: %d; columna: %d \n", FA, CA);
         return patron;
     }
-    // si la ultima posiciÛn era v·lida y la ficha es del jugador actual,
-    // entonces hemos encontrado el patrÛn
+    // si la ultima posici√≥n era v√°lida y la ficha es del jugador actual,
+    // entonces hemos encontrado el patr√≥n
     else if ((posicion_valida == 1) && (casilla == color))
     {
         if (*longitud > 0) // longitud indica cuantas fichas hay que voltear
             {
-            return PATRON_ENCONTRADO; // si hay que voltear una ficha o m·s hemos encontrado el patrÛn
+            return PATRON_ENCONTRADO; // si hay que voltear una ficha o m√°s hemos encontrado el patr√≥n
             //printf("PATRON_ENCONTRADO \n");
             }
         else {
-            return NO_HAY_PATRON; // si no hay que voltear no hay patrÛn
+            return NO_HAY_PATRON; // si no hay que voltear no hay patr√≥n
             //printf("NO_HAY_PATRON \n");
             }
     }
-    // en caso contrario es que no hay patrÛn
+    // en caso contrario es que no hay patr√≥n
     else
     {
         return NO_HAY_PATRON;
@@ -228,8 +228,8 @@ int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF,
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-// voltea n fichas en la direcciÛn que toque
-// SF y SC son las cantidades a sumar para movernos en la direcciÛn que toque
+// voltea n fichas en la direcci√≥n que toque
+// SF y SC son las cantidades a sumar para movernos en la direcci√≥n que toque
 // color indica el color de la pieza que se acaba de colocar
 // FA y CA son la fila y columna a analizar
 void voltear(char tablero[][DIM], unsigned char FA, unsigned char CA, unsigned char SF, unsigned char SC, int n, char color)
@@ -245,13 +245,13 @@ void voltear(char tablero[][DIM], unsigned char FA, unsigned char CA, unsigned c
 }
 ////////////////////////////////////////////////////////////////////////////////
 // comprueba si hay que actualizar alguna ficha
-// no comprueba que el movimiento realizado sea v·lido
+// no comprueba que el movimiento realizado sea v√°lido
 // f y c son la fila y columna a analizar
 // char vSF[DIM] = {-1,-1, 0, 1, 1, 1, 0,-1};
 // char vSC[DIM] = { 0, 1, 1, 1, 0,-1,-1,-1};
 int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
 {
-    char SF, SC; // cantidades a sumar para movernos en la direcciÛn que toque
+    char SF, SC; // cantidades a sumar para movernos en la direcci√≥n que toque
     int i, flip, patron;
 
     for (i = 0; i < DIM; i++) // 0 es Norte, 1 NE, 2 E ...
@@ -271,8 +271,8 @@ int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-// Recorre todo el tablero comprobando en cada posiciÛn si se puede mover
-// En caso afirmativo, consulta la puntuaciÛn de la posiciÛn y si es la mejor
+// Recorre todo el tablero comprobando en cada posici√≥n si se puede mover
+// En caso afirmativo, consulta la puntuaci√≥n de la posici√≥n y si es la mejor
 // que se ha encontrado la guarda
 // Al acabar escribe el movimiento seleccionado en f y c
 
@@ -287,14 +287,14 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
     int mc;      // almacena la columna del mejor movimiento encontrado
     char mejor = 0; // almacena el mejor valor encontrado
     int patron, longitud;
-    char SF, SC; // cantidades a sumar para movernos en la direcciÛn que toque
+    char SF, SC; // cantidades a sumar para movernos en la direcci√≥n que toque
 
-    // Recorremos todo el tablero comprobando dÛnde podemos mover
-    // Comparamos la puntuaciÛn de los movimientos encontrados y nos quedamos con el mejor
+    // Recorremos todo el tablero comprobando d√≥nde podemos mover
+    // Comparamos la puntuaci√≥n de los movimientos encontrados y nos quedamos con el mejor
     for (i=0; i<DIM; i++)
     {
         for (j=0; j<DIM; j++)
-        {   // indica en quÈ casillas quiz· se pueda mover
+        {   // indica en qu√© casillas quiz√° se pueda mover
             if (candidatas[i][j] == SI)
             {
                 if (tablero[i][j] == CASILLA_VACIA)
@@ -302,14 +302,14 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
                     found = 0;
                     k = 0;
 
-                    // en este bucle comprobamos si es un movimiento v·lido
-                    // (es decir si implica voltear en alguna direcciÛn)
+                    // en este bucle comprobamos si es un movimiento v√°lido
+                    // (es decir si implica voltear en alguna direcci√≥n)
                     while ((found == 0) && (k < DIM))
                     {
-                        SF = vSF[k];    // k representa la direcciÛn que miramos
+                        SF = vSF[k];    // k representa la direcci√≥n que miramos
                         SC = vSC[k];    // 1 es norte, 2 NE, 3 E ...
 
-                        // nos dice quÈ hay que voltear en cada direcciÛn
+                        // nos dice qu√© hay que voltear en cada direcci√≥n
                         longitud = 0;
                         patron = patron_volteo(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
                         //  //printf("%d ", patron);
@@ -324,7 +324,7 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
                             }
                         }
                         k++;
-                        // si no hemos encontrado nada probamos con la siguiente direcciÛn
+                        // si no hemos encontrado nada probamos con la siguiente direcci√≥n
                     }
                 }
             }
@@ -332,12 +332,12 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
     }
     *f = (char) mf;
     *c = (char) mc;
-    // si no se ha encontrado una posiciÛn v·lida devuelve -1
+    // si no se ha encontrado una posici√≥n v√°lida devuelve -1
     return mf;
 }
 ////////////////////////////////////////////////////////////////////////////////
-// Cuenta el n˙mero de fichas de cada color.
-// Los guarda en la direcciÛn b (blancas) y n (negras)
+// Cuenta el n√∫mero de fichas de cada color.
+// Los guarda en la direcci√≥n b (blancas) y n (negras)
 void contar(char tablero[][DIM], int *b, int *n)
 {
     int i,j;
@@ -365,7 +365,7 @@ void contar(char tablero[][DIM], int *b, int *n)
 void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned char c)
 {
     // donde ya se ha colocado no se puede volver a colocar
-    // En las posiciones alrededor sÌ
+    // En las posiciones alrededor s√≠
     candidatas[f][c] = CASILLA_OCUPADA;
     if (f > 0)
     {
@@ -403,18 +403,18 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
 // Proceso principal del juego
 // Utiliza el tablero,
 // y las direcciones en las que indica el jugador la fila y la columna
-// y la seÒal de ready que indica que se han actualizado fila y columna
-// tablero, fila, columna y ready son variables globales aunque deberÌan ser locales de reversi8,
-// la razÛn es que al meterlas en la pila no las pone juntas, y asÌ jugar es m·s complicado.
-// en esta versiÛn el humano lleva negras y la m·quina blancas
+// y la se√±al de ready que indica que se han actualizado fila y columna
+// tablero, fila, columna y ready son variables globales aunque deber√≠an ser locales de reversi8,
+// la raz√≥n es que al meterlas en la pila no las pone juntas, y as√≠ jugar es m√°s complicado.
+// en esta versi√≥n el humano lleva negras y la m√°quina blancas
 // no se comprueba que el humano mueva correctamente.
-// SÛlo que la m·quina realice un movimiento correcto.
+// S√≥lo que la m√°quina realice un movimiento correcto.
 void reversi8()
 {
 
 	 ////////////////////////////////////////////////////////////////////
 	 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
-	// sÛlo se exploran las que est·n alrededor de las fichas colocadas
+	// s√≥lo se exploran las que est√°n alrededor de las fichas colocadas
 	 ////////////////////////////////////////////////////////////////////
 	char __attribute__ ((aligned (8))) candidatas[DIM][DIM] =
     {
@@ -429,13 +429,13 @@ void reversi8()
     };
 
 
-    int done;     // la m·quina ha conseguido mover o no
+    int done;     // la m√°quina ha conseguido mover o no
     int move = 0; // el humano ha conseguido mover o no
-    int blancas, negras; // n˙mero de fichas de cada color
+    int blancas, negras; // n√∫mero de fichas de cada color
     int fin = 0;  // fin vale 1 si el humano no ha podido mover
-                  // (ha introducido un valor de movimiento con alg˙n 8)
-                  // y luego la m·quina tampoco puede
-    unsigned char f, c;    // fila y columna elegidas por la m·quina para su movimiento
+                  // (ha introducido un valor de movimiento con alg√∫n 8)
+                  // y luego la m√°quina tampoco puede
+    unsigned char f, c;    // fila y columna elegidas por la m√°quina para su movimiento
 
     init_table(tablero, candidatas);
     while (fin == 0)
