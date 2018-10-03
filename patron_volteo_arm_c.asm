@@ -21,7 +21,7 @@ patron_volteo_asm_c:
   # *(sp+8) = color
   
   mov ip, sp
-  push {r4-r10, fp, sp, lr, pc}
+  push {r4-r10, fp, ip, lr, pc}
   sub fp, ip, #4
   # Solo hace falta guardar espacio para posicion_valida
   # casilla y patron no necesitan guardarse en memoria al ser devueltas en r0 por sus respectivas funciones
