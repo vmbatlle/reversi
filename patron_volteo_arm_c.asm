@@ -1,90 +1,111 @@
+
+#----------------------------------------------------------------------------------------
+# Fichero:     patron_volteo_arm_c.asm
+# Autores:     Diego Royo Meneses <740388@unizar.es>, Victor M. Batlle <736478@unizar.es>
+# Descripción: Implementación de la función patron_volteo en ARM
+# Versión:     1.0.0
+#----------------------------------------------------------------------------------------
+
 .section .text
 .globl patron_volteo_asm_c
 .extern ficha_valida
 
 patron_volteo_asm_c:
-  mov r12, sp
-  # TODO: Guardar solo reg necesarios
-  push {r4-r10, r11, r12, lr, pc}
-
-  sub r11, r12, #4
-  # 0x30 TODO: ¿Hace falta todo este espacio? -> Si, para llamar recursivamente a patron_volteo...?
-  sub sp, sp, #48
-  #str r0, [r11, #-32] &tablero
-  mov r4, r0
-  #str r1, [r11, #-36] &longitud    # 0x24
-  mov r5, r1
-  #strb r2, [r11, #-37] FA    # 0x25
-  mov r6, r2
-  #strb r3, [r11, #-38] CA   # 0x26
-  mov r7, r3
+  #----- Inicio subrutina
+  # r0 = &tablero
+  # r1 = &longitud
+  # r2 = FA
+  # r3 = CA
+  # *sp = SF
+  # *(sp+4) = SC
+  # *(sp+8) = color
+  
+  # Al no modificar los registros r8-r10 no hace falta guardarlos en la pila
+  mov ip, sp
+  push {r4-r10, fp, sp, lr, pc}
+  sub fp, ip, #4
+  # Solo hace falta guardar espacio para posicion_valida
+  # casilla y patron no necesitan guardarse en memoria al ser devueltas en r0 por sus respectivas funciones
+  # Guardar 3 bytes más para poder almacenar sf, sc y color en caso de llamar a la subrutina
+  sub sp, sp, #4
+  
+  #----- Cuerpo de la subrutina
+  # Cargar SF en r4, SC en r5 y color en r6
+  ldmib fp, {r4-r6}
   
   # FA = FA + SF
-  ldrb r8, [r11, #4]
-  add r6, r6, r8
+  add r2, r2, r4
+  # Para restar 1 suma 255, por lo tanto solo los 8 primeros bits de r2 son válidos
+  and r2, r2, #255
   
   # CA = CA + SC
-  ldrb r9, [r11, #8]
-  add r7, r7, r9
+  add r3, r3, r5
+  and r2, r2, #255
   
-  # casilla = ficha_valida(tablero, FA, CA, &posicion_valida)#
+  # casilla = ficha_valida(tablero, FA, CA, &posicion_valida)
   # Preparar el paso de parámetros, r0 ya tiene &tablero
-  mov r1, r6
-  mov r2, r7
-  sub r3, r11, #24
+  # Salvar &tablero (r0) en r6 y &longitud (r1) en r7
+  mov r7, r0
+  mov r8, r1
+  # FA en r1 y CA en r2, guardarlos en r9 y r10 respectivamente, pueden cambiar al llamar a ficha_valida
+  mov r1, r2
+  mov r2, r3
+  mov r9, r1
+  mov r10, r2
+  # &posicion_valida en r3
+  sub r3, fp, #44
   bl ficha_valida
-  # TODO: guardar el resultado (r0) en algún sitio?
   
+  #--- Bloque condicional principal
   #- if ((posicion_valida == 1) && (casilla != color)) {
-  # } else if ((posicion_valida == 1 && (casilla == color)) {
-  # } else { }
+  #- } else if ((posicion_valida == 1 && (casilla == color)) {
+  #- } else { }
   
-  # Comprobar primero si posición válida es distinto de 1
-  ldr r1, [r11, #-24]
-  cmp r1, #1
-  movne r3, #0
-  # NO_HAY_PATRON
+  # Comprobar primero si posicion_valida es distinto de 1
+  ldr r3, [fp, #-44]
+  cmp r3, #1
+  # posicion_valida = 0, devolver #NO_HAY_PATRON
+  movne r0, #0
   bne patron_volteo_callback
   
-  # Decidir qué hacer según el valor de casilla
-  ldr r10, [r11, #12]
-  cmp r0, r10
+  # Comparar casilla (r0) con color (r6)
+  cmp r0, r6
   beq patron_volteo_color_igual
   
-  # casilla != color
+  # Caso casilla != color
   # *longitud = *longitud + 1
-  ldr r1, [r5]
+  ldr r1, [r8]
   add r1, r1, #1
-  str r1, [r5]
+  str r1, [r8]
   # patron = patron_volteo(tablero, longitud, FA, CA, SF, SC, color)
-  mov r0, r4
-  mov r1, r5
-  mov r2, r6
-  mov r3, r7
-  # TODO: no estoy nada seguro de esto, he confiado mucho en eclipse para hacerlo
-  str r8, [sp]
-  # Guardar SF, SC y color para la llamada a patron_volteo
-  str r9, [sp, #4]
-  str r10, [sp, #8]
+  # r0 = tablero (r7), r1 = &longitud (r8), r2 = FA (r9), r3 = CA (r10)
+  mov r0, r7
+  mov r1, r8
+  mov r2, r9
+  mov r3, r10
+  # Guardar en la pila SF (r4 -> sp), SC (r5 -> sp+4) y color (r6 -> sp+8) para la llamada recursiva
+  stmdb sp!, {r4-r6}
   bl patron_volteo_asm_c
-  mov r3, r0
+  # Devolver el resultado que ha devuelto en r0
   b patron_volteo_callback
   
-  # casilla == color
+  # Caso casilla == color
   patron_volteo_color_igual:
   #- if (*longitud > 0)
-  ldr r1, [r5]
-  cmp r1, #0
-  movgt r3, #1
-  # PATRON_ENCONTRADO
-  movle r3, #0
-  # NO_HAY_PATRON
+  ldr r8, [r8]
+  cmp r8, #0
+  # Si longitud > 0 devuelve PATRON_ENCONTRADO, si no NO_HAY_PATRON
+  movgt r0, #1
+  movle r0, #0
   
-  # Callback
+  #----- Fin subrutina
+  
+  # Callback, r0 contiene el valor a devolver
   patron_volteo_callback:
-  mov r0, r3
-  sub sp, r11, #12
-  ldm sp, {r11, sp, lr}
+  sub sp, fp, #40
+  pop {r4-r10, fp, ip, lr}
+  # No cargar el valor de PC y devolver el sp al que tenía al iniciar la función
+  add sp, sp, #4
   bx lr
 
-  .end
+.end
