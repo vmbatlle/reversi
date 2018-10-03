@@ -20,13 +20,11 @@ patron_volteo_asm_c:
   # *(sp+4) = SC
   # *(sp+8) = color
   
-  # Al no modificar los registros r8-r10 no hace falta guardarlos en la pila
   mov ip, sp
   push {r4-r10, fp, sp, lr, pc}
   sub fp, ip, #4
   # Solo hace falta guardar espacio para posicion_valida
   # casilla y patron no necesitan guardarse en memoria al ser devueltas en r0 por sus respectivas funciones
-  # Guardar 3 bytes más para poder almacenar sf, sc y color en caso de llamar a la subrutina
   sub sp, sp, #4
   
   #----- Cuerpo de la subrutina
@@ -44,7 +42,7 @@ patron_volteo_asm_c:
   
   # casilla = ficha_valida(tablero, FA, CA, &posicion_valida)
   # Preparar el paso de parámetros, r0 ya tiene &tablero
-  # Salvar &tablero (r0) en r6 y &longitud (r1) en r7
+  # Salvar &tablero (r0) en r7 y &longitud (r1) en r8
   mov r7, r0
   mov r8, r1
   # FA en r1 y CA en r2, guardarlos en r9 y r10 respectivamente, pueden cambiar al llamar a ficha_valida
