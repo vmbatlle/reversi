@@ -35,7 +35,6 @@ void timer2_inicializar(void)
 {
 	/* Configuraion controlador de interrupciones */
 	rINTMOD &= ~(BIT_TIMER2); // Configura la linea INT_TIMER2 como de tipo IRQ (bit 11 = 0)
-	/* TODO: Comprobar si es necesario desactivar explicitamente la linea FIQ */
 	rINTCON &= 0b001; // Habilita int. vectorizadas (bit 2 = 0) y la linea IRQ (bit 1 = 0)
 	rINTMSK &= ~(BIT_TIMER2); // habilitamos en vector de mascaras de interrupcion el Timer2 (bits 26 y 11, BIT_GLOBAL y BIT_TIMER2 están definidos en 44b.h)
 
@@ -44,21 +43,16 @@ void timer2_inicializar(void)
 
 	/* Configura el Timer2 
 	 * Timer_input = MCLK / (preesclado + 1) / divisor */
-	/* TODO: ajustar precisión del temporizador */
-	//rTCFG0 |= 255<<8;
 	rTCFG0 &= ~(255<<8); // ajusta el preescalado para Timer2 y Timer3 al máximo (bits 15:8)
 	rTCFG1 &= ~(~(0b0000)<<8); // selecciona la entrada del MUX2 (bits 11:8) que proporciona el reloj. Estableciendo el divisor a 1/2
 							// 0000 -> 1/2, 0001 -> 1/4, 0010 -> 1/8, 0011 -> 1/16, 01xx -> 1/32.
 	rTCNTB2 = 65535;// valor inicial de cuenta (la cuenta es descendente)
 	rTCMPB2 = 0;// valor de comparación
-//	rTCNTB2 = 0xFFFFFFFF;// valor inicial de cuenta (la cuenta es descendente) al máximo
-//	rTCMPB2 = 0;// valor de comparación
 }
 
 void timer2_empezar(void) {
 	timer2_num_int = 0;
 	/* establecer update=manual (bit 13 = 1) */
-	/* TODO: Comprobar si se necesita activar el inverter a la salida de TOUT2 */
 	rTCON |= 0x1<<13;
 	/* iniciar timer (bit 12 = 1) con auto-reload (bit 15 = 1) y desactivar manual update (bit 13 = 0) */
 	rTCON &= ~(0x1<<13);
@@ -66,9 +60,11 @@ void timer2_empezar(void) {
 }
 
 unsigned int timer2_leer(void) {
-	/* TODO: Implementar calculo del tiempo transcurrido */
-	return (198500 * timer2_num_int + 3 * (rTCNTB2 - rTCNTO2)) / 100;
-
+	/* TODO: Asegurar consistencia en acceso NO atómico */
+	unsigned int TCNTOX = rTCNTO2;
+	unsigned int num_int = timer2_num_int;
+	/* Obtener tiempo en microsegundos dada una frecuencia efectiva de 33MHz */
+	return (( rTCNTB2 - rTCMPB2 ) * num_int + (rTCNTB2 - TCNTOX)) / 33;
 }
 
 unsigned int timer2_parar(void) {
