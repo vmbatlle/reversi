@@ -7,10 +7,10 @@
 #----------------------------------------------------------------------------------------
 
 .section .text
-.globl patron_volteo_asm_c
+.globl patron_volteo_arm_c
 .extern ficha_valida
 
-patron_volteo_asm_c:
+patron_volteo_arm_c:
   #----- Inicio subrutina
   # r0 = &tablero
   # r1 = &longitud
@@ -83,7 +83,7 @@ patron_volteo_asm_c:
   mov r3, r10
   # Guardar en la pila SF (r4 -> sp), SC (r5 -> sp+4) y color (r6 -> sp+8) para la llamada recursiva
   stmdb sp!, {r4-r6}
-  bl patron_volteo_asm_c
+  bl patron_volteo_arm_c
   # Devolver el resultado que ha devuelto en r0
   b patron_volteo_callback
   
