@@ -67,12 +67,14 @@ patron_volteo_arm_c:
   bne patron_volteo_callback
   
   # Comparar casilla (r0) con color (r6)
+  # Cargar longitud en r1 ya que lo vamos a usar independientemente del salto
+  ldr r1, [r8]
   cmp r0, r6
   beq patron_volteo_color_igual
   
   # Caso casilla != color
   # *longitud = *longitud + 1
-  ldr r1, [r8]
+  # ldr r1, [r8] (ya está cargado antes del branch)
   add r1, r1, #1
   str r1, [r8]
   # patron = patron_volteo(tablero, longitud, FA, CA, SF, SC, color)
@@ -82,7 +84,7 @@ patron_volteo_arm_c:
   mov r2, r9
   mov r3, r10
   # Guardar en la pila SF (r4 -> sp), SC (r5 -> sp+4) y color (r6 -> sp+8) para la llamada recursiva
-  stmdb sp!, {r4-r6}
+  push {r4-r6}
   bl patron_volteo_arm_c
   # Devolver el resultado que ha devuelto en r0
   b patron_volteo_callback
@@ -90,8 +92,8 @@ patron_volteo_arm_c:
   # Caso casilla == color
   patron_volteo_color_igual:
   #- if (*longitud > 0)
-  ldr r8, [r8]
-  cmp r8, #0
+  # ldr r1, [r8] (ya está cargado antes del branch)
+  cmp r1, #0
   # Si longitud > 0 devuelve PATRON_ENCONTRADO, si no NO_HAY_PATRON
   movgt r0, #1
   movle r0, #0
