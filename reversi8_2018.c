@@ -1,3 +1,4 @@
+#include "test_bench.h"
 // Tamaño del tablero
 enum { DIM=8 };
 
@@ -438,6 +439,17 @@ void reversi8()
     unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
 
     init_table(tablero, candidatas);
+
+    while (1) {
+    	int (*f[3])(char[][DIM], int*, char, char, char, char, char) = {
+    			patron_volteo,
+    			patron_volteo,
+    			patron_volteo
+    	};
+    	int ok = test_version1(f, 3, tablero);
+    	if (!ok) while(1);
+    }
+
     while (fin == 0)
     {
         move = 0;
