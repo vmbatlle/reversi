@@ -102,10 +102,6 @@ patron_volteo_arm_c:
   
   # Callback, r0 contiene el valor a devolver
   patron_volteo_callback:
-  sub sp, fp, #40
-  pop {r4-r10, fp, ip, lr}
-  # No cargar el valor de PC y devolver el sp al que tenía al iniciar la función
-  add sp, sp, #4
-  bx lr
+  ldmia sp {r4-r10, fp, sp, pc}
 
 .end
