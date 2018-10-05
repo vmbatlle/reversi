@@ -1,4 +1,8 @@
 #include "test_bench.h"
+enum {
+	N=2
+};
+
 // Tamaño del tablero
 enum { DIM=8 };
 
@@ -412,70 +416,12 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
 // Sólo que la máquina realice un movimiento correcto.
 void reversi8()
 {
+    int (*func[N])(char[][DIM], int*, char, char, char, char, char) = {patron_volteo, patron_volteo};
+    int result1 = test_version1(func, N, tablero);
+    int result2 = test_version2(func, N, tablero);
+    int result3 = test_version3(func, N, tablero);
+    int result4 = test_version4(func, N, tablero);
+    int result5 = test_version5(func, N, tablero);
 
-	 ////////////////////////////////////////////////////////////////////
-	 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
-	// sólo se exploran las que están alrededor de las fichas colocadas
-	 ////////////////////////////////////////////////////////////////////
-	char __attribute__ ((aligned (8))) candidatas[DIM][DIM] =
-    {
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO}
-    };
-
-
-    int done;     // la máquina ha conseguido mover o no
-    int move = 0; // el humano ha conseguido mover o no
-    int blancas, negras; // número de fichas de cada color
-    int fin = 0;  // fin vale 1 si el humano no ha podido mover
-                  // (ha introducido un valor de movimiento con algún 8)
-                  // y luego la máquina tampoco puede
-    unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
-
-    init_table(tablero, candidatas);
-
-    while (1) {
-    	int (*f[3])(char[][DIM], int*, char, char, char, char, char) = {
-    			patron_volteo,
-    			patron_volteo,
-    			patron_volteo
-    	};
-    	int ok = test_version1(f, 3, tablero);
-    	if (!ok) while(1);
-    }
-
-    while (fin == 0)
-    {
-        move = 0;
-        esperar_mov(&ready);
-        // si la fila o columna son 8 asumimos que el jugador no puede mover
-        if (((fila) != DIM) && ((columna) != DIM))
-        {
-            tablero[fila][columna] = FICHA_NEGRA;
-            actualizar_tablero(tablero, fila, columna, FICHA_NEGRA);
-            actualizar_candidatas(candidatas, fila, columna);
-            move = 1;
-        }
-
-        // escribe el movimiento en las variables globales fila columna
-        done = elegir_mov(candidatas, tablero, &f, &c);
-        if (done == -1)
-        {
-            if (move == 0)
-                fin = 1;
-        }
-        else
-        {
-            tablero[f][c] = FICHA_BLANCA;
-            actualizar_tablero(tablero, f, c, FICHA_BLANCA);
-            actualizar_candidatas(candidatas, f, c);
-        }
-    }
-    contar(tablero, &blancas, &negras);
+    while(1);
 }
