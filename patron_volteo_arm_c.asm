@@ -102,6 +102,7 @@ patron_volteo_arm_c:
   
   # Callback, r0 contiene el valor a devolver
   patron_volteo_callback:
+  sub sp, fp, #40
   ldmia sp, {r4-r10, fp, sp, pc}
 
 .end
