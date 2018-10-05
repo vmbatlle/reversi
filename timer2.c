@@ -10,7 +10,11 @@
 #include "44b.h"
 #include "44blib.h"
 
-volatile int switch2_leds = 0;
+enum {
+	MIN_COUNT = 0, //0x0000
+	MAX_COUNT = 65535, // 0xffff
+	TICKS_PER_MICRO = 33 // Preescalado = 1 && Divisor = 1/2
+};
 
 /*--- variables globales ---*/
 /* static -> duración igual a la duración del programa, ámbito restringido al fichero.
@@ -35,7 +39,9 @@ void timer2_inicializar(void)
 {
 	/* Configuraion controlador de interrupciones */
 	rINTMOD &= ~(BIT_TIMER2); // Configura la linea INT_TIMER2 como de tipo IRQ (bit 11 = 0)
-	rINTCON &= 0b001; // Habilita int. vectorizadas (bit 2 = 0) y la linea IRQ (bit 1 = 0)
+
+	/* La configuración del controlador de interrupcion se delega en sys_init() [Módulo: 44blib] */
+	// rINTCON &= 0b001; // Habilita int. vectorizadas (bit 2 = 0) y la linea IRQ (bit 1 = 0)
 	rINTMSK &= ~(BIT_TIMER2); // habilitamos en vector de mascaras de interrupcion el Timer2 (bits 26 y 11, BIT_GLOBAL y BIT_TIMER2 están definidos en 44b.h)
 
 	/* Establece la rutina de servicio para TIMER2 */
@@ -43,11 +49,11 @@ void timer2_inicializar(void)
 
 	/* Configura el Timer2 
 	 * Timer_input = MCLK / (preesclado + 1) / divisor */
-	rTCFG0 &= ~(255<<8); // ajusta el preescalado para Timer2 y Timer3 al máximo (bits 15:8)
-	rTCFG1 &= ~(~(0b0000)<<8); // selecciona la entrada del MUX2 (bits 11:8) que proporciona el reloj. Estableciendo el divisor a 1/2
+	rTCFG0 &= 0xFFFF00FF; // ajusta el preescalado para Timer2 y Timer3 al máximo (bits 15:8)
+	rTCFG1 &= 0xFFFFF0FF; // selecciona la entrada del MUX2 (bits 11:8) que proporciona el reloj. Estableciendo el divisor a 1/2
 							// 0000 -> 1/2, 0001 -> 1/4, 0010 -> 1/8, 0011 -> 1/16, 01xx -> 1/32.
-	rTCNTB2 = 65535;// valor inicial de cuenta (la cuenta es descendente)
-	rTCMPB2 = 0;// valor de comparación
+	rTCNTB2 = MAX_COUNT;// valor inicial de cuenta (la cuenta es descendente)
+	rTCMPB2 = MIN_COUNT;// valor de comparación
 }
 
 void timer2_empezar(void) {
@@ -60,18 +66,17 @@ void timer2_empezar(void) {
 }
 
 unsigned int timer2_leer(void) {
-	/* TODO: Asegurar consistencia en acceso NO atómico */
-	unsigned int TCNTOX = rTCNTO2;
+	/* Asegurar consistencia en acceso NO atómico */
 	unsigned int num_int = timer2_num_int;
+	unsigned int TCNTOX = rTCNTO2;
+	if (num_int != timer2_num_int) TCNTOX = rTCNTO2;
 	/* Obtener tiempo en microsegundos dada una frecuencia efectiva de 33MHz */
-	return (( rTCNTB2 - rTCMPB2 ) * num_int + (rTCNTB2 - TCNTOX)) / 33;
+	return (( MAX_COUNT - MIN_COUNT ) * num_int + (MAX_COUNT - TCNTOX)) / TICKS_PER_MICRO;
 }
 
 unsigned int timer2_parar(void) {
 	/* detener timer (bit 12 = 0) */
-	unsigned int aux = timer2_leer();
 	rTCON &= ~(0x1<<12);
-	/* TODO: Comprobar que se puede llamar a timer2_leer() tras haber detenido el timer2 */
-	return aux;
+	return timer2_leer();
 }
 
