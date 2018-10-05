@@ -24,6 +24,10 @@ int test_version(int (*f[])(char[][DIM], int*, char, char, char, char, char),
 	if (dim > 1) {
 		int i, j, k;
 		int return_value[MAX], longitud[MAX];
+		for (i = 0; i < MAX; i++){
+			return_value[i] = -1;
+			longitud[i] = 0;
+		}
 		if (dim > MAX) dim = MAX;
 		for (i = 0; i < dim; i++){
 			/* Preparar tablero en estado inicial */
@@ -35,7 +39,8 @@ int test_version(int (*f[])(char[][DIM], int*, char, char, char, char, char),
 			return_value[i] = f[i](tablero, &longitud[i], FA, CA, SF, SC, color);
 		}
 		for (i = 1; i < dim; i++){
-			if (return_value[i] != return_value[0] || longitud[i] != longitud[0]) return FALSE;
+			if (return_value[i] != return_value[0] ||
+					(return_value[i] == 1 && (longitud[i] != longitud[0])) ) return FALSE;
 		}
 		return TRUE;
 	}
@@ -111,7 +116,7 @@ int test_version3(int (*f[])(char[][DIM], int*, char, char, char, char, char), i
 	};
 	char FA = 1,
 		 CA = 3,
-		 SF = -1,
+		 SF = 1,
 		 SC = 0,
 		 color = N;
 	return test_version(f, dim, tablero, state, FA, CA, SF, SC, color);
@@ -119,7 +124,7 @@ int test_version3(int (*f[])(char[][DIM], int*, char, char, char, char, char), i
 
 /*
  * Prueba 4: COLOCADA + DISTINTA + VACÍA
- *   Acción: Colocar en F4:C5 y explorar hacia el SUROESTE.
+ *   Acción: Colocar en F2:C3 y explorar hacia el SUROESTE.
  *   Resultado: NO_HAY_PATRON
  */
 
@@ -129,14 +134,14 @@ int test_version4(int (*f[])(char[][DIM], int*, char, char, char, char, char), i
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
 			{0,0,N,N,N,0,0,0},
-			{0,0,0,N,B,0,0,0},
+			{0,N,N,N,B,0,0,0},
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0}
 	};
 	char FA = 2,
 		 CA = 3,
-		 SF = -1,
+		 SF = 1,
 		 SC = -1,
 		 color = B;
 	return test_version(f, dim, tablero, state, FA, CA, SF, SC, color);
