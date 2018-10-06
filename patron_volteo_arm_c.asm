@@ -10,7 +10,14 @@
 .globl patron_volteo_arm_c
 .extern ficha_valida
 
+# Posibles valores que puede devolver patron_volteo_arm_c
+.equ PATRON_ENCONTRADO, 1
+.equ NO_HAY_PATRON, 0
+
+
+
 patron_volteo_arm_c:
+
   #----- Inicio subrutina
   # r0 = &tablero
   # r1 = &longitud
@@ -27,6 +34,8 @@ patron_volteo_arm_c:
   # casilla y patron no necesitan guardarse en memoria al ser devueltas en r0 por sus respectivas funciones
   sub sp, sp, #4
   
+
+
   #----- Cuerpo de la subrutina
   # Cargar SF en r4, SC en r5 y color en r6
   ldmib fp, {r4-r6}
@@ -62,8 +71,8 @@ patron_volteo_arm_c:
   # Comprobar primero si posicion_valida es distinto de 1
   ldr r3, [fp, #-44]
   cmp r3, #1
-  # posicion_valida = 0, devolver #NO_HAY_PATRON
-  movne r0, #0
+  # posicion_valida = 0, devolver NO_HAY_PATRON
+  movne r0, #NO_HAY_PATRON
   bne patron_volteo_callback
   
   # Comparar casilla (r0) con color (r6)
@@ -95,8 +104,10 @@ patron_volteo_arm_c:
   # ldr r1, [r8] (ya está cargado antes del branch)
   cmp r1, #0
   # Si longitud > 0 devuelve PATRON_ENCONTRADO, si no NO_HAY_PATRON
-  movgt r0, #1
-  movle r0, #0
+  movgt r0, #PATRON_ENCONTRADO
+  movle r0, #NO_HAY_PATRON
+
+
   
   #----- Fin subrutina
   
