@@ -73,6 +73,7 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
 
 static int (*patron_volteo) (char tablero[][8], int *longitud, char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_c(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_arm(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 0 indica CASILLA_VACIA, 1 indica FICHA_BLANCA y 2 indica FICHA_NEGRA
