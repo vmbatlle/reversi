@@ -254,7 +254,7 @@ void voltear(char tablero[][DIM], unsigned char FA, unsigned char CA, unsigned c
 // f y c son la fila y columna a analizar
 // char vSF[DIM] = {-1,-1, 0, 1, 1, 1, 0,-1};
 // char vSC[DIM] = { 0, 1, 1, 1, 0,-1,-1,-1};
-int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
+int actualizar_tablero(char tablero[][DIM], unsigned char f, unsigned char c, char color)
 {
     char SF, SC; // cantidades a sumar para movernos en la dirección que toque
     int i, flip, patron;
@@ -461,9 +461,11 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 	do {
 		exist = 0; // Si existe patrón en alguna casilla candidata
 
-		for (i=0; (i<DIM) && (fin == 0); i++)
+		i=0;
+		while((i<DIM) && (fin == 0))
 		{
-			for (j=0; (j<DIM) && (fin == 0); j++)
+			j=0;
+			while((j<DIM) && (fin == 0))
 			{   // indica en qué casillas quizá se pueda mover
 				if (candidatas[i][j] == SI)
 				{
@@ -493,7 +495,7 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 						}
 
 						if (found==1) {
-							// TODO: seleccionar ese movimiento o no de manera aleatoria
+							// seleccionar ese movimiento o no de manera aleatoria
 							if (rand_interval(0,100) < 33 ) { // 33% probabilidad de ser aceptada
 								// Aceptar movimiento
 								*f = (char) i;
@@ -508,13 +510,15 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 								fin = 1;
 							} else {
 								// Continuar explorando movimientos
+								found = 0;
 							}
 						}
 					}
 				}
+				j++;
 			}
+			i++;
 		}
-
 	} while ((exist == 1) && (fin == 0));
 
 	if (exist == 1) {
@@ -540,7 +544,7 @@ int mov_auto_iterator_next(volatile unsigned char *f, volatile unsigned char *c)
 	}
 }
 
-static char tablero_salvado[DIM][DIM];
+static char __attribute__ ((aligned (8))) tablero_salvado[DIM][DIM];
 
 void salvar_tablero(char tablero[][DIM]) {
 	int i,j;
@@ -619,9 +623,9 @@ void reversi8()
 		mov_auto_iterator_begin();
 		break;
 	case 3:
-		//patron_volteo = &patron_volteo_arm_arm;
-		//mov_auto_iterator_begin();
-		//break;
+		patron_volteo = &patron_volteo_arm_arm;
+		mov_auto_iterator_begin();
+		break;
 	default:
 		contar(tablero, &blancas, &negras);
 		while(1) { /* FIN */ }
