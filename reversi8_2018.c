@@ -1,4 +1,4 @@
-#define TEST_AUTO
+#define TEST_STEP_BY_STEP
 
 // Tamaño del tablero
 enum { DIM=8 };
@@ -401,7 +401,7 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
         candidatas[f][c+1] = SI;
 }
 
-#ifdef TEST_AUTO
+#ifdef TEST_STEP_BY_STEP
 
 static unsigned int rand_seed;
 
@@ -443,11 +443,6 @@ int rand(){
 int rand_interval(int min, int max) {
 	return (rand() % (max - min + 1)) + min;
 }
-
-static unsigned char mov_auto_fila[DIM*DIM/2];
-static unsigned char mov_auto_columna[DIM*DIM/2];
-static int mov_auto_cursor = 0;
-static int mov_auto_num = 0;
 
 int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsigned char *f, volatile unsigned char *c){
 	int i, j, k, found, exist, fin;
@@ -501,12 +496,6 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 								*f = (char) i;
 								*c = (char) j;
 
-								// Almacenar movimiento en vector
-								mov_auto_fila[mov_auto_cursor] = *f;
-								mov_auto_columna[mov_auto_cursor] = *c;
-								mov_auto_cursor++;
-								mov_auto_num++;
-
 								fin = 1;
 							} else {
 								// Continuar explorando movimientos
@@ -528,47 +517,23 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 	}
 }
 
-void mov_auto_iterator_begin(){
-	mov_auto_cursor = 0;
-}
+int patron_volteo_all(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color)
+{
+	int longitud_c_c = 0, return_c_c = 0;
+	return_c_c = patron_volteo_c_c(tablero, &longitud_c_c, FA, CA, SF, SC, color);
+	int longitud_arm_c = 0, return_arm_c = 0;
+	return_arm_c = patron_volteo_arm_c(tablero, &longitud_arm_c, FA, CA, SF, SC, color);
+	int longitud_arm_arm = 0, return_arm_arm = 0;
+	return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
 
-int mov_auto_iterator_next(volatile unsigned char *f, volatile unsigned char *c){
-	// Almacenar movimiento en vector
-	if (mov_auto_cursor < mov_auto_num) {
-		*f = mov_auto_fila[mov_auto_cursor];
-		*c = mov_auto_columna[mov_auto_cursor];
-		mov_auto_cursor++;
-		return 0; // Se puede colocar ficha
+	if ((return_c_c == return_arm_c) && ((return_c_c == NO_HAY_PATRON) | (longitud_c_c == longitud_arm_c))
+			&& (return_c_c == return_arm_arm) && ((return_c_c == NO_HAY_PATRON) | (longitud_c_c == longitud_arm_arm))) {
+		*longitud = longitud_c_c;
+		return return_c_c;
 	} else {
-		return -1; // No se puede colocar
+		while(1) { /* ERROR */ }
+		return NO_HAY_PATRON;
 	}
-}
-
-static char __attribute__ ((aligned (8))) tablero_salvado[DIM][DIM];
-
-void salvar_tablero(char tablero[][DIM]) {
-	int i,j;
-	for (i=0; i<DIM; i++)
-	{
-		for (j=0; j<DIM; j++)
-		{
-			tablero_salvado[i][j] = tablero[i][j];
-		}
-	}
-}
-
-int comparar_tablero(char tablero[][DIM]) {
-	int i,j;
-	for (i=0; i<DIM; i++)
-	{
-		for (j=0; j<DIM; j++)
-		{
-			if (tablero_salvado[i][j] != tablero[i][j]){
-				return 0;
-			}
-		}
-	}
-	return 1;
 }
 #endif
 
@@ -610,27 +575,8 @@ void reversi8()
                   // y luego la máquina tampoco puede
     unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
 
-#ifdef TEST_AUTO
-	static int num_invocacion = 1; // Veces que ha sido invocada
-	switch (num_invocacion){
-	case 1:
-		srand(__TIME__);
-		patron_volteo = &patron_volteo_c_c;
-		mov_auto_iterator_begin();
-		break;
-	case 2:
-		patron_volteo = &patron_volteo_arm_c;
-		mov_auto_iterator_begin();
-		break;
-	case 3:
-		patron_volteo = &patron_volteo_arm_arm;
-		mov_auto_iterator_begin();
-		break;
-	default:
-		contar(tablero, &blancas, &negras);
-		while(1) { /* FIN */ }
-		break;
-	}
+#ifdef TEST_STEP_BY_STEP
+    patron_volteo = &patron_volteo_all;
 #else
 	patron_volteo = &patron_volteo_c_c; // Implementación a utilizar
 #endif
@@ -640,12 +586,8 @@ void reversi8()
     {
         move = 0;
 
-#ifdef TEST_AUTO
-        if (num_invocacion == 1) {
-        	done = elegir_mov_auto(candidatas, tablero, &fila, &columna);
-        } else {
-        	done = mov_auto_iterator_next(&fila, &columna);
-        }
+#ifdef TEST_STEP_BY_STEP
+       	done = elegir_mov_auto(candidatas, tablero, &fila, &columna);
 
         if (done == -1) {
 			fila = DIM;
@@ -678,21 +620,5 @@ void reversi8()
             actualizar_candidatas(candidatas, f, c);
         }
     }
-#ifdef TEST_AUTO
-	switch (num_invocacion){
-	case 1:
-		salvar_tablero(tablero);
-		break;
-	case 2:
-	case 3:
-		if (comparar_tablero(tablero) == 0) {
-			while(1) { /* ERROR */ }
-		}
-		break;
-	}
-	num_invocacion++; // Nueva invocación
-	reversi8();
-#else
-	 contar(tablero, &blancas, &negras);
-#endif
+	contar(tablero, &blancas, &negras);
 }
