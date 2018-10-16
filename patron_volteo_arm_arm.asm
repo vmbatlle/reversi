@@ -49,7 +49,7 @@ patron_volteo_arm_arm:
   
   # CA = CA + SC
   add r3, r3, r5
-  and r2, r2, #255
+  and r3, r3, #255
   
   #- if ((f < DIM) && (f >= 0) && (c < DIM) && (c >= 0) && (tablero[f][c] != CASILLA_VACIA))
   # Asumimos que fila y columna son unsigned char, es decir, no pueden ser < 0
