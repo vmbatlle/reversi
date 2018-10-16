@@ -168,13 +168,13 @@ int test_version5(int (*f[])(char[][DIM], int*, char, char, char, char, char), i
 	return test_version(f, dim, tablero, state, 2, 2, 0, -1, color) &&
 		   test_version(f, dim, tablero, state, 2, 2, -1, -1, color) &&
 		   test_version(f, dim, tablero, state, 2, 2,0 -1, 0, color) &&
-		   //test_version(f, dim, tablero, state, 2, 5, 1, 0, color) &&
+		   //test_version(f, dim, tablero, state, 2, 5, -1, 0, color) &&
 		   test_version(f, dim, tablero, state, 2, 5, -1, 1, color) &&
 		   test_version(f, dim, tablero, state, 2, 5, 0, 1, color) &&
 		   //test_version(f, dim, tablero, state, 5, 5, 0, 1, color) &&
 		   test_version(f, dim, tablero, state, 5, 5, 1, 1, color) &&
 		   test_version(f, dim, tablero, state, 5, 5, 1, 0, color) &&
-		   //test_version(f, dim, tablero, state, 5, 2, 1, 1, color) &&
+		   //test_version(f, dim, tablero, state, 5, 2, 1, 0, color) &&
 		   test_version(f, dim, tablero, state, 5, 2, 1, -1, color);
 }
 #undef DIM
