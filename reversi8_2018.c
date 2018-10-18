@@ -1,6 +1,6 @@
 #include "test_bench.h"
 enum {
-	N=2
+	N=5
 };
 
 // Tamaño del tablero
@@ -444,12 +444,17 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
 // Sólo que la máquina realice un movimiento correcto.
 void reversi8()
 {
-    int (*func[N])(char[][DIM], int*, char, char, char, char, char) = {patron_volteo, patron_volteo};
-    int result1 = test_version1(func, N, tablero);
-    int result2 = test_version2(func, N, tablero);
-    int result3 = test_version3(func, N, tablero);
-    int result4 = test_version4(func, N, tablero);
-    int result5 = test_version5(func, N, tablero);
+    int (*func[N])(char[][DIM], int*, char, char, char, char, char) = {
+    		patron_volteo,
+    		patron_volteo_arm_c,
+    		patron_volteo_arm_arm,
+    		patron_volteo_c_iter,
+    		patron_volteo_arm_iter};
+    volatile int result1 = test_version1(func, N, tablero);
+    volatile int result2 = test_version2(func, N, tablero);
+    volatile int result3 = test_version3(func, N, tablero);
+    volatile int result4 = test_version4(func, N, tablero);
+    volatile int result5 = test_version5(func, N, tablero);
 
     while(1);
 }
