@@ -1,6 +1,6 @@
 #include "test_bench.h"
 enum {
-	N=5
+	N=6
 };
 
 // Tamaño del tablero
@@ -450,7 +450,8 @@ void reversi8()
     		patron_volteo_arm_c,
     		patron_volteo_arm_arm,
     		patron_volteo_c_iter,
-    		patron_volteo_arm_iter};
+    		patron_volteo_arm_iter,
+    		patron_volteo_arm_iter_v2};
     volatile int result1 = test_version1(func, N, tablero);
     volatile int result2 = test_version2(func, N, tablero);
     volatile int result3 = test_version3(func, N, tablero);
