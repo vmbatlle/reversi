@@ -227,6 +227,32 @@ int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF,
         //printf("NO_HAY_PATRON \n");
     }
 }
+int patron_volteo_c_iter(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
+	int posicion_valida; // indica si la posición es valida y contiene una ficha de algún jugador
+	char casilla;   // casilla es la casilla que se lee del tablero
+
+	int fin = 0;
+	while (fin == 0) {
+		FA = FA + SF;
+		CA = CA + SC;
+		casilla = ficha_valida(tablero, FA, CA, &posicion_valida);
+		if ((posicion_valida == 1) && (casilla != color))
+		{
+			*longitud = *longitud + 1;
+		}
+		else if ((posicion_valida == 1) && (casilla == color)) {
+			fin = 1;
+		} else {
+			*longitud = 0;
+			fin = 1;
+		}
+	}
+	if (*longitud > 0) {
+		return PATRON_ENCONTRADO;
+	} else {
+		return NO_HAY_PATRON;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // voltea n fichas en la dirección que toque
 // SF y SC son las cantidades a sumar para movernos en la dirección que toque
