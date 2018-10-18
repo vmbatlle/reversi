@@ -552,7 +552,12 @@ int patron_volteo_all(char tablero[][DIM], int *longitud, char FA, char CA, char
 	return_arm_c = patron_volteo_arm_c(tablero, &longitud_arm_c, FA, CA, SF, SC, color);
 	int longitud_arm_arm = 0, return_arm_arm = 0;
 	return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
-
+	int longitud_c_iter = 0, return_c_iter = 0;
+	return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+/*
+	int longitud_arm_iter = 0, return_arm_iter = 0;
+	return_arm_iter = patron_volteo_arm_iter(tablero, &longitud_arm_iter, FA, CA, SF, SC, color);
+*/
 	if ((return_c_c != return_arm_c) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_c))) {
 		// Fallo de función arm_c
 		// breakpoint aquí
@@ -565,6 +570,20 @@ int patron_volteo_all(char tablero[][DIM], int *longitud, char FA, char CA, char
 		longitud_arm_arm = 0;
 		return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
 		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_c_iter) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_c_iter))) {
+		// Fallo de función arm_arm
+		// breakpoint aquí
+		longitud_c_iter = 0;
+		return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+/*
+	} else if ((return_c_c != return_arm_iter) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_iter))) {
+		// Fallo de función arm_arm
+		// breakpoint aquí
+		longitud_arm_iter = 0;
+		return_arm_iter = patron_volteo_arm_iter(tablero, &longitud_arm_iter, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+*/
 	} else {
 		*longitud = longitud_c_c;
 		return return_c_c;
