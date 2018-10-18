@@ -653,6 +653,16 @@ void reversi8()
 		patron_volteo = &patron_volteo_arm_arm;
 		mov_auto_iterator_begin();
 		break;
+	case 4:
+		patron_volteo = &patron_volteo_c_iter;
+		mov_auto_iterator_begin();
+		break;
+/*
+	case 5:
+		patron_volteo = &patron_volteo_arm_iter;
+		mov_auto_iterator_begin();
+		break;
+*/
 	default:
 		contar(tablero, &blancas, &negras);
 		while(1) { /* FIN */ }
