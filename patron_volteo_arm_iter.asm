@@ -166,17 +166,16 @@ patron_volteo_arm_iter_v2:
 
   # Decidir qué hacer según el valor de tablero[f][c]
   cmp r7, #CASILLA_VACIA
+  # Si tablero[f][c] no es CASILLA_VACIA, compararlo con color (r6)
+  cmpne r7, r6
 
-  # Caso: CASILLA_VACIA
+  # Caso: tablero[f][c] == CASILLA_VACIA || tablero[f][c] == color
+  # En ambos casos hay que devolver NO_HAY_PATRON
+  # Si tablero[f][c] == color, sabemos que longitud=0 y no hace falta compararlo (primera iteración)
   moveq r0, #NO_HAY_PATRON
   beq patron_volteo_arm_iter_v2_callback
-  # Comparar tablero[f][c] (r7) con color (r6)
-  cmp r7, r6
-  # Caso: tablero[f][c] == color
-  # Salir de la función, sabemos que longitud=0 y no hace falta comparar
-  beq patron_volteo_arm_iter_v2_callback
 
-  # Caso: tablero[f][c] != color
+  # Caso: tablero[f][c] != CASILLA_VACIA && tablero[f][c] != color
   # *longitud = *longitud + 1
   # Cargar longitud ya que estamos en la primera iteración
   ldr r8, [r1]
