@@ -5,6 +5,7 @@
  */
 
 #include "test_bench.h"
+#include "timer2.h"
 
 /* Constantes del programa */
 #define DIM 8
@@ -176,5 +177,49 @@ int test_version5(int (*f[])(char[][DIM], int*, char, char, char, char, char), i
 		   test_version(f, dim, tablero, state, 5, 5, 1, 0, color) &&
 		   //test_version(f, dim, tablero, state, 5, 2, 1, 0, color) &&
 		   test_version(f, dim, tablero, state, 5, 2, 1, -1, color);
+}
+
+int test_version6(int (*f)(char[][DIM], int*, char, char, char, char, char)) {
+	char state[DIM][DIM] = {
+			{0,0,0,0,0,0,0,0},
+			{0,B,0,0,0,0,0,0},
+			{0,0,B,0,0,0,0,0},
+			{0,0,0,B,N,0,0,0},
+			{0,0,0,N,B,0,0,0},
+			{0,0,0,0,0,B,0,0},
+			{0,0,0,0,0,0,B,0},
+			{0,0,0,0,0,0,0,B}
+	};
+	char FA = 0,
+		 CA = 0,
+		 SF = 1,
+		 SC = 1,
+		 color = N;
+	int longitud = 0;
+	timer2_empezar();
+	f(state, &longitud, FA, CA, SF, SC, color);
+	return timer2_parar();
+}
+
+int test_version7(int (*f)(char[][DIM], int*, char, char, char, char, char)) {
+	char state[DIM][DIM] = {
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,B,N,0,0,0},
+			{0,0,0,N,B,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0}
+	};
+	char FA = 2,
+		 CA = 5,
+		 SF = 1,
+		 SC = -1,
+		 color = N;
+	int longitud = 0;
+	timer2_empezar();
+	f(state, &longitud, FA, CA, SF, SC, color);
+	return timer2_parar();
 }
 #undef DIM
