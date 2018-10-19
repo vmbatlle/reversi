@@ -73,6 +73,7 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
 extern int patron_volteo_arm_arm(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_iter(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_iter_v2(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_c(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 0 indica CASILLA_VACIA, 1 indica FICHA_BLANCA y 2 indica FICHA_NEGRA
@@ -136,9 +137,11 @@ void init_table(char tablero[][DIM], char candidatas[][DIM])
 
 void esperar_mov(volatile unsigned char *ready)
 {
+
     while (*ready == 0) {};  // bucle de espera de respuestas hasta que el se modifique el valor de ready (hay que hacerlo manualmente)
 
     *ready = 0;  //una vez que pasemos el bucle volvemos a fijar ready a 0;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +291,7 @@ int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
         SC = vSC[i];
         // flip: numero de fichas a voltear
         flip = 0;
-        patron = patron_volteo(tablero, &flip, f, c, SF, SC, color);
+        patron = patron_volteo_arm_c(tablero, &flip, f, c, SF, SC, color);
         //printf("Flip: %d \n", flip);
         if (patron == PATRON_ENCONTRADO )
         {
@@ -339,7 +342,7 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
 
                         // nos dice qué hay que voltear en cada dirección
                         longitud = 0;
-                        patron = patron_volteo(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
+                        patron = patron_volteo_arm_c(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
                         //  //printf("%d ", patron);
                         if (patron == PATRON_ENCONTRADO)
                         {
