@@ -1,3 +1,4 @@
+#include "timer2.h"
 #define TEST_AUTO
 
 // Tamaño del tablero
@@ -71,7 +72,7 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
   volatile unsigned char fila=0, columna=0, ready = 0;
 
 
-static int (*patron_volteo) (char tablero[][8], int *longitud, char f, char c, char SF, char SC, char color);
+static int (*patron_volteo_implementation) (char tablero[][8], int *longitud, char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_c(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_arm(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_iter(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
@@ -286,6 +287,16 @@ int patron_volteo_c_iter_inline(char tablero[][DIM], int *longitud, char FA, cha
 		return NO_HAY_PATRON;
 	}
 }
+
+static volatile unsigned int time_patron_volteo = 0;
+int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
+	unsigned int t0 = timer2_leer();
+	int ret = patron_volteo_implementation(tablero,longitud,FA,CA,SF,SC,color);
+	unsigned int tf = timer2_leer();
+	time_patron_volteo += tf-t0;
+	return ret;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // voltea n fichas en la dirección que toque
 // SF y SC son las cantidades a sumar para movernos en la dirección que toque
@@ -668,31 +679,35 @@ void reversi8()
 	switch (num_invocacion){
 	case 1:
 		srand(__TIME__);
-		patron_volteo = &patron_volteo_c_c;
+		patron_volteo_implementation = &patron_volteo_c_c;
 		mov_auto_iterator_begin();
 		break;
 	case 2:
-		patron_volteo = &patron_volteo_arm_c;
+		patron_volteo_implementation = &patron_volteo_c_c;
 		mov_auto_iterator_begin();
 		break;
 	case 3:
-		patron_volteo = &patron_volteo_arm_arm;
+		patron_volteo_implementation = &patron_volteo_arm_c;
 		mov_auto_iterator_begin();
 		break;
 	case 4:
-		patron_volteo = &patron_volteo_c_iter;
+		patron_volteo_implementation = &patron_volteo_arm_arm;
 		mov_auto_iterator_begin();
 		break;
 	case 5:
-		patron_volteo = &patron_volteo_arm_iter;
+		patron_volteo_implementation = &patron_volteo_c_iter;
 		mov_auto_iterator_begin();
 		break;
 	case 6:
-		patron_volteo = &patron_volteo_arm_iter_v2;
+		patron_volteo_implementation = &patron_volteo_arm_iter;
 		mov_auto_iterator_begin();
 		break;
 	case 7:
-		patron_volteo = &patron_volteo_c_iter_inline;
+		patron_volteo_implementation = &patron_volteo_arm_iter_v2;
+		mov_auto_iterator_begin();
+		break;
+	case 8:
+		patron_volteo_implementation = &patron_volteo_c_iter_inline;
 		mov_auto_iterator_begin();
 		break;
 
@@ -706,6 +721,8 @@ void reversi8()
 #endif
 
     init_table(tablero, candidatas);
+    time_patron_volteo = 0;
+    timer2_empezar();
     while (fin == 0)
     {
         move = 0;
@@ -748,6 +765,10 @@ void reversi8()
             actualizar_candidatas(candidatas, f, c);
         }
     }
+    volatile unsigned int time = timer2_parar();
+    time++;time--;
+    volatile int kk = 1; kk++;
+    time_patron_volteo = 0;
 #ifdef TEST_AUTO
 	switch (num_invocacion){
 	case 1:
