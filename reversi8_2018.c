@@ -71,6 +71,8 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
 
 
 extern int patron_volteo_arm_arm(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_iter(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_iter_v2(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 0 indica CASILLA_VACIA, 1 indica FICHA_BLANCA y 2 indica FICHA_NEGRA
@@ -227,6 +229,32 @@ int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF,
         //printf("NO_HAY_PATRON \n");
     }
 }
+int patron_volteo_c_iter(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
+	int posicion_valida; // indica si la posición es valida y contiene una ficha de algún jugador
+	char casilla;   // casilla es la casilla que se lee del tablero
+
+	int fin = 0;
+	while (fin == 0) {
+		FA = FA + SF;
+		CA = CA + SC;
+		casilla = ficha_valida(tablero, FA, CA, &posicion_valida);
+		if ((posicion_valida == 1) && (casilla != color))
+		{
+			*longitud = *longitud + 1;
+		}
+		else if ((posicion_valida == 1) && (casilla == color)) {
+			fin = 1;
+		} else {
+			*longitud = 0;
+			fin = 1;
+		}
+	}
+	if (*longitud > 0) {
+		return PATRON_ENCONTRADO;
+	} else {
+		return NO_HAY_PATRON;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // voltea n fichas en la dirección que toque
 // SF y SC son las cantidades a sumar para movernos en la dirección que toque
@@ -260,7 +288,7 @@ int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
         SC = vSC[i];
         // flip: numero de fichas a voltear
         flip = 0;
-        patron = patron_volteo_arm_arm(tablero, &flip, f, c, SF, SC, color);
+        patron = patron_volteo(tablero, &flip, f, c, SF, SC, color);
         //printf("Flip: %d \n", flip);
         if (patron == PATRON_ENCONTRADO )
         {
@@ -311,7 +339,7 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
 
                         // nos dice qué hay que voltear en cada dirección
                         longitud = 0;
-                        patron = patron_volteo_arm_arm(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
+                        patron = patron_volteo(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
                         //  //printf("%d ", patron);
                         if (patron == PATRON_ENCONTRADO)
                         {
