@@ -491,8 +491,12 @@ void reversi8()
     for (i = 0; i < N; i++) {
 		volatile int result6 = test_version6(func[i]);
 		volatile int result7 = test_version7(func[i]);
+		volatile int result8 = test_version8(func[i]);
+		volatile int result9 = test_version9(func[i]);
 	    result6++;result6--;
 	    result7++;result7--;
+	    result8++;result8--;
+	    result9++;result9--;
     }
 
 

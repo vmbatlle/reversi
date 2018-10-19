@@ -25,6 +25,8 @@ int test_version5(int (*f[])(char[][DIM], int*, char, char, char, char, char),
 		int dim, char tablero[][DIM]);
 int test_version6(int (*f)(char[][DIM], int*, char, char, char, char, char));
 int test_version7(int (*f)(char[][DIM], int*, char, char, char, char, char));
+int test_version8(int (*f)(char[][DIM], int*, char, char, char, char, char));
+int test_version9(int (*f)(char[][DIM], int*, char, char, char, char, char));
 
 #undef DIM
 

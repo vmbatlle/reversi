@@ -222,4 +222,49 @@ int test_version7(int (*f)(char[][DIM], int*, char, char, char, char, char)) {
 	f(state, &longitud, FA, CA, SF, SC, color);
 	return timer2_parar();
 }
+
+int test_version8(int (*f)(char[][DIM], int*, char, char, char, char, char)) {
+	char state[DIM][DIM] = {
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,B,N,0,0,0},
+			{0,0,0,N,B,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0}
+	};
+	char FA = 2,
+		 CA = 3,
+		 SF = 1,
+		 SC = 0,
+		 color = N;
+	int longitud = 0;
+	timer2_empezar();
+	f(state, &longitud, FA, CA, SF, SC, color);
+	return timer2_parar();
+}
+
+int test_version9(int (*f)(char[][DIM], int*, char, char, char, char, char)) {
+	char state[DIM][DIM] = {
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,B,N,0,0,0},
+			{0,0,0,N,B,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0}
+	};
+	char FA = 2,
+		 CA = 3,
+		 SF = -1,
+		 SC = +1,
+		 color = N;
+	int longitud = 0;
+	timer2_empezar();
+	f(state, &longitud, FA, CA, SF, SC, color);
+	return timer2_parar();
+}
+
 #undef DIM
