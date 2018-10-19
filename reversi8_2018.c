@@ -683,12 +683,19 @@ void reversi8()
 		patron_volteo = &patron_volteo_c_iter;
 		mov_auto_iterator_begin();
 		break;
-/*
 	case 5:
 		patron_volteo = &patron_volteo_arm_iter;
 		mov_auto_iterator_begin();
 		break;
-*/
+	case 6:
+		patron_volteo = &patron_volteo_arm_iter_v2;
+		mov_auto_iterator_begin();
+		break;
+	case 7:
+		patron_volteo = &patron_volteo_c_iter_inline;
+		mov_auto_iterator_begin();
+		break;
+
 	default:
 		contar(tablero, &blancas, &negras);
 		while(1) { /* FIN */ }
@@ -746,9 +753,10 @@ void reversi8()
 	case 1:
 		salvar_tablero(tablero);
 		break;
-	case 2:
-	case 3:
+	default:
 		if (comparar_tablero(tablero) == 0) {
+			volatile int kk = 1;
+			kk++;
 			while(1) { /* ERROR */ }
 		}
 		break;
