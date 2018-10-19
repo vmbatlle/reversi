@@ -14,6 +14,7 @@
 #include "44blib.h"
 #include "44b.h"
 #include "reversi8_2018.h"
+#include "test_bench.h"
 
 /*--- variables globales ---*/
 
@@ -33,25 +34,33 @@ void Main(void)
 	leds_off();
 	led1_on();
 
-	timer2_empezar();
+#if 1
 
-	int tiempo = 0;
-	int i = 0;
+	volatile unsigned int tiempo1ms,tiempo10ms,tiempo1s,tiempo10s;
 	while (1)
 	{
 
-		Delay(1);
-
-		tiempo = timer2_parar();
-		i++;
 		timer2_empezar();
+		Delay(10);
+		tiempo1ms = timer2_parar();
+		tiempo1ms++;tiempo1ms--;
 
-		/* Cambia los leds con cada interrupcion del temporizador */
-		/*if (switch2_leds == 1)
-		{
-			leds_switch();
-			switch2_leds = 0;
-		}*/
-		leds_switch();
+		timer2_empezar();
+		Delay(100);
+		tiempo10ms = timer2_parar();
+		tiempo10ms++;tiempo10ms--;
+
+		timer2_empezar();
+		Delay(10000);
+		tiempo1s = timer2_parar();
+		tiempo1s++;tiempo1s--;
+
+		timer2_empezar();
+		Delay(100000);
+		tiempo10s = timer2_parar();
+		tiempo10s++;tiempo10s--;
 	}
+#else
+	reversi8();
+#endif
 }

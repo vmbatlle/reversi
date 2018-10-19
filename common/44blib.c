@@ -23,7 +23,7 @@ void (*run)(void) = (void (*)(void))DOWNLOAD_ADDRESS;
 //--------------------------------SYSTEM---------------------------------//
 static int delayLoopCount = 400;
 
-void Delay(int time)
+void __attribute__((optimize("O0"))) Delay(int time)
 // time=0: adjust the Delay function by WatchDog timer
 // time>0: the number of loop time
 // 100us resolution

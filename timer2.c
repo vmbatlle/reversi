@@ -40,7 +40,7 @@ void timer2_inicializar(void)
 	/* Configuraion controlador de interrupciones */
 	rINTMOD &= ~(BIT_TIMER2); // Configura la linea INT_TIMER2 como de tipo IRQ (bit 11 = 0)
 
-	/* La configuración del controlador de interrupcion se delega en sys_init() [Módulo: 44blib] */
+	/* NO se configura el vector de interrupciones. Ya se ha realizado en 44binit.asm. */
 	// rINTCON &= 0b001; // Habilita int. vectorizadas (bit 2 = 0) y la linea IRQ (bit 1 = 0)
 	rINTMSK &= ~(BIT_TIMER2); // habilitamos en vector de mascaras de interrupcion el Timer2 (bits 26 y 11, BIT_GLOBAL y BIT_TIMER2 están definidos en 44b.h)
 

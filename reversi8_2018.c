@@ -1,4 +1,7 @@
-#include "reversi8_2018.h"
+#include "test_bench.h"
+enum {
+	N=7
+};
 
 // Tamaño del tablero
 enum { DIM=8 };
@@ -72,7 +75,10 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
 
 
 
-extern int patron_volteo_asm_c(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_c(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_arm(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_iter(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
+extern int patron_volteo_arm_iter_v2(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 0 indica CASILLA_VACIA, 1 indica FICHA_BLANCA y 2 indica FICHA_NEGRA
@@ -136,9 +142,11 @@ void init_table(char tablero[][DIM], char candidatas[][DIM])
 
 void esperar_mov(volatile unsigned char *ready)
 {
+
     while (*ready == 0) {};  // bucle de espera de respuestas hasta que el se modifique el valor de ready (hay que hacerlo manualmente)
 
     *ready = 0;  //una vez que pasemos el bucle volvemos a fijar ready a 0;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +189,6 @@ char ficha_valida(char tablero[][DIM], unsigned char f, unsigned char c, int *po
     }
     return ficha;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 // La función patrón volteo es una función recursiva que busca el patrón de volteo
 // (n fichas del rival seguidas de una ficha del jugador actual) en una dirección determinada
@@ -229,6 +236,59 @@ int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF,
         //printf("NO_HAY_PATRON \n");
     }
 }
+int patron_volteo_c_iter(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
+	int posicion_valida; // indica si la posición es valida y contiene una ficha de algún jugador
+	char casilla;   // casilla es la casilla que se lee del tablero
+
+	int fin = 0;
+	while (fin == 0) {
+		FA = FA + SF;
+		CA = CA + SC;
+		casilla = ficha_valida(tablero, FA, CA, &posicion_valida);
+		if ((posicion_valida == 1) && (casilla != color))
+		{
+			*longitud = *longitud + 1;
+		}
+		else if ((posicion_valida == 1) && (casilla == color)) {
+			fin = 1;
+		} else {
+			*longitud = 0;
+			fin = 1;
+		}
+	}
+	if (*longitud > 0) {
+		return PATRON_ENCONTRADO;
+	} else {
+		return NO_HAY_PATRON;
+	}
+}
+int patron_volteo_c_iter_inline(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
+	int fin = 0;
+	while (fin == 0) {
+		FA = FA + SF;
+		CA = CA + SC;
+		if ((FA < DIM) && (FA >= 0) && (CA < DIM) && (CA >= 0) && (tablero[(int)FA][(int)CA] != CASILLA_VACIA))
+		{
+			if (tablero[(int)FA][(int)CA] != color)
+			{
+				*longitud = *longitud + 1;
+			}
+			else {
+				fin = 1;
+			}
+		}
+		else
+		{
+			*longitud = 0;
+			fin = 1;
+		}
+	}
+	if (*longitud > 0) {
+		return PATRON_ENCONTRADO;
+	} else {
+		return NO_HAY_PATRON;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // voltea n fichas en la dirección que toque
 // SF y SC son las cantidades a sumar para movernos en la dirección que toque
@@ -262,7 +322,7 @@ int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
         SC = vSC[i];
         // flip: numero de fichas a voltear
         flip = 0;
-        patron = patron_volteo_asm_c(tablero, &flip, f, c, SF, SC, color);
+        patron = patron_volteo(tablero, &flip, f, c, SF, SC, color);
         //printf("Flip: %d \n", flip);
         if (patron == PATRON_ENCONTRADO )
         {
@@ -313,8 +373,8 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
 
                         // nos dice qué hay que voltear en cada dirección
                         longitud = 0;
-                        patron = patron_volteo_asm_c(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
-                        //  //printf("%d ", patron);
+                        patron = patron_volteo(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
+						//  //printf("%d ", patron);
                         if (patron == PATRON_ENCONTRADO)
                         {
                             found = 1;
@@ -413,59 +473,32 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
 // Sólo que la máquina realice un movimiento correcto.
 void reversi8()
 {
+    int (*func[N])(char[][DIM], int*, char, char, char, char, char) = {
+    		patron_volteo,
+    		patron_volteo_arm_c,
+    		patron_volteo_arm_arm,
+    		patron_volteo_c_iter,
+    		patron_volteo_c_iter_inline,
+    		patron_volteo_arm_iter,
+    		patron_volteo_arm_iter_v2};
+    volatile int result1 = test_version1(func, N, tablero);
+    volatile int result2 = test_version2(func, N, tablero);
+    volatile int result3 = test_version3(func, N, tablero);
+    volatile int result4 = test_version4(func, N, tablero);
+    volatile int result5 = test_version5(func, N, tablero);
 
-	 ////////////////////////////////////////////////////////////////////
-	 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
-	// sólo se exploran las que están alrededor de las fichas colocadas
-	 ////////////////////////////////////////////////////////////////////
-	char __attribute__ ((aligned (8))) candidatas[DIM][DIM] =
-    {
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO}
-    };
-
-
-    int done;     // la máquina ha conseguido mover o no
-    int move = 0; // el humano ha conseguido mover o no
-    int blancas, negras; // número de fichas de cada color
-    int fin = 0;  // fin vale 1 si el humano no ha podido mover
-                  // (ha introducido un valor de movimiento con algún 8)
-                  // y luego la máquina tampoco puede
-    unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
-
-    init_table(tablero, candidatas);
-    while (fin == 0)
-    {
-        move = 0;
-        esperar_mov(&ready);
-        // si la fila o columna son 8 asumimos que el jugador no puede mover
-        if (((fila) != DIM) && ((columna) != DIM))
-        {
-            tablero[fila][columna] = FICHA_NEGRA;
-            actualizar_tablero(tablero, fila, columna, FICHA_NEGRA);
-            actualizar_candidatas(candidatas, fila, columna);
-            move = 1;
-        }
-
-        // escribe el movimiento en las variables globales fila columna
-        done = elegir_mov(candidatas, tablero, &f, &c);
-        if (done == -1)
-        {
-            if (move == 0)
-                fin = 1;
-        }
-        else
-        {
-            tablero[f][c] = FICHA_BLANCA;
-            actualizar_tablero(tablero, f, c, FICHA_BLANCA);
-            actualizar_candidatas(candidatas, f, c);
-        }
+    int i;
+    for (i = 0; i < N; i++) {
+		volatile int result6 = test_version6(func[i]);
+		volatile int result7 = test_version7(func[i]);
+		volatile int result8 = test_version8(func[i]);
+		volatile int result9 = test_version9(func[i]);
+	    result6++;result6--;
+	    result7++;result7--;
+	    result8++;result8--;
+	    result9++;result9--;
     }
-    contar(tablero, &blancas, &negras);
+
+
+    while(1);
 }
