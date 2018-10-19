@@ -142,9 +142,11 @@ void init_table(char tablero[][DIM], char candidatas[][DIM])
 
 void esperar_mov(volatile unsigned char *ready)
 {
+
     while (*ready == 0) {};  // bucle de espera de respuestas hasta que el se modifique el valor de ready (hay que hacerlo manualmente)
 
     *ready = 0;  //una vez que pasemos el bucle volvemos a fijar ready a 0;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +189,6 @@ char ficha_valida(char tablero[][DIM], unsigned char f, unsigned char c, int *po
     }
     return ficha;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 // La función patrón volteo es una función recursiva que busca el patrón de volteo
 // (n fichas del rival seguidas de una ficha del jugador actual) en una dirección determinada
@@ -251,6 +252,33 @@ int patron_volteo_c_iter(char tablero[][DIM], int *longitud, char FA, char CA, c
 		else if ((posicion_valida == 1) && (casilla == color)) {
 			fin = 1;
 		} else {
+			*longitud = 0;
+			fin = 1;
+		}
+	}
+	if (*longitud > 0) {
+		return PATRON_ENCONTRADO;
+	} else {
+		return NO_HAY_PATRON;
+	}
+}
+int patron_volteo_c_iter_inline(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
+	int fin = 0;
+	while (fin == 0) {
+		FA = FA + SF;
+		CA = CA + SC;
+		if ((FA < DIM) && (FA >= 0) && (CA < DIM) && (CA >= 0) && (tablero[(int)FA][(int)CA] != CASILLA_VACIA))
+		{
+			if (tablero[(int)FA][(int)CA] != color)
+			{
+				*longitud = *longitud + 1;
+			}
+			else {
+				fin = 1;
+			}
+		}
+		else
+		{
 			*longitud = 0;
 			fin = 1;
 		}
