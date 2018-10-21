@@ -48,7 +48,7 @@ Sigue la estrategia propuesta en el guión de prácticas. Se invoca a `patron_vo
 
 _Se podrán dar más explicaciones sobre el generador aleatorio en la defensa del proyecto._
 
-**Resultado erróneo:** La función `patron_volteo_test(...)` no retornará el control en caso de producirse una inconsistencia entre los resultados de las implementaciones. Además, situado _breakpoints_ en el lugar marcado se permite repetir paso a paso la ejecución de la implementación que ha fallado.
+**Resultado erróneo:** La función `patron_volteo_test(...)` no retornará el control en caso de producirse una inconsistencia entre los resultados de las implementaciones. Además, situando _breakpoints_ en el lugar marcado se permite repetir paso a paso la ejecución de la implementación que ha fallado.
 
 **Resultado correcto:** La ejecución de `reversi8()` termina normalmente. Se debe establecer un _breakpoint_ al final de dicha función.
 
