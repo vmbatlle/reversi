@@ -4,6 +4,8 @@
  * @date 2018/10/04
  */
 
+#define ENVIRONMENT_IO
+
 #include "test_bench.h"
 #if defined (ENVIRONMENT_IO)
 #include "timer2.h"

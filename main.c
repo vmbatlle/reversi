@@ -9,7 +9,6 @@
 #include "44blib.h"
 #include "44b.h"
 #include "reversi8_2018.h"
-#include "test_bench.h"
 
 //#define TEST_BENCH_TIMER2
 

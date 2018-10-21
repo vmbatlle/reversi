@@ -14,8 +14,8 @@
 //#define TEST_BENCH_3
 
 /* Descomente SÓLO UNA línea cada vez */
-#define ENVIRONMENT_EMULATOR
-//#define ENVIRONMENT_IO
+//#define ENVIRONMENT_EMULATOR
+#define ENVIRONMENT_IO
 
 #if defined (TEST_BENCH_2)
 #include "test_bench.h"
