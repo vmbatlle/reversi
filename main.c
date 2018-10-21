@@ -11,7 +11,7 @@
 #include "reversi8_2018.h"
 #include "test_bench.h"
 
-#define TEST_BENCH_TIMER2
+//#define TEST_BENCH_TIMER2
 
 /*--- codigo de funciones ---*/
 void Main(void)
