@@ -48,16 +48,36 @@ Sigue la estrategia propuesta en el guión de prácticas. Se invoca a `patron_vo
 
 _Se podrán dar más explicaciones sobre el generador aleatorio en la defensa del proyecto._
 
+**Resultado erróneo:** La función `patron_volteo_test(...)` no retornará el control en caso de producirse una inconsistencia entre los resultados de las implementaciones. Además, situado _breakpoints_ en el lugar marcado se permite repetir paso a paso la ejecución de la implementación que ha fallado.
+
+**Resultado correcto:** La ejecución de `reversi8()` termina normalmente. Se debe establecer un _breakpoint_ al final de dicha función.
+
 #### Prueba 2: TEST_BENCH_2
 Estudia casos considerados críticos y aplica sobre ellos todas las implementaciones de `patron_volteo(...)`. Compara los resultados de todas las implementaciones.
 
 Los casos se encuentran descritos en la biblioteca test_bench.c.
 
+##### Casos 1 a 5:
+**Resultado erróneo:** La función `test_version(...)` (fichero test_bench.c) devolverá un valor `FALSE` y en la correspondiente variable local a `reversi8()` se almacenará dicho valor (p. ej. `result1 = 0`).
+
+**Resultado correcto:** El valor almacenado será `TRUE`.
+
+##### Casos 6 a 9:
+Se debe establecer un _breakpoint_ al final de cada iteración del bucle para poder consultar el resultado de la ejecución.
+
+**Resultado:** El valor almacenado en cada variable será el tiempo empleado para la ejecución de la implementación correspondiente para cada uno de los cuatro casos probados.
+
 #### Prueba 3: TEST_BENCH_3
 Mediante el generador de movimientos aleatorios se juega la misma partida completa con cada implementación de `patron_volteo(...)`. Al finalizar un juego se comparan los tablero para comprobar que, al aplicar los mismo movimientos de fichas negras, los tableros resultantes son iguales.
 
+**Resultado erróneo:** La ejecución se detiene en un bucle `/* ERROR */` al comprobar que los tableros no coinciden al finalizar cada partida.
+
+**Resultado correcto:**  La ejecución se detiene en un bucle `/* FIN */` si todos los tableros han sido iguales.
+
 #### Prueba 4: TEST_BENCH_TIMER2
 Pruebas de la biblioteca de medición de tiempo pedidas en el paso 7. Implementadas en main.c.
+
+**Resultado:** El tiempo medido en microsegundos queda alamcenado en las variables `tiempo*`.
 
 Anotaciones para el día de la defensa
 -------------------------------------
