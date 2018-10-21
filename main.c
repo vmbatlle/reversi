@@ -5,37 +5,23 @@
 * Version:  <P4-ARM.timer-leds>
 *********************************************************************************************/
 
-/*--- ficheros de cabecera ---*/
-#include "8led.h"
-#include "button.h"
-#include "led.h"
-//#include "timer0.h"
 #include "timer2.h"
 #include "44blib.h"
 #include "44b.h"
 #include "reversi8_2018.h"
 #include "test_bench.h"
 
-/*--- variables globales ---*/
-
+#define TEST_BENCH_TIMER2
 
 /*--- codigo de funciones ---*/
 void Main(void)
 {
 	/* Inicializa controladores */
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
-//	timer_init();	    // Inicializacion del temporizador
-	timer2_inicializar();	// Inicializaci�n del timer 2
-//	Eint4567_init();	// inicializamos los pulsadores. Cada vez que se pulse se ver� reflejado en el 8led
-//	D8Led_init();       // inicializamos el 8led
+	timer2_inicializar();	// Inicialización del timer 2
 
 
-	/* Valor inicial de los leds */
-	leds_off();
-	led1_on();
-
-#if 1
-
+#if defined (TEST_BENCH_TIMER2)
 	volatile unsigned int tiempo1ms,tiempo10ms,tiempo1s,tiempo10s;
 	while (1)
 	{
@@ -58,7 +44,7 @@ void Main(void)
 		timer2_empezar();
 		Delay(100000);
 		tiempo10s = timer2_parar();
-		tiempo10s++;tiempo10s--;
+		tiempo10s++;tiempo10s--; /* [BREAKPOINT] */
 	}
 #else
 	reversi8();
