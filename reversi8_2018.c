@@ -1,3 +1,12 @@
+#include "test_bench.h"
+
+#define NORMAL_PLAY
+//#define TEST_BENCH_2
+
+enum {
+	N=7
+};
+
 // Tamaño del tablero
 enum { DIM=8 };
 
@@ -70,10 +79,10 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
 
 
 
+extern int patron_volteo_arm_c(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_arm(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_iter(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 extern int patron_volteo_arm_iter_v2(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
-extern int patron_volteo_arm_c(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 0 indica CASILLA_VACIA, 1 indica FICHA_BLANCA y 2 indica FICHA_NEGRA
@@ -258,6 +267,33 @@ int patron_volteo_c_iter(char tablero[][DIM], int *longitud, char FA, char CA, c
 		return NO_HAY_PATRON;
 	}
 }
+int patron_volteo_c_iter_inline(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
+	int fin = 0;
+	while (fin == 0) {
+		FA = FA + SF;
+		CA = CA + SC;
+		if ((FA < DIM) && (FA >= 0) && (CA < DIM) && (CA >= 0) && (tablero[(int)FA][(int)CA] != CASILLA_VACIA))
+		{
+			if (tablero[(int)FA][(int)CA] != color)
+			{
+				*longitud = *longitud + 1;
+			}
+			else {
+				fin = 1;
+			}
+		}
+		else
+		{
+			*longitud = 0;
+			fin = 1;
+		}
+	}
+	if (*longitud > 0) {
+		return PATRON_ENCONTRADO;
+	} else {
+		return NO_HAY_PATRON;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // voltea n fichas en la dirección que toque
 // SF y SC son las cantidades a sumar para movernos en la dirección que toque
@@ -291,7 +327,7 @@ int actualizar_tablero(char tablero[][DIM], char f, char c, char color)
         SC = vSC[i];
         // flip: numero de fichas a voltear
         flip = 0;
-        patron = patron_volteo_arm_c(tablero, &flip, f, c, SF, SC, color);
+        patron = patron_volteo(tablero, &flip, f, c, SF, SC, color);
         //printf("Flip: %d \n", flip);
         if (patron == PATRON_ENCONTRADO )
         {
@@ -342,8 +378,8 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
 
                         // nos dice qué hay que voltear en cada dirección
                         longitud = 0;
-                        patron = patron_volteo_arm_c(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
-                        //  //printf("%d ", patron);
+                        patron = patron_volteo(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
+						//  //printf("%d ", patron);
                         if (patron == PATRON_ENCONTRADO)
                         {
                             found = 1;
@@ -443,6 +479,7 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
 void reversi8()
 {
 
+#ifdef NORMAL_PLAY
 	 ////////////////////////////////////////////////////////////////////
 	 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
 	// sólo se exploran las que están alrededor de las fichas colocadas
@@ -495,6 +532,35 @@ void reversi8()
             actualizar_tablero(tablero, f, c, FICHA_BLANCA);
             actualizar_candidatas(candidatas, f, c);
         }
+	}
+	contar(tablero, &blancas, &negras);
+
+#elif TEST_BENCH_2
+    int (*func[N])(char[][DIM], int*, char, char, char, char, char) = {
+    		patron_volteo,
+    		patron_volteo_arm_c,
+    		patron_volteo_arm_arm,
+    		patron_volteo_c_iter,
+    		patron_volteo_c_iter_inline,
+    		patron_volteo_arm_iter,
+    		patron_volteo_arm_iter_v2};
+    volatile int result1 = test_version1(func, N, tablero);
+    volatile int result2 = test_version2(func, N, tablero);
+    volatile int result3 = test_version3(func, N, tablero);
+    volatile int result4 = test_version4(func, N, tablero);
+    volatile int result5 = test_version5(func, N, tablero);
+	
+	int i;
+    for (i = 0; i < N; i++) {
+		volatile int result6 = test_version6(func[i]);
+		volatile int result7 = test_version7(func[i]);
+		volatile int result8 = test_version8(func[i]);
+		volatile int result9 = test_version9(func[i]);
+	    result6++;result6--;
+	    result7++;result7--;
+	    result8++;result8--;
+	    result9++;result9--;
     }
-    contar(tablero, &blancas, &negras);
+#endif
+    while(1);
 }
