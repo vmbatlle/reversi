@@ -1,6 +1,6 @@
 /*
  * @file test_bench.h
- * @author Victor M. Batlle <736478@unizar.es>
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
  * @date 2018/10/04
  */
 
@@ -23,10 +23,12 @@ int test_version4(int (*f[])(char[][DIM], int*, char, char, char, char, char),
 		int dim, char tablero[][DIM]);
 int test_version5(int (*f[])(char[][DIM], int*, char, char, char, char, char),
 		int dim, char tablero[][DIM]);
+#if defined (ENVIRONMENT_IO)
 int test_version6(int (*f)(char[][DIM], int*, char, char, char, char, char));
 int test_version7(int (*f)(char[][DIM], int*, char, char, char, char, char));
 int test_version8(int (*f)(char[][DIM], int*, char, char, char, char, char));
 int test_version9(int (*f)(char[][DIM], int*, char, char, char, char, char));
+#endif
 
 #undef DIM
 

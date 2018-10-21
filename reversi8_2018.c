@@ -1,12 +1,32 @@
-#include "test_bench.h"
-#include "timer2.h"
+/*
+ * @file reversi8_2018.c
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ * @date 2018/10/21
+ */
 
 /* Descomente SÓLO UNA línea cada vez */
+// TEST_BENCH_1: Juego normal con patron_volteo_test que compara los resultados de todas las implementaciones
+// TEST_BENCH_2: Uso de test_bench: Casos conflictivos (tests 1-5) y medidas de tiempo (tests 6-9)
+// TEST_BENCH_3: Juego automático de una partida completa con cada una de las implementaciones de patron_volteo
 #define NORMAL_PLAY
 //#define TEST_BENCH_1
 //#define TEST_BENCH_2
 //#define TEST_BENCH_3
 
+/* Descomente SÓLO UNA línea cada vez */
+#define ENVIRONMENT_EMULATOR
+//#define ENVIRONMENT_IO
+
+#if defined (TEST_BENCH_2)
+#include "test_bench.h"
+#endif
+#if defined (ENVIRONMENT_IO)
+#include "timer2.h"
+#endif
+
+// Número de implementaciones diferentes de patron_volteo
+// Son: patron_volteo, patron_volteo_arm_c, patron_volteo_arm_arm
+//      patron_volteo_c_iter, patron_volteo_c_iter_inline, patron_volteo_arm_iter, patron_volteo_arm_iter_v2
 enum {
 	N=7
 };
@@ -247,6 +267,8 @@ int patron_volteo(char tablero[][DIM], int *longitud, char FA, char CA, char SF,
         //printf("NO_HAY_PATRON \n");
     }
 }
+////////////////////////////////////////////////////////////////////////////////
+// Implementación de patrón_volteo iterativa haciendo una llamada a ficha_valida
 int patron_volteo_c_iter(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
 	int posicion_valida; // indica si la posición es valida y contiene una ficha de algún jugador
 	char casilla;   // casilla es la casilla que se lee del tablero
@@ -273,6 +295,8 @@ int patron_volteo_c_iter(char tablero[][DIM], int *longitud, char FA, char CA, c
 		return NO_HAY_PATRON;
 	}
 }
+////////////////////////////////////////////////////////////////////////////////
+// Implementación de patrón_volteo iterativa con inlining de la función ficha_valida
 int patron_volteo_c_iter_inline(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
 	int fin = 0;
 	while (fin == 0) {
@@ -472,14 +496,17 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
 
 #if defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
 static unsigned int rand_seed;
-
+////////////////////////////////////////////////////////////////////////////////
+// Genera una semilla aleatoria dada una cadena de caracteres, en especial
+// el macro __TIME__ ("hh:mm:ss")
 void srand(char time[8]){
 	rand_seed = (((time[7] - '0') * 10 + (time[6] - '0')) * 60 +
 			((time[4] - '0') * 10 + (time[3] - '0'))) * 60 +
 			(time[1] - '0') * 10 + (time[0] - '0');
 }
 
-// From stdlib
+////////////////////////////////////////////////////////////////////////////////
+// Genera un número aleatorio
 int rand_r (unsigned int *seed)
 {
   unsigned int next = *seed;
@@ -503,11 +530,13 @@ int rand_r (unsigned int *seed)
 
   return result;
 }
-
+////////////////////////////////////////////////////////////////////////////////
+// Genera un número aleatorio
 int rand(){
 	return rand_r(&rand_seed);
 }
-
+////////////////////////////////////////////////////////////////////////////////
+// Genera un número aleatorio dentro de un intervalo [min, max]
 int rand_interval(int min, int max) {
 	return (rand() % (max - min + 1)) + min;
 }
@@ -517,8 +546,12 @@ static unsigned char mov_auto_fila[DIM*DIM/2];
 static unsigned char mov_auto_columna[DIM*DIM/2];
 static int mov_auto_cursor = 0;
 static int mov_auto_num = 0;
-#endif
+#endif // defined (TEST_BENCH_3)
 
+////////////////////////////////////////////////////////////////////////////////
+// Genera movimientos válidos de menera aleatoria para jugar partidas contra
+// la IA programada para las fichas blancas. Con proposito de automatizar las
+// pruebas de los TEST_BENCH_1 y TEST_BENCH 3.
 int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsigned char *f, volatile unsigned char *c){
 	int i, j, k, found, exist, fin;
 	int patron, longitud;
@@ -577,7 +610,7 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 								mov_auto_columna[mov_auto_cursor] = *c;
 								mov_auto_cursor++;
 								mov_auto_num++;
-#endif
+#endif // defined (TEST_BENCH_3)
 
 								fin = 1;
 							} else {
@@ -601,6 +634,10 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 }
 
 #if defined (TEST_BENCH_1)
+////////////////////////////////////////////////////////////////////////////////
+// Ejecuta todas las implementaciones de patron_volteo y compara sus resultados,
+// permite diferenciar qué función genera resultados diferentes mediante el uso
+// de breakpoints. Si todo funciona bien, devuelve el resultado del patron_volteo original
 int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color)
 {
 	int longitud_c_c = 0, return_c_c = 0;
@@ -611,6 +648,8 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 	return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
 	int longitud_c_iter = 0, return_c_iter = 0;
 	return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+	int longitud_c_iter_inline = 0, return_c_iter_inline = 0;
+	return_c_iter_inline = patron_volteo_c_iter_inline(tablero, &longitud_c_iter_inline, FA, CA, SF, SC, color);
 	int longitud_arm_iter = 0, return_arm_iter = 0;
 	return_arm_iter = patron_volteo_arm_iter(tablero, &longitud_arm_iter, FA, CA, SF, SC, color);
 	int longitud_arm_iter_v2 = 0, return_arm_iter_v2 = 0;
@@ -634,6 +673,12 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 		longitud_c_iter = 0;
 		return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
 		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_c_iter_inline) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_c_iter_inline))) {
+		// Fallo de función c_iter_inline
+		/* [BREAKPOINT] */
+		longitud_c_iter_inline = 0;
+		return_c_iter_inline = patron_volteo_c_iter_inline(tablero, &longitud_c_iter_inline, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
 	} else if ((return_c_c != return_arm_iter) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_iter))) {
 		// Fallo de función arm_iter
 		/* [BREAKPOINT] */
@@ -652,11 +697,18 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 		return return_c_c;
 	}
 }
+// defined (TEST_BENCH_1)
 #elif defined (TEST_BENCH_3)
+////////////////////////////////////////////////////////////////////////////////
+// Establece al comienzo (índice 0) el iterador que recorre el vector de
+// movimientos usado para jugar varias partidas iguales en el TEST_BENCH_3
+// de manera que sean aleatorias pero todas iguales.
 void mov_auto_iterator_begin(){
 	mov_auto_cursor = 0;
 }
-
+////////////////////////////////////////////////////////////////////////////////
+// Avanza el iterador que recorre el vector de movimientos explicado en
+// el comentario de la función @ref mov_auto_cursor
 int mov_auto_iterator_next(volatile unsigned char *f, volatile unsigned char *c){
 	// Almacenar movimiento en vector
 	if (mov_auto_cursor < mov_auto_num) {
@@ -670,6 +722,8 @@ int mov_auto_iterator_next(volatile unsigned char *f, volatile unsigned char *c)
 }
 
 static char __attribute__ ((aligned (8))) tablero_salvado[DIM][DIM];
+////////////////////////////////////////////////////////////////////////////////
+// Guarda el contenido de tablero en tablero_salvado
 void salvar_tablero(char tablero[][DIM]) {
 	int i,j;
 	for (i=0; i<DIM; i++)
@@ -680,7 +734,8 @@ void salvar_tablero(char tablero[][DIM]) {
 		}
 	}
 }
-
+////////////////////////////////////////////////////////////////////////////////
+// Compara tablero con tablero_salvado, devuelve 1 si son iguales, 0 en caso contrario
 int comparar_tablero(char tablero[][DIM]) {
 	int i,j;
 	for (i=0; i<DIM; i++)
@@ -695,7 +750,11 @@ int comparar_tablero(char tablero[][DIM]) {
 	return 1;
 }
 
+#if defined (ENVIRONMENT_IO)
 static volatile unsigned int time_patron_volteo = 0;
+////////////////////////////////////////////////////////////////////////////////
+// Mide el tiempo de ejecución de la implementación correspondiente de patron_volteo
+// y lo suma a time_patron_volteo
 int patron_volteo_time(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
 	unsigned int t0 = timer2_leer();
 	int ret = patron_volteo_implementation(tablero,longitud,FA,CA,SF,SC,color);
@@ -703,8 +762,9 @@ int patron_volteo_time(char tablero[][DIM], int *longitud, char FA, char CA, cha
 	time_patron_volteo += tf-t0;
 	return ret;
 }
-#endif
-#endif
+#endif // defined (ENVIRONMENT_IO)
+#endif // defined (TEST_BENCH_3)
+#endif // defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Proceso principal del juego
@@ -750,6 +810,7 @@ void reversi8()
 #elif defined (TEST_BENCH_1)
 	patron_volteo_implementation = &patron_volteo_test; /* Prueba todas las implementaciones */
 #elif defined (TEST_BENCH_3)
+	mov_auto_iterator_begin();
 	static int num_invocacion = 1; // Veces que ha sido invocada
 	switch (num_invocacion){
 	
@@ -757,37 +818,29 @@ void reversi8()
 	case 1:
 		srand(__TIME__);
 		patron_volteo_implementation = &patron_volteo;
-		mov_auto_iterator_begin();
 		break;
 	
 	/* Resto de iteraciones: utilizar movimientos generados */
 	case 2:
 		patron_volteo_implementation = &patron_volteo;
-		mov_auto_iterator_begin();
 		break;
 	case 3:
 		patron_volteo_implementation = &patron_volteo_arm_c;
-		mov_auto_iterator_begin();
 		break;
 	case 4:
 		patron_volteo_implementation = &patron_volteo_arm_arm;
-		mov_auto_iterator_begin();
 		break;
 	case 5:
 		patron_volteo_implementation = &patron_volteo_c_iter;
-		mov_auto_iterator_begin();
 		break;
 	case 6:
 		patron_volteo_implementation = &patron_volteo_arm_iter;
-		mov_auto_iterator_begin();
 		break;
 	case 7:
 		patron_volteo_implementation = &patron_volteo_arm_iter_v2;
-		mov_auto_iterator_begin();
 		break;
 	case 8:
 		patron_volteo_implementation = &patron_volteo_c_iter_inline;
-		mov_auto_iterator_begin();
 		break;
 
 	default:
@@ -796,16 +849,18 @@ void reversi8()
 		while(1) { /* FIN */ }
 		break;
 	}
+#if defined (ENVIRONMENT_IO)
     time_patron_volteo = 0;
     timer2_empezar(); /* Comenzar a medir tiempo total de partida */
-#endif
+#endif // defined (ENVIRONMENT_IO)
+#endif // defined (TEST_VERSION_3)
 
     while (fin == 0)
     {
         move = 0;
 
 #if defined (NORMAL_PLAY)
-        esperar_mov(&ready);
+        esperar_mov(&ready); /* [BREAKPOINT] */
 #elif defined (TEST_BENCH_1)
 		/* Genera movimientos aleatorios */
        	done = elegir_mov_auto(candidatas, tablero, &fila, &columna);
@@ -817,12 +872,14 @@ void reversi8()
 			/* Resto de iteraciones: utilizar movimientos generados */
         	done = mov_auto_iterator_next(&fila, &columna);
         }
-
+#endif
+#if defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
+        /* Detección de NO_HAY_PATRÓN */
         if (done == -1) {
 			fila = DIM;
 			columna = DIM;
 		}		
-#endif
+#endif // defined (TEST_BENCH_3)
 
         // si la fila o columna son 8 asumimos que el jugador no puede mover
         if (((fila) != DIM) && ((columna) != DIM))
@@ -848,10 +905,12 @@ void reversi8()
         }
 	}
 #if defined (TEST_BENCH_3)
+#if defined (ENVIRONMENT_IO)
 	/* Terminar de medir tiempo de partida */
 	volatile unsigned int time = timer2_parar(); /* Tiempo total de partida */
     time++;time--; /* [BREAKPOINT] */
     time_patron_volteo = 0; /* Tiempo de usado por la implementación de patrón volteo */
+#endif // defined (ENVIRONMENT_IO)
 
 	switch (num_invocacion){
 	case 1:
@@ -869,10 +928,11 @@ void reversi8()
 	}
 	num_invocacion++; // Nueva invocación
 	reversi8();
+// defined (TEST_BENCH_3)
 #else
 	 contar(tablero, &blancas, &negras);
-#endif
-/* END: if defined (NORMAL_PLAY) || defined (TEST_BENCH_1) || defined (TEST_BENCH_3) */
+#endif // defined (ENVIRONMENT_IO)
+// defined (NORMAL_PLAY) || defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
 #elif defined (TEST_BENCH_2)
     int (*func[N])(char[][DIM], int*, char, char, char, char, char) = {
     		patron_volteo,
@@ -888,6 +948,7 @@ void reversi8()
     volatile int result4 = test_version4(func, N, tablero);
     volatile int result5 = test_version5(func, N, tablero);
 	
+#if defined (ENVIRONMENT_IO)
 	int i;
     for (i = 0; i < N; i++) {
 		volatile int result6 = test_version6(func[i]);
@@ -899,8 +960,8 @@ void reversi8()
 	    result8++;result8--;
 	    result9++;result9--;
     }
-#endif
-/* END: if defined (TEST_BENCH_2) */
+#endif // defined (ENVIRONMENT_IO)
+#endif // defined (TEST_BENCH_2)
 
     while(1){/* FIN */}; /* [BREAKPOINT] */
 }
