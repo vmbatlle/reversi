@@ -2,6 +2,7 @@
 #include "timer2.h"
 
 #define NORMAL_PLAY
+//#define TEST_BENCH_1
 //#define TEST_BENCH_2
 //#define TEST_BENCH_3
 
@@ -467,8 +468,8 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
         candidatas[f][c+1] = SI;
 }
 
-#ifdef TEST_BENCH_3
 
+#if defined(TEST_BENCH_1) || defined(TEST_BENCH_3)
 static unsigned int rand_seed;
 
 void srand(char time[8]){
@@ -510,10 +511,12 @@ int rand_interval(int min, int max) {
 	return (rand() % (max - min + 1)) + min;
 }
 
+#if defined(TEST_BENCH_3)
 static unsigned char mov_auto_fila[DIM*DIM/2];
 static unsigned char mov_auto_columna[DIM*DIM/2];
 static int mov_auto_cursor = 0;
 static int mov_auto_num = 0;
+#endif
 
 int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsigned char *f, volatile unsigned char *c){
 	int i, j, k, found, exist, fin;
@@ -567,11 +570,13 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 								*f = (char) i;
 								*c = (char) j;
 
+#if defined(TEST_BENCH_3)
 								// Almacenar movimiento en vector
 								mov_auto_fila[mov_auto_cursor] = *f;
 								mov_auto_columna[mov_auto_cursor] = *c;
 								mov_auto_cursor++;
 								mov_auto_num++;
+#endif
 
 								fin = 1;
 							} else {
@@ -594,6 +599,59 @@ int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsign
 	}
 }
 
+#if defined(TEST_BENCH_1)
+int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color)
+{
+	int longitud_c_c = 0, return_c_c = 0;
+	return_c_c = patron_volteo_c_c(tablero, &longitud_c_c, FA, CA, SF, SC, color);
+	int longitud_arm_c = 0, return_arm_c = 0;
+	return_arm_c = patron_volteo_arm_c(tablero, &longitud_arm_c, FA, CA, SF, SC, color);
+	int longitud_arm_arm = 0, return_arm_arm = 0;
+	return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
+	int longitud_c_iter = 0, return_c_iter = 0;
+	return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+	int longitud_arm_iter = 0, return_arm_iter = 0;
+	return_arm_iter = patron_volteo_arm_iter(tablero, &longitud_arm_iter, FA, CA, SF, SC, color);
+	int longitud_arm_iter_v2 = 0, return_arm_iter_v2 = 0;
+	return_arm_iter_v2 = patron_volteo_arm_iter_v2(tablero, &longitud_arm_iter_v2, FA, CA, SF, SC, color);
+	
+	if ((return_c_c != return_arm_c) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_c))) {
+		// Fallo de función arm_c
+		/* [BREAKPOINT] */
+		longitud_arm_c = 0;
+		return_arm_c = patron_volteo_arm_c(tablero, &longitud_arm_c, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_arm_arm) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_arm))) {
+		// Fallo de función arm_arm
+		/* [BREAKPOINT] */
+		longitud_arm_arm = 0;
+		return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_c_iter) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_c_iter))) {
+		// Fallo de función c_iter
+		/* [BREAKPOINT] */
+		longitud_c_iter = 0;
+		return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_arm_iter) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_iter))) {
+		// Fallo de función arm_iter
+		/* [BREAKPOINT] */
+		longitud_arm_iter = 0;
+		return_arm_iter = patron_volteo_arm_iter(tablero, &longitud_arm_iter, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_arm_iter_v2) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_iter_v2))) {
+		// Fallo de función arm_iter_v2
+		/* [BREAKPOINT] */
+		longitud_arm_iter_v2 = 0;
+		return_arm_iter_v2 = patron_volteo_arm_iter_v2(tablero, &longitud_arm_iter_v2, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+	} else {
+		/* Todo ha ido bien. Devolver valores de c_c */
+		*longitud = longitud_c_c;
+		return return_c_c;
+	}
+}
+#elif defined(TEST_BENCH_3)
 void mov_auto_iterator_begin(){
 	mov_auto_cursor = 0;
 }
@@ -659,10 +717,10 @@ int patron_volteo_time(char tablero[][DIM], int *longitud, char FA, char CA, cha
 void reversi8()
 {
 
-#if defined(NORMAL_PLAY) || defined(TEST_BENCH_3)
+#if defined(NORMAL_PLAY) || defined(TEST_BENCH_1) || defined(TEST_BENCH_3)
 	 ////////////////////////////////////////////////////////////////////
 	 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
-	// sólo se exploran las que están alrededor de las fichas colocadas
+	 // sólo se exploran las que están alrededor de las fichas colocadas
 	 ////////////////////////////////////////////////////////////////////
 	char __attribute__ ((aligned (8))) candidatas[DIM][DIM] =
     {
@@ -685,15 +743,22 @@ void reversi8()
                   // y luego la máquina tampoco puede
     unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
 	init_table(tablero, candidatas);
-	
-#ifdef TEST_BENCH_3
+#if defined(NORMAL_PLAY)
+	patron_volteo_implementation = &patron_volteo_arm_iter_v2; /* Mejor versión */
+#elif defined(TEST_BENCH_1)
+    patron_volteo = &patron_volteo_all; /* Prueba todas las implementaciones */
+#elif defined(TEST_BENCH_3)
 	static int num_invocacion = 1; // Veces que ha sido invocada
 	switch (num_invocacion){
+	
+	/* Primera invocación: generar movimientos aleatorios */
 	case 1:
 		srand(__TIME__);
 		patron_volteo_implementation = &patron_volteo;
 		mov_auto_iterator_begin();
 		break;
+	
+	/* Resto de iteraciones: utilizar movimientos generados */
 	case 2:
 		patron_volteo_implementation = &patron_volteo;
 		mov_auto_iterator_begin();
@@ -725,34 +790,36 @@ void reversi8()
 
 	default:
 		contar(tablero, &blancas, &negras);
+		/* [BREAKPOINT] */
 		while(1) { /* FIN */ }
 		break;
 	}
     time_patron_volteo = 0;
     timer2_empezar(); /* Comenzar a medir tiempo total de partida */
-#elif NORMAL_PLAY
-	patron_volteo_implementation = &patron_volteo_arm_iter_v2; /* Mejor versión */
 #endif
 
     while (fin == 0)
     {
         move = 0;
 
-#ifdef TEST_BENCH_3
-		/* Primera iteración: generar movimientos aleatorios */
-		/* Resto de iteraciones: utilizar movimientos generados */
+#if defined(NORMAL_PLAY)
+        esperar_mov(&ready);
+#elif defined(TEST_BENCH_1)
+		/* Genera movimientos aleatorios */
+       	done = elegir_mov_auto(candidatas, tablero, &fila, &columna);
+#elif defined(TEST_BENCH_3)
         if (num_invocacion == 1) {
+			/* Primera iteración: generar movimientos aleatorios */
         	done = elegir_mov_auto(candidatas, tablero, &fila, &columna);
         } else {
+			/* Resto de iteraciones: utilizar movimientos generados */
         	done = mov_auto_iterator_next(&fila, &columna);
         }
 
         if (done == -1) {
 			fila = DIM;
 			columna = DIM;
-		}
-#elif NORMAL_PLAY
-        esperar_mov(&ready);
+		}		
 #endif
 
         // si la fila o columna son 8 asumimos que el jugador no puede mover
@@ -778,7 +845,7 @@ void reversi8()
             actualizar_candidatas(candidatas, f, c);
         }
 	}
-#ifdef TEST_BENCH_3
+#if defined(TEST_BENCH_3)
 	/* Terminar de medir tiempo de partida */
 	volatile unsigned int time = timer2_parar(); /* Tiempo total de partida */
     time++;time--; /* [BREAKPOINT] */
@@ -803,8 +870,8 @@ void reversi8()
 #else
 	 contar(tablero, &blancas, &negras);
 #endif
-/* END: defined(NORMAL_PLAY) || defined(TEST_BENCH_3) */
-#elif TEST_BENCH_2
+/* END: if defined(NORMAL_PLAY) || defined(TEST_BENCH_1) || defined(TEST_BENCH_3) */
+#elif defined(TEST_BENCH_2)
     int (*func[N])(char[][DIM], int*, char, char, char, char, char) = {
     		patron_volteo,
     		patron_volteo_arm_c,
@@ -831,10 +898,10 @@ void reversi8()
 	    result9++;result9--;
     }
 #endif
-/* END: defined(TEST_BENCH_2) */
+/* END: if defined(TEST_BENCH_2) */
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
-    while(1); /* [BREAKPOINT] */
+    while(1){/* FIN */}; /* [BREAKPOINT] */
 #pragma GCC pop_options
 }
