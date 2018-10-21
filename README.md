@@ -55,3 +55,15 @@ Los casos se encuentran descritos en la biblioteca test_bench.c.
 
 #### Prueba 3: TEST_BENCH_3
 Mediante el generador de movimientos aleatorios se juega la misma partida completa con cada implementación de `patron_volteo(...)`. Al finalizar un juego se comparan los tablero para comprobar que, al aplicar los mismo movimientos de fichas negras, los tableros resultantes son iguales.
+
+#### Prueba 4: TEST_BENCH_TIMER2
+Pruebas de la biblioteca de medición de tiempo pedidas en el paso 7. Implementadas en main.c.
+
+Anotaciones para el día de la defensa
+-------------------------------------
+1. _"El día de la corrección se debe realizar la verificación automática."_ utilizar TEST_BENCH_1. Descomentado `#define TEST_BENCH_1` y estableciendo _breakpoints_ dentro de la función `patron_volteo_test(...)` y al final de `reversi8()`.
+
+1. _"Durante la corrección de la práctica
+deberéis tener todo preparado para hacer estas mediciones."_ Utilizar TEST_BENCH_TIMER2 descomentando en `#define` en main.c.
+
+1. Los datos de rendimiento se presentarán en formato impreso.
