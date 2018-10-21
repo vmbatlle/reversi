@@ -228,14 +228,10 @@ patron_volteo_arm_iter_v2:
 
   patron_volteo_arm_iter_v2_color_igual:
   # Caso: tablero[f][c] == color
-  #- if (*longitud > 0)
-  # ldr r8, [r1] (ya está cargado)
-  cmp r8, #0
-  # Guardar longitud en memoria (al menos ha sido modificado una vez)
+  # longitud ha sido modificada al menos una vez, es decir, es >0
+  # Guardar el valor modificado
   str r8, [r1]
-  # Si longitud > 0 devuelve PATRON_ENCONTRADO, si no NO_HAY_PATRON
-  movgt r0, #PATRON_ENCONTRADO
-  movle r0, #NO_HAY_PATRON
+  mov r0, #PATRON_ENCONTRADO
 
 
 
