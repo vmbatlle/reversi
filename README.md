@@ -41,7 +41,7 @@ Aclaración de funciones implementadas
 1. `timer2_inicializar()`, `timer2_empezar()`, `timer2_leer()` y `timer2_parar()` en fichero timer2.c.
 
 ### Biblioteca de pruebas
-Para las pruebas se unas un puntero a función `praton_volteo_implementacion`. Este puntero apunta a la función de la implementación que se desee probar en cada caso.
+Para las pruebas se usa un puntero a función `praton_volteo_implementacion`. Este puntero apunta a la función de la implementación que se desee probar en cada caso.
 
 #### Prueba 1: TEST_BENCH_1
 Sigue la estrategia propuesta en el guión de prácticas. Se invoca a `patron_volteo_test(...)` y ésta a su vez invoca a todas las implementaciones. Se ha aprovechado un generador de movimientos aleatorios para jugar una partida entera a reversi usando este método de pruebas.
