@@ -815,7 +815,7 @@ void reversi8()
         move = 0;
 
 #if defined (NORMAL_PLAY)
-        esperar_mov(&ready);
+        esperar_mov(&ready); /* [BREAKPOINT] */
 #elif defined (TEST_BENCH_1)
 		/* Genera movimientos aleatorios */
        	done = elegir_mov_auto(candidatas, tablero, &fila, &columna);
@@ -827,7 +827,9 @@ void reversi8()
 			/* Resto de iteraciones: utilizar movimientos generados */
         	done = mov_auto_iterator_next(&fila, &columna);
         }
-
+#endif
+#if defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
+        /* Detección de NO_HAY_PATRÓN */
         if (done == -1) {
 			fila = DIM;
 			columna = DIM;
