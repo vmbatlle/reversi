@@ -113,8 +113,6 @@ patron_volteo_arm_arm:
   
   # Callback, r0 contiene el valor a devolver
   patron_volteo_callback:
-  sub sp, fp, #28
-  ldmia sp, {r4-r7, fp, sp, lr}
-  bx lr
+  ldmdb fp, {r4-r7, fp, sp, pc}
 
 .end

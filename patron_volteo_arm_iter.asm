@@ -107,9 +107,7 @@ patron_volteo_arm_iter:
 
   # Callback, r0 contiene el valor a devolver
   patron_volteo_arm_iter_callback:
-  sub sp, fp, #28
-  ldmia sp, {r4-r7, fp, sp, lr}
-  bx lr
+  ldmdb fp, {r4-r7, fp, sp, pc}
 
 
 #------------------------------------------------------------------------
@@ -245,8 +243,6 @@ patron_volteo_arm_iter_v2:
 
   # Callback, r0 contiene el valor a devolver
   patron_volteo_arm_iter_v2_callback:
-  sub sp, fp, #32
-  ldmia sp, {r4-r8, fp, sp, lr}
-  bx lr
+  ldmdb fp, {r4-r8, fp, sp, pc}
 
 .end
