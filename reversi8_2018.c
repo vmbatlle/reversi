@@ -616,6 +616,8 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 	return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
 	int longitud_c_iter = 0, return_c_iter = 0;
 	return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+	int longitud_c_iter_inline = 0, return_c_iter_inline = 0;
+	return_c_iter_inline = patron_volteo_c_iter_inline(tablero, &longitud_c_iter_inline, FA, CA, SF, SC, color);
 	int longitud_arm_iter = 0, return_arm_iter = 0;
 	return_arm_iter = patron_volteo_arm_iter(tablero, &longitud_arm_iter, FA, CA, SF, SC, color);
 	int longitud_arm_iter_v2 = 0, return_arm_iter_v2 = 0;
@@ -638,6 +640,12 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 		/* [BREAKPOINT] */
 		longitud_c_iter = 0;
 		return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_c_iter_inline) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_c_iter_inline))) {
+		// Fallo de función c_iter_inline
+		/* [BREAKPOINT] */
+		longitud_c_iter_inline = 0;
+		return_c_iter_inline = patron_volteo_c_iter_inline(tablero, &longitud_c_iter_inline, FA, CA, SF, SC, color);
 		return NO_HAY_PATRON;
 	} else if ((return_c_c != return_arm_iter) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_iter))) {
 		// Fallo de función arm_iter
