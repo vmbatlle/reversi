@@ -549,7 +549,9 @@ static int mov_auto_num = 0;
 #endif // defined (TEST_BENCH_3)
 
 ////////////////////////////////////////////////////////////////////////////////
-// TODO: pequeña explicación
+// Genera movimientos válidos de menera aleatoria para jugar partidas contra
+// la IA programada para las fichas blancas. Con proposito de automatizar las
+// pruebas de los TEST_BENCH_1 y TEST_BENCH 3.
 int elegir_mov_auto(char candidatas[][DIM], char tablero[][DIM], volatile unsigned char *f, volatile unsigned char *c){
 	int i, j, k, found, exist, fin;
 	int patron, longitud;
@@ -698,12 +700,15 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 // defined (TEST_BENCH_1)
 #elif defined (TEST_BENCH_3)
 ////////////////////////////////////////////////////////////////////////////////
-// TODO: pequeña explicación
+// Establece al comienzo (índice 0) el iterador que recorre el vector de
+// movimientos usado para jugar varias partidas iguales en el TEST_BENCH_3
+// de manera que sean aleatorias pero todas iguales.
 void mov_auto_iterator_begin(){
 	mov_auto_cursor = 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
-// TODO: pequeña explicación
+// Avanza el iterador que recorre el vector de movimientos explicado en
+// el comentario de la función @ref mov_auto_cursor
 int mov_auto_iterator_next(volatile unsigned char *f, volatile unsigned char *c){
 	// Almacenar movimiento en vector
 	if (mov_auto_cursor < mov_auto_num) {
