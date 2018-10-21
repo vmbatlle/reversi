@@ -47,7 +47,7 @@ patron_volteo_arm_c:
   
   # CA = CA + SC
   add r3, r3, r5
-  and r2, r2, #255
+  and r3, r3, #255
   
   # casilla = ficha_valida(tablero, FA, CA, &posicion_valida)
   # Preparar el paso de parámetros, r0 ya tiene &tablero
