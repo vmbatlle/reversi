@@ -5,7 +5,9 @@
  */
 
 #include "test_bench.h"
+#if defined (ENVIRONMENT_IO)
 #include "timer2.h"
+#endif
 
 /* Constantes del programa */
 #define DIM 8
@@ -179,6 +181,7 @@ int test_version5(int (*f[])(char[][DIM], int*, char, char, char, char, char), i
 		   test_version(f, dim, tablero, state, 5, 2, 1, -1, color);
 }
 
+#if defined (ENVIRONMENT_IO)
 int test_version6(int (*f)(char[][DIM], int*, char, char, char, char, char)) {
 	char state[DIM][DIM] = {
 			{0,0,0,0,0,0,0,0},
@@ -266,5 +269,6 @@ int test_version9(int (*f)(char[][DIM], int*, char, char, char, char, char)) {
 	f(state, &longitud, FA, CA, SF, SC, color);
 	return timer2_parar();
 }
+#endif
 
 #undef DIM

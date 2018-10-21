@@ -1,11 +1,16 @@
 #include "test_bench.h"
+#if defined (ENVIRONMENT_IO)
 #include "timer2.h"
+#endif
 
 /* Descomente SÓLO UNA línea cada vez */
 #define NORMAL_PLAY
 //#define TEST_BENCH_1
 //#define TEST_BENCH_2
 //#define TEST_BENCH_3
+
+#define ENVIRONMENT_EMULATOR
+//#define ENVIRONMENT_IO
 
 enum {
 	N=7
@@ -695,6 +700,7 @@ int comparar_tablero(char tablero[][DIM]) {
 	return 1;
 }
 
+#if defined (ENVIRONMENT_IO)
 static volatile unsigned int time_patron_volteo = 0;
 int patron_volteo_time(char tablero[][DIM], int *longitud, char FA, char CA, char SF, char SC, char color){
 	unsigned int t0 = timer2_leer();
@@ -703,6 +709,7 @@ int patron_volteo_time(char tablero[][DIM], int *longitud, char FA, char CA, cha
 	time_patron_volteo += tf-t0;
 	return ret;
 }
+#endif
 #endif
 #endif
 
@@ -796,8 +803,10 @@ void reversi8()
 		while(1) { /* FIN */ }
 		break;
 	}
+#if defined (ENVIRONMENT_IO)
     time_patron_volteo = 0;
     timer2_empezar(); /* Comenzar a medir tiempo total de partida */
+#endif
 #endif
 
     while (fin == 0)
@@ -848,10 +857,12 @@ void reversi8()
         }
 	}
 #if defined (TEST_BENCH_3)
+#if defined (ENVIRONMENT_IO)
 	/* Terminar de medir tiempo de partida */
 	volatile unsigned int time = timer2_parar(); /* Tiempo total de partida */
     time++;time--; /* [BREAKPOINT] */
     time_patron_volteo = 0; /* Tiempo de usado por la implementación de patrón volteo */
+#endif
 
 	switch (num_invocacion){
 	case 1:
@@ -888,6 +899,7 @@ void reversi8()
     volatile int result4 = test_version4(func, N, tablero);
     volatile int result5 = test_version5(func, N, tablero);
 	
+#if defined (ENVIRONMENT_IO)
 	int i;
     for (i = 0; i < N; i++) {
 		volatile int result6 = test_version6(func[i]);
@@ -899,6 +911,7 @@ void reversi8()
 	    result8++;result8--;
 	    result9++;result9--;
     }
+#endif
 #endif
 /* END: if defined (TEST_BENCH_2) */
 
