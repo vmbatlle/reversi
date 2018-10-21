@@ -8,8 +8,6 @@
 #ifndef _TIMER2_H_
 #define _TIMER2_H_
 
-volatile int switch2_leds;
-
 /*--- declaracion de funciones visibles del módulo timer.c/timer.h ---*/
 
 /**
