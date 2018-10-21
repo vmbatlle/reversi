@@ -765,6 +765,7 @@ void reversi8()
 #elif defined (TEST_BENCH_1)
 	patron_volteo_implementation = &patron_volteo_test; /* Prueba todas las implementaciones */
 #elif defined (TEST_BENCH_3)
+	mov_auto_iterator_begin();
 	static int num_invocacion = 1; // Veces que ha sido invocada
 	switch (num_invocacion){
 	
@@ -772,37 +773,29 @@ void reversi8()
 	case 1:
 		srand(__TIME__);
 		patron_volteo_implementation = &patron_volteo;
-		mov_auto_iterator_begin();
 		break;
 	
 	/* Resto de iteraciones: utilizar movimientos generados */
 	case 2:
 		patron_volteo_implementation = &patron_volteo;
-		mov_auto_iterator_begin();
 		break;
 	case 3:
 		patron_volteo_implementation = &patron_volteo_arm_c;
-		mov_auto_iterator_begin();
 		break;
 	case 4:
 		patron_volteo_implementation = &patron_volteo_arm_arm;
-		mov_auto_iterator_begin();
 		break;
 	case 5:
 		patron_volteo_implementation = &patron_volteo_c_iter;
-		mov_auto_iterator_begin();
 		break;
 	case 6:
 		patron_volteo_implementation = &patron_volteo_arm_iter;
-		mov_auto_iterator_begin();
 		break;
 	case 7:
 		patron_volteo_implementation = &patron_volteo_arm_iter_v2;
-		mov_auto_iterator_begin();
 		break;
 	case 8:
 		patron_volteo_implementation = &patron_volteo_c_iter_inline;
-		mov_auto_iterator_begin();
 		break;
 
 	default:
