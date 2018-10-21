@@ -646,6 +646,8 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 	return_arm_arm = patron_volteo_arm_arm(tablero, &longitud_arm_arm, FA, CA, SF, SC, color);
 	int longitud_c_iter = 0, return_c_iter = 0;
 	return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+	int longitud_c_iter_inline = 0, return_c_iter_inline = 0;
+	return_c_iter_inline = patron_volteo_c_iter_inline(tablero, &longitud_c_iter_inline, FA, CA, SF, SC, color);
 	int longitud_arm_iter = 0, return_arm_iter = 0;
 	return_arm_iter = patron_volteo_arm_iter(tablero, &longitud_arm_iter, FA, CA, SF, SC, color);
 	int longitud_arm_iter_v2 = 0, return_arm_iter_v2 = 0;
@@ -668,6 +670,12 @@ int patron_volteo_test(char tablero[][DIM], int *longitud, char FA, char CA, cha
 		/* [BREAKPOINT] */
 		longitud_c_iter = 0;
 		return_c_iter = patron_volteo_c_iter(tablero, &longitud_c_iter, FA, CA, SF, SC, color);
+		return NO_HAY_PATRON;
+	} else if ((return_c_c != return_c_iter_inline) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_c_iter_inline))) {
+		// Fallo de función c_iter_inline
+		/* [BREAKPOINT] */
+		longitud_c_iter_inline = 0;
+		return_c_iter_inline = patron_volteo_c_iter_inline(tablero, &longitud_c_iter_inline, FA, CA, SF, SC, color);
 		return NO_HAY_PATRON;
 	} else if ((return_c_c != return_arm_iter) || ((return_c_c != NO_HAY_PATRON) && (longitud_c_c != longitud_arm_iter))) {
 		// Fallo de función arm_iter
@@ -797,6 +805,7 @@ void reversi8()
 #elif defined (TEST_BENCH_1)
 	patron_volteo_implementation = &patron_volteo_test; /* Prueba todas las implementaciones */
 #elif defined (TEST_BENCH_3)
+	mov_auto_iterator_begin();
 	static int num_invocacion = 1; // Veces que ha sido invocada
 	switch (num_invocacion){
 	
@@ -804,37 +813,29 @@ void reversi8()
 	case 1:
 		srand(__TIME__);
 		patron_volteo_implementation = &patron_volteo;
-		mov_auto_iterator_begin();
 		break;
 	
 	/* Resto de iteraciones: utilizar movimientos generados */
 	case 2:
 		patron_volteo_implementation = &patron_volteo;
-		mov_auto_iterator_begin();
 		break;
 	case 3:
 		patron_volteo_implementation = &patron_volteo_arm_c;
-		mov_auto_iterator_begin();
 		break;
 	case 4:
 		patron_volteo_implementation = &patron_volteo_arm_arm;
-		mov_auto_iterator_begin();
 		break;
 	case 5:
 		patron_volteo_implementation = &patron_volteo_c_iter;
-		mov_auto_iterator_begin();
 		break;
 	case 6:
 		patron_volteo_implementation = &patron_volteo_arm_iter;
-		mov_auto_iterator_begin();
 		break;
 	case 7:
 		patron_volteo_implementation = &patron_volteo_arm_iter_v2;
-		mov_auto_iterator_begin();
 		break;
 	case 8:
 		patron_volteo_implementation = &patron_volteo_c_iter_inline;
-		mov_auto_iterator_begin();
 		break;
 
 	default:
@@ -854,7 +855,7 @@ void reversi8()
         move = 0;
 
 #if defined (NORMAL_PLAY)
-        esperar_mov(&ready);
+        esperar_mov(&ready); /* [BREAKPOINT] */
 #elif defined (TEST_BENCH_1)
 		/* Genera movimientos aleatorios */
        	done = elegir_mov_auto(candidatas, tablero, &fila, &columna);
@@ -866,7 +867,9 @@ void reversi8()
 			/* Resto de iteraciones: utilizar movimientos generados */
         	done = mov_auto_iterator_next(&fila, &columna);
         }
-
+#endif
+#if defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
+        /* Detección de NO_HAY_PATRÓN */
         if (done == -1) {
 			fila = DIM;
 			columna = DIM;
