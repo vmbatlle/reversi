@@ -1,6 +1,6 @@
 /**
  * @file    timer2.h
- * @author  Victor M. Batlle <736478@unizar.es>
+ * @author  Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
  * @brief   Funciones de control del timer2 del s3c44b0x
  * @version 1.0.0
  */

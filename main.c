@@ -1,6 +1,6 @@
 /*********************************************************************************************
 * Fichero:	main.c
-* Autor:
+* Autor:    Diego Royo Meneses <740388@unizar.es>, Victor M. Batlle <736478@unizar.es>
 * Descrip:	punto de entrada de C
 * Version:  <P4-ARM.timer-leds>
 *********************************************************************************************/
