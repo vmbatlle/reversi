@@ -1,6 +1,6 @@
 /*
  * @file test_bench.c
- * @author Victor M. Batlle <736478@unizar.es>
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
  * @date 2018/10/04
  */
 
@@ -10,8 +10,12 @@
 #endif
 
 /* Constantes del programa */
+// Dimensión del tablero (DIMxDIM)
 #define DIM 8
-enum { MAX=10, FALSE=0, TRUE=1 };
+// Máximo de implementaciones diferentes que puede probar test_version
+enum { MAX=10 };
+enum { FALSE=0, TRUE=1 };
+// Ficha blanca, ficha negra
 enum {
 B = 1,
 N = 2
