@@ -110,7 +110,11 @@ patron_volteo_arm_iter:
   ldmdb fp, {r4-r7, fp, sp, pc}
 
 
-#------------------------------------------------------------------------
+
+
+#------------------------- COMIENZO SEGUNDA VERSIÓN ------------------------
+
+
 
 
 patron_volteo_arm_iter_v2:
