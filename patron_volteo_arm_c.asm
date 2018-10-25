@@ -27,19 +27,39 @@ patron_volteo_arm_c:
   # *(sp+4) = SC
   # *(sp+8) = color
   
+  #-- Creación del bloque de activación
+  # Apilar los registros que se modifican en la subrutina junto con sp, lr y pc
   mov ip, sp
   push {r4-r10, fp, ip, lr, pc}
+  # Apuntar el fp al primero de los registros apilado anteriormente (pc)
   sub fp, ip, #4
   # Solo hace falta guardar espacio para posicion_valida
-  # casilla y patron no necesitan guardarse en memoria al ser devueltas en r0 por sus respectivas funciones
+  # casilla y patron no necesitan almacenarse en memoria, solo registros
   sub sp, sp, #4
   
-
+  # El bloque de activación queda así:
+  #
+  #     (-44) |_posicion_valida_| <- sp
+  # (-16/-40) |_____r4-r10______|
+  #     (-12) |_______fp________|
+  #      (-8) |_______ip________|
+  #      (-4) |_______lr________|
+  #       (0) |_______pc________| <- fp
+  #      (+4) |_______SF________| <- ip
+  #      (+8) |_______SC________|
+  #     (+12) |______color______|
 
   #----- Cuerpo de la subrutina
-  # Cargar SF en r4, SC en r5 y color en r6
+  # Cargar los parámetros pasados por pila
   ldmib fp, {r4-r6}
+
+  # Uso de los registros (en esta parte):
+  # r0: &tablero     r4: SF
+  # r1: &longitud    r5: SC
+  # r2: FA           r6: color
+  # r3: CA
   
+  patron_volteo_sumas:
   # FA = FA + SF
   add r2, r2, r4
   # Para restar 1 suma 255, por lo tanto solo los 8 primeros bits de r2 son válidos
@@ -49,63 +69,77 @@ patron_volteo_arm_c:
   add r3, r3, r5
   and r3, r3, #255
   
+  patron_volteo_llamada_ficha_valida:
   # casilla = ficha_valida(tablero, FA, CA, &posicion_valida)
-  # Preparar el paso de parámetros, r0 ya tiene &tablero
-  # Salvar &tablero (r0) en r7 y &longitud (r1) en r8
-  mov r7, r0
-  mov r8, r1
-  # FA en r1 y CA en r2, guardarlos en r9 y r10 respectivamente, pueden cambiar al llamar a ficha_valida
-  mov r1, r2
-  mov r2, r3
-  mov r9, r1
-  mov r10, r2
-  # &posicion_valida en r3
-  sub r3, fp, #44
+  # Salvaguardar el valor de los registros r0-r3 en r7-r10
+  mov r7, r0        /* &tablero */
+  mov r8, r1        /* &longitud */
+  mov r9, r2        /* FA */
+  mov r10, r3       /* CA */
+  # Pasar los parámetros de ficha_valida en r0-r3
+  # r0 ya tiene &tablero
+  mov r1, r2        /* FA */
+  mov r2, r3        /* CA */
+  sub r3, fp, #44   /* &posicion_valida */
   bl ficha_valida
   
+  # Uso de los registros (en esta parte):
+  # r0: casilla                                   r6: color
+  # r1: <undef> (longitud más adelante)           r7: &tablero
+  # r2: <undef>                                   r8: &longitud
+  # r3: <undef> (posicion_valida más adelante)    r9: FA
+  # r4: SF                                       r10: CA
+  # r5: SC
+
   #--- Bloque condicional principal
   #- if ((posicion_valida == 1) && (casilla != color)) {
   #- } else if ((posicion_valida == 1 && (casilla == color)) {
   #- } else { }
-  
-  # Comprobar primero si posicion_valida es distinto de 1
+  patron_volteo_bloque_condicional:
+  # Cargar posicion_valida en r3 y compararlo con 1 para ver qué caso escoger
   ldr r3, [fp, #-44]
   cmp r3, #1
-  # posicion_valida = 0, devolver NO_HAY_PATRON
+
+  # Caso: posicion_valida != 1 (correspondiente al else final)
+  patron_volteo_posicion_valida_else:
   movne r0, #NO_HAY_PATRON
-  bne patron_volteo_callback
+  bne patron_volteo_callback  /* return NO_HAY_PATRON; */
   
-  # Comparar casilla (r0) con color (r6)
-  # Cargar longitud en r1 ya que lo vamos a usar independientemente del salto
+  # Caso: posicion_valida == 1 (correspondiente a los dos primeros casos del if)
+  patron_volteo_posicion_valida_1:
+  # Cargar longitud en r1 (se empleará más adelante)
   ldr r1, [r8]
+  # Comparación de casilla (r0) con color (r6) para ver qué caso escoger
   cmp r0, r6
   beq patron_volteo_color_igual
-  
-  # Caso casilla != color
+
+
+  # Caso: casilla != color (correspondiente al primer caso del bloque if)
+  patron_volteo_color_diferente:
   # *longitud = *longitud + 1
-  # ldr r1, [r8] (ya está cargado antes del branch)
+  # Sumar uno y almacenarlo en &longitud
   add r1, r1, #1
   str r1, [r8]
   # patron = patron_volteo(tablero, longitud, FA, CA, SF, SC, color)
-  # r0 = tablero (r7), r1 = &longitud (r8), r2 = FA (r9), r3 = CA (r10)
-  mov r0, r7
-  mov r1, r8
-  mov r2, r9
-  mov r3, r10
-  # Guardar en la pila SF (r4 -> sp), SC (r5 -> sp+4) y color (r6 -> sp+8) para la llamada recursiva
-  push {r4-r6}
+  # Paso de parámetros y creación del marco de pila para la llamada recursiva
+  # Pasar los cuatro primeros parámetros en r0-r3 (ver uso de los registros)
+  mov r0, r7    /* &tablero */
+  mov r1, r8    /* &longitud */
+  mov r2, r9    /* FA */
+  mov r3, r10   /* CA */
+  # Apilar los tres últimos parámetros en la pila
+  push {r4-r6}  /* SF, SC, color */
   bl patron_volteo_arm_c
-  # Devolver el resultado que ha devuelto en r0
-  b patron_volteo_callback
+  # r0 contiene el resultado a devolver
+  b patron_volteo_callback /* return patron; */
   
-  # Caso casilla == color
+  # Caso casilla == color (correspondiente al segundo caso del bloque if)
   patron_volteo_color_igual:
   #- if (*longitud > 0)
-  # ldr r1, [r8] (ya está cargado antes del branch)
   cmp r1, #0
   # Si longitud > 0 devuelve PATRON_ENCONTRADO, si no NO_HAY_PATRON
-  movgt r0, #PATRON_ENCONTRADO
-  movle r0, #NO_HAY_PATRON
+  movgt r0, #PATRON_ENCONTRADO /* return PATRON_ENCONTRADO; */
+  movle r0, #NO_HAY_PATRON     /* return NO_HAY_PATRON; */
 
 
   
@@ -113,6 +147,10 @@ patron_volteo_arm_c:
   
   # Callback, r0 contiene el valor a devolver
   patron_volteo_callback:
+  #-- Destrucción del bloque de activación
+  # Devolver el valor original a los registros,
+  # deshacer el bloque de activación de la subrutina
+  # y retornar al código correspondiente
   ldmdb fp, {r4-r10, fp, sp, pc}
 
 .end
