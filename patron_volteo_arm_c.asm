@@ -27,8 +27,11 @@ patron_volteo_arm_c:
   # *(sp+4) = SC
   # *(sp+8) = color
   
+  #-- Creación del bloque de activación
+  # Apilar los registros que se modifican en la subrutina junto con sp, lr y pc
   mov ip, sp
   push {r4-r10, fp, ip, lr, pc}
+  # Apuntar el fp al primero de los registros apilado anteriormente (pc)
   sub fp, ip, #4
   # Solo hace falta guardar espacio para posicion_valida
   # casilla y patron no necesitan almacenarse en memoria, solo registros
@@ -50,7 +53,7 @@ patron_volteo_arm_c:
   # Cargar los parámetros pasados por pila
   ldmib fp, {r4-r6}
 
-  # Uso de los registros:
+  # Uso de los registros (en esta parte):
   # r0: &tablero     r4: SF
   # r1: &longitud    r5: SC
   # r2: FA           r6: color
@@ -80,12 +83,12 @@ patron_volteo_arm_c:
   sub r3, fp, #44   /* &posicion_valida */
   bl ficha_valida
   
-  # Uso de los registros:
+  # Uso de los registros (en esta parte):
   # r0: casilla                                   r6: color
   # r1: <undef> (longitud más adelante)           r7: &tablero
   # r2: <undef>                                   r8: &longitud
   # r3: <undef> (posicion_valida más adelante)    r9: FA
-  # r4: SF                                        r10: CA
+  # r4: SF                                       r10: CA
   # r5: SC
 
   #--- Bloque condicional principal
@@ -114,11 +117,12 @@ patron_volteo_arm_c:
   # Caso: casilla != color (correspondiente al primer caso del bloque if)
   patron_volteo_color_diferente:
   # *longitud = *longitud + 1
-  # Sumar y almacenarlo en &longitud
+  # Sumar uno y almacenarlo en &longitud
   add r1, r1, #1
   str r1, [r8]
   # patron = patron_volteo(tablero, longitud, FA, CA, SF, SC, color)
-  # Pasar los cuatro primeros parámetros en r0-r3 (ver "uso de los registros")
+  # Paso de parámetros y creación del marco de pila para la llamada recursiva
+  # Pasar los cuatro primeros parámetros en r0-r3 (ver uso de los registros)
   mov r0, r7    /* &tablero */
   mov r1, r8    /* &longitud */
   mov r2, r9    /* FA */
@@ -143,8 +147,10 @@ patron_volteo_arm_c:
   
   # Callback, r0 contiene el valor a devolver
   patron_volteo_callback:
+  #-- Destrucción del bloque de activación
   # Devolver el valor original a los registros,
-  # deshacer el bloque de activación y retornar al código correspondiente
+  # deshacer el bloque de activación de la subrutina
+  # y retornar al código correspondiente
   ldmdb fp, {r4-r10, fp, sp, pc}
 
 .end
