@@ -6,19 +6,20 @@
 *********************************************************************************************/
 
 #include "timer2.h"
+#include "button.h"
 #include "44blib.h"
 #include "44b.h"
 #include "reversi8_2018.h"
 
 //#define TEST_BENCH_TIMER2
+#define TEST_BENCH_BUTTON
 
 /*--- codigo de funciones ---*/
 void Main(void)
 {
 	/* Inicializa controladores */
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
-	timer2_inicializar();	// Inicialización del timer 2
-
+	//timer2_inicializar();	// Inicialización del timer 2
 
 #if defined (TEST_BENCH_TIMER2)
 	volatile unsigned int tiempo1ms,tiempo10ms,tiempo1s,tiempo10s;
@@ -44,6 +45,13 @@ void Main(void)
 		Delay(100000);
 		tiempo10s = timer2_parar();
 		tiempo10s++;tiempo10s--; /* [BREAKPOINT] */
+	}
+#elif defined(TEST_BENCH_BUTTON)
+	button_iniciar();
+	button_empezar(&button_tratar);
+	double kk = 1.0;
+	while(1){
+		kk = kk * 372.47;
 	}
 #else
 	reversi8();

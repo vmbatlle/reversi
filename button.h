@@ -2,10 +2,11 @@
 #define _BUTTON_H_
 
 /* TODO cabeceras */
+enum estado_button {button_none, button_iz, button_dr};
 
 void button_iniciar(void);
 
-void button_empezar(void (*callback)(estado_button));
+void button_empezar(void (*callback)(enum estado_button));
 
 enum estado_button button_estado(void);
 
