@@ -7,7 +7,6 @@
 
 #include "timer0.h"
 #include "timer2.h"
-#include "led.h"
 #include "44blib.h"
 #include "44b.h"
 #include "reversi8_2018.h"
@@ -22,7 +21,7 @@ void Main(void)
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
-	leds_off();				// Apagar leds
+
 
 
 #if defined (TEST_BENCH_TIMER2)
@@ -63,18 +62,9 @@ void Main(void)
 		tiempo10s0++;tiempo10s0--; /* [BREAKPOINT] */
 	}
 #elif defined(TEST_BENCH_TIMER0)
-	unsigned long int anterior = 0;
 	timer0_empezar();
 	while(1){
 		int ahora = timer0_leer();
-		if (anterior + 25 <= ahora) {
-			if (led1_status()){
-				led1_off();
-			} else {
-				led1_on();
-			}
-			anterior = ahora;
-		}
 	}
 #else
 	reversi8();
