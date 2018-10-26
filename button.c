@@ -12,7 +12,7 @@ volatile static unsigned int int_count = 0;
 
 /* TODO volatile/static? */
 enum estado_button {button_none, button_iz, button_dr} button;
-void f_callback(enum estado_button button);
+void (*f_callback)(enum estado_button button);
 
 /* TODO escribir 0xf en EXTINTPND en lugar de 0xC (las eint4/5/6/7 van juntas) */
 
@@ -98,10 +98,11 @@ void button_empezar(void (*callback)(estado_button))
 
 enum estado_button button_estado(void)
 {
-	// TODO:
+	// TODO: completar
 	return button_none;
 }
 
+void button_tratar(enum estado_button button) __attribute__((interrupt("IRQ")));
 void button_tratar(enum estado_button button)
 {
 	// TODO: quitar int_count y el 8led, estan solo por tests
