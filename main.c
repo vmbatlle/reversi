@@ -14,6 +14,18 @@
 //#define TEST_BENCH_TIMER2
 #define TEST_BENCH_BUTTON
 
+void button_tratar(enum estado_button button)
+{
+	static int int_count = 0;
+	// TODO: quitar int_count y el 8led, estan solo por tests
+	if (button == button_iz) {
+		int_count--;
+	} else if (button == button_dr) {
+		int_count++;
+	}
+	//D8Led_symbol(int_count & 0x000f); // sacamos el valor por pantalla (módulo 16)
+}
+
 /*--- codigo de funciones ---*/
 void Main(void)
 {
@@ -49,9 +61,10 @@ void Main(void)
 #elif defined(TEST_BENCH_BUTTON)
 	button_iniciar();
 	button_empezar(&button_tratar);
-	double kk = 1.0;
+	int kk = 1;
 	while(1){
-		kk = kk * 372.47;
+		kk = kk + 1;
+		button_empezar(&button_tratar);
 	}
 #else
 	reversi8();
