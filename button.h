@@ -34,7 +34,4 @@ void button_empezar(void (*callback)(enum estado_button));
  */
 enum estado_button button_estado(void);
 
-/* TODO: mover función de callback a otro fichero */
-void button_tratar(enum estado_button button);
-
 #endif /* _BUTTON_H_ */
