@@ -4,9 +4,6 @@
 #include "button.h"
 #include "8led.h"
 
-/* Estado de los botones */
-static enum estado_button estado_actual_button;
-
 /* Función de callback */
 static void (*f_callback)(enum estado_button button);
 
@@ -41,7 +38,7 @@ void button_iniciar(void)
 {
 
 	rINTMSK |= BIT_EINT4567; 	    // Deshabilitar int. linea EINT4/5/6/7 en vector de máscaras
-										// poniendo el bit correspondiente a 0.
+									// poniendo el bit correspondiente a 0.
 
 	/* Configuracion del controlador de interrupciones. Estos registros están definidos en 44b.h */
 	rEXTINTPND |= 0xF;				// Pone a 0 los bits de EXTINTPND escribiendo 1s en el propio registro
@@ -83,5 +80,12 @@ void button_empezar(void (*callback)(enum estado_button))
 
 enum estado_button button_estado(void)
 {
-	return estado_actual_button;
+	unsigned int which = ~(rPDATG) & 0xFF;
+	if (which & 0x80) { // bit 7
+		return button_dr;
+	} else if (which & 0x40) { // bit 6
+		return button_iz;
+	} else {
+		return button_none;
+	}
 }
