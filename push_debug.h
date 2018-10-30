@@ -3,11 +3,18 @@
 
 #include <stdint.h>
 
+enum evento_ID { evento_button=1 };
+
+/**
+ * @brief TODO
+ */
+void push_inciar();
+
 /**
  * @brief Apila un nuevo evento en la cima.
  * @param ID_evento Identificador de la interrupción (MSB)
- * @param auxData Momento exacto de invocación
+ * @param auxData Información adicional
  */
-void push_debug(uint32_t ID_evento, uint32_t auxData);
+void push_debug(uint8_t ID_evento, uint32_t auxData);
 
 #endif /* __PUSH_DEBUG_H__ */

@@ -1,14 +1,25 @@
 #include "push_debug.h"
+#include "timer2.h"
 #include "option.h"
 
 enum {
-	MAX_SIZE = 256
+	MAX_SIZE = 256 / 4,
 };
-static volatile uint32_t *stack = (volatile uint32_t*)_ISR_STARTADDRESS-0xf00-MAX_SIZE; /*0xc7fef000*/
-static uint32_t size = 0;
+static volatile uint32_t *stack = (volatile uint32_t*)((_ISR_STARTADDRESS)-0xf00-0x100); /*0xc7fef00*/
+static uint32_t size;
 
-void push_debug(uint32_t ID_evento, uint32_t auxData){
-	(*(stack + size)) = ID_evento;
-	(*(stack + size + 4)) = auxData;
-	size = (size + 8) % MAX_SIZE;
+void push_iniciar() {
+	size = 1;
+	int i;
+	for (i = 1; i < MAX_SIZE; i++) {
+		(*(stack - i)) = 0;
+	}
+	timer2_empezar();
+
+}
+
+void push_debug(uint8_t ID_evento, uint32_t auxData){
+	(*(stack - size)) = (ID_evento << (8*3)) | (auxData & 0xFFFFFF);
+	(*(stack - size - 1)) = timer2_leer();
+	size = (size + 2) % MAX_SIZE;
 }
