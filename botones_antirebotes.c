@@ -49,7 +49,7 @@ enum pulsacion action_wait_trp (void) {
 
 enum pulsacion action_pressed (void) {
 	unsigned int time = timer0_leer();
-	if (time >= nextTime) {
+	if (time >= nextTime) { /* TODO: Comprobar overflow */
 		if (button_estado() == button_none) {
 			nextTime = time + trd;
 		} else {
