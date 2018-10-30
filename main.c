@@ -8,25 +8,21 @@
 #include "timer0.h"
 #include "timer2.h"
 #include "button.h"
-#include "led.h"
+#include "botones_antirebotes.h"
+#include "push_debug.h"
+//#include "led.h"
 #include "44blib.h"
 #include "44b.h"
 #include "reversi8_2018.h"
 
 //#define TEST_BENCH_TIMER2
-#define TEST_BENCH_TIMER0
+//#define TEST_BENCH_TIMER0
 //#define TEST_BENCH_BUTTON
+#define TEST_BENCH_REBOTES
 
-void button_tratar(enum estado_button button)
-{
-	static int int_count = 0;
-	// TODO: quitar int_count y el 8led, estan solo por tests
-	if (button == button_iz) {
-		int_count--;
-	} else if (button == button_dr) {
-		int_count++;
-	}
-	//D8Led_symbol(int_count & 0x000f); // sacamos el valor por pantalla (módulo 16)
+void insertar_pulsacion(enum estado_button button) {
+	push_debug((uint8_t) evento_button, (uint32_t)button);
+	button_empezar(insertar_pulsacion);
 }
 
 /*--- codigo de funciones ---*/
@@ -36,7 +32,6 @@ void Main(void)
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
-	leds_off();				// Apagar leds
 
 #if defined (TEST_BENCH_TIMER2)
 	volatile unsigned int tiempo1ms0,tiempo10ms0,tiempo1s0,tiempo10s0,
@@ -90,13 +85,24 @@ void Main(void)
 		}
 	}
 #elif defined(TEST_BENCH_BUTTON)
+	timer0_empezar();
 	button_iniciar();
-	button_empezar(&button_tratar);
+	antirebotes_iniciar();
 	int kk = 1;
 	while(1){
-		kk = kk + 1;
-		button_empezar(&button_tratar);
+		/* TODO: hacer la lectura del timer0 aqui y pasarlo como parametro a ar_gestionar */
+		volatile enum pulsacion button_pulsado = antirebotes_gestionar();
+		if (button_pulsado == pulsacion_iz) {
+			kk++;
+		} else if (button_pulsado == pulsacion_dr) {
+			kk++;
+		}
 	}
+#elif defined(TEST_BENCH_REBOTES)
+	push_iniciar();
+	button_iniciar();
+	button_empezar(insertar_pulsacion);
+	while(1);
 #else
 	reversi8();
 #endif
