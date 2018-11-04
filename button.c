@@ -95,12 +95,12 @@ enum estado_button button_estado(void)
 	 */
 	static volatile int emular_estado_button = 0;
 	switch(emular_estado_button){
-	case 0:
-		return button_none;
 	case 1:
 		return button_iz;
 	case 2:
 		return button_dr;
+	default:
+		return button_none;
 	}
 #else
 	unsigned int which = ~(rPDATG) & 0xFF;
