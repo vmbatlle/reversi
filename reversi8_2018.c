@@ -776,10 +776,6 @@ int patron_volteo_time(char tablero[][DIM], int *longitud, char FA, char CA, cha
 #endif // defined (TEST_BENCH_3)
 #endif // defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
 
-void reversi8_inicializar() {
-
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Proceso principal del juego
 // Utiliza el tablero,
