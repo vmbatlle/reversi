@@ -7,6 +7,7 @@
 
 #include "timer0.h"
 #include "timer2.h"
+#include "exceptions.h"
 #include "button.h"
 #include "botones_antirebotes.h"
 #include "push_debug.h"
@@ -30,8 +31,11 @@ void Main(void)
 {
 	/* Inicializa controladores */
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
+	excepciones_inicializar(); // Inicialización del capturador de excepciones
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
+
+	asm("swi #1");
 
 #if defined (TEST_BENCH_TIMER2)
 	volatile unsigned int tiempo1ms0,tiempo10ms0,tiempo1s0,tiempo10s0,
