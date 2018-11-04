@@ -18,7 +18,7 @@
 #define ENVIRONMENT_IO
 
 #if defined (TEST_BENCH_2)
-#include "test_bench.h"
+//#include "test_bench.h"
 #endif
 #if defined (ENVIRONMENT_IO)
 #include "timer2.h"
