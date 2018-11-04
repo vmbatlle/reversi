@@ -1,5 +1,5 @@
 /*
- * @file test_bench.h
+ * @file reversi8_2018.h
  * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
  * @date 2018/10/04
  */

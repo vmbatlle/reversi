@@ -17,8 +17,8 @@
 
 //#define TEST_BENCH_TIMER2
 //#define TEST_BENCH_TIMER0
-//#define TEST_BENCH_BUTTON
-#define TEST_BENCH_REBOTES
+#define TEST_BENCH_BUTTON
+//#define TEST_BENCH_REBOTES
 
 void insertar_pulsacion(enum estado_button button) {
 	push_debug((uint8_t) evento_button, (uint32_t)button);
