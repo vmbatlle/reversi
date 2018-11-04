@@ -10,6 +10,8 @@
 #include "44b.h"
 #include "44blib.h"
 
+#define ENVIRONMENT_EMULATOR
+
 /*--- variables globales del módulo ---*/
 /* tabla de segmentos */
 static int
@@ -25,8 +27,12 @@ void D8Led_init(void)
 
 void D8Led_symbol(int value)
 {
+#if defined(ENVIRONMENT_EMULATOR)
+	volatile int emular_8led = value;
+#else
 	/* muestra el Symbol[value] en el display (analogo al caso anterior) */
 	if ((value >= 0) && (value < size_8led)) {
 		LED8ADDR = (unsigned char) Symbol[value];
 	}
+#endif
 }

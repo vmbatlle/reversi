@@ -10,6 +10,8 @@
 #include "44b.h"
 #include "44blib.h"
 
+#define ENVIRONMENT_EMULATOR
+
 enum {
 	MIN_COUNT = 0, //0x0000
 	MAX_COUNT = 41237 // (MCLK/DIVISOR)/FRECUENCIA_DESEADA = (66MHz/32)/50Hz
@@ -63,7 +65,12 @@ void timer0_empezar(void) {
 }
 
 unsigned long int timer0_leer(void) {
+#if defined(ENVIRONMENT_EMULATOR)
+	static volatile unsigned long int emular_timer0 = 0;
+	return emular_timer0;
+#else
 	return timer0_num_int;
+#endif
 }
 
 unsigned long int timer0_parar(void) {

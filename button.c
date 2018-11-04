@@ -4,6 +4,8 @@
 #include "button.h"
 #include "8led.h"
 
+#define ENVIRONMENT_EMULATOR
+
 /* Función de callback */
 static void (*f_callback)(enum estado_button button);
 
@@ -80,6 +82,23 @@ void button_empezar(void (*callback)(enum estado_button))
 
 enum estado_button button_estado(void)
 {
+#if defined(ENVIRONMENT_EMULATOR)
+	/**
+	 * emular_estado_button:
+	 * 0 -> button_none
+	 * 1 -> button_iz
+	 * 2 -> button_dr
+	 */
+	static volatile int emular_estado_button = 0;
+	switch(emular_estado_button){
+	case 0:
+		return button_none;
+	case 1:
+		return button_iz;
+	case 2:
+		return button_dr;
+	}
+#else
 	unsigned int which = ~(rPDATG) & 0xFF;
 	if (which & 0x80) { // bit 7
 		return button_dr;
@@ -87,5 +106,6 @@ enum estado_button button_estado(void)
 		return button_iz;
 	} else {
 		return button_none;
+#endif
 	}
 }
