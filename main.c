@@ -94,11 +94,12 @@ void Main(void)
 	antirebotes_iniciar();
 	int kk = 1;
 	while(1){
+		/* TODO: llamada a reversi_main */
 		/* TODO: hacer la lectura del timer0 aqui y pasarlo como parametro a ar_gestionar */
-		volatile enum pulsacion button_pulsado = antirebotes_gestionar();
-		if (button_pulsado == pulsacion_iz) {
+		volatile enum pulsacion_button buttonPulsado = antirebotes_gestionar();
+		if (buttonPulsado == pulsacion_iz) {
 			kk++;
-		} else if (button_pulsado == pulsacion_dr) {
+		} else if (buttonPulsado == pulsacion_dr) {
 			kk++;
 		}
 	}
