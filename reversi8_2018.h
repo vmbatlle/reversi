@@ -9,4 +9,6 @@
 
 void reversi8();
 
+void reversi_main();
+
 #endif

@@ -89,20 +89,10 @@ void Main(void)
 		}
 	}
 #elif defined(TEST_BENCH_BUTTON)
-	timer0_empezar();
 	button_iniciar();
 	antirebotes_iniciar();
-	int kk = 1;
-	while(1){
-		/* TODO: llamada a reversi_main */
-		/* TODO: hacer la lectura del timer0 aqui y pasarlo como parametro a ar_gestionar */
-		volatile enum pulsacion_button buttonPulsado = antirebotes_gestionar();
-		if (buttonPulsado == pulsacion_iz) {
-			kk++;
-		} else if (buttonPulsado == pulsacion_dr) {
-			kk++;
-		}
-	}
+	timer0_empezar();
+	reversi_main();
 #elif defined(TEST_BENCH_REBOTES)
 	push_iniciar();
 	button_iniciar();

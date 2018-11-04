@@ -4,6 +4,10 @@
  * @date 2018/10/21
  */
 
+/* TODO */
+#include "timer0.h"
+#include "botones_antirebotes.h"
+
 /* Descomente SÓLO UNA línea cada vez */
 // TEST_BENCH_1: Juego normal con patron_volteo_test que compara los resultados de todas las implementaciones
 // TEST_BENCH_2: Uso de test_bench: Casos conflictivos (tests 1-5) y medidas de tiempo (tests 6-9)
@@ -772,6 +776,10 @@ int patron_volteo_time(char tablero[][DIM], int *longitud, char FA, char CA, cha
 #endif // defined (TEST_BENCH_3)
 #endif // defined (TEST_BENCH_1) || defined (TEST_BENCH_3)
 
+void reversi8_inicializar() {
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Proceso principal del juego
 // Utiliza el tablero,
@@ -970,4 +978,28 @@ void reversi8()
 #endif // defined (TEST_BENCH_2)
 
     while(1){/* FIN */}; /* [BREAKPOINT] */
+}
+
+void reversi_inicializar() {
+	/* TODO juntar con la otra funcion, esto es de prueba */
+}
+
+void reversi_main() {
+	/* TODO juntar con la otra funcion, esto es de prueba */
+	reversi_inicializar();
+	volatile int kk;
+	while(1) {
+		unsigned int ahora = timer0_leer();
+		enum pulsacion_button buttonPulsado = antirebotes_gestionar(ahora);
+		switch (buttonPulsado) {
+		case pulsacion_iz:
+			kk++;
+			break;
+		case pulsacion_dr:
+			kk++;
+			break;
+		default:
+			kk++;
+		}
+	}
 }
