@@ -106,6 +106,6 @@ enum estado_button button_estado(void)
 		return button_iz;
 	} else {
 		return button_none;
-#endif
 	}
+#endif
 }
