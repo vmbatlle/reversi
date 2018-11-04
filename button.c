@@ -15,6 +15,7 @@ void button_ISR(void) __attribute__((interrupt("IRQ")));
 
 void button_ISR(void)
 {
+
 	/* Desactivar las interrupciones para la línea correspondiente a EINT4/5/6/7 */
 	rINTMSK |= BIT_EINT4567; 		// Enmascarar interrupciones línea EINT4/5/6/7
 
@@ -39,6 +40,7 @@ void button_ISR(void)
 void button_iniciar(void)
 {
 
+	/* Desactivar las interrupciones para la línea correspondiente a EINT4/5/6/7 */
 	rINTMSK |= BIT_EINT4567; 	    // Deshabilitar int. linea EINT4/5/6/7 en vector de máscaras
 									// poniendo el bit correspondiente a 0.
 
@@ -55,6 +57,8 @@ void button_iniciar(void)
 	pISR_EINT4567 = (unsigned) button_ISR;
 
 	/* TODO: sería más correcto configurar primero el puerto y luego las interrupciones o da igual? */
+	/* TODO: En 44blib.c existe una funcion Port_Init() que inicializa los puertos A-G y se llama desde sys_init()
+	 * 			Por lo tanto, estas dos instrucciones no hacen nada. */
 	/* Configuracion del puerto G */
 	rPCONG |= 0xF000;			// Establece la funcion de los pines 6 y 7 como EINT6-7
 	rPUPG &= ~(0xC0);			// Habilita el "pull up" de los puertos 6 y 7
