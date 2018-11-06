@@ -19,14 +19,14 @@ static int Symbol[size_8led] = { cero, uno, dos, tres, cuatro, cinco, seis, siet
 #endif
 
 /*--- código de las funciones ---*/
-void D8Led_init(void)
+void D8led_inicializar(void)
 {
 	/* Estado inicial del display con todos los segmentos iluminados
 	   (buscar en los ficheros de cabecera la direccion implicada) */
 	LED8ADDR = (unsigned char) cero;
 }
 
-void D8Led_symbol(int value)
+void D8led_gestionar(int value)
 {
 #if defined(ENVIRONMENT_EMULATOR)
 	volatile int emular_8led = value;

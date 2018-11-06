@@ -4,6 +4,10 @@
  * @date 2018/11/06
  */
 
+#include "timer0.h"
+#include "botones_antirebotes.h"
+#include "8led.h"
+
 //#define ENVIRONMENT_EMULATOR
 
 // Tamaño del tablero
@@ -74,14 +78,13 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
      // VARIABLES PARA INTERACCIONAR CON LA ENTRADA SALIDA
      // Pregunta: ¿hay que hacer algo con ellas para que esto funcione bien?
      // (por ejemplo añadir alguna palabra clave para garantizar que la sincronización a través de esa variable funcione)
-  volatile unsigned char fila=0, columna=0, ready = 0;
 
 extern int patron_volteo(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 0 indica CASILLA_VACIA, 1 indica FICHA_BLANCA y 2 indica FICHA_NEGRA
 // pone el tablero a cero y luego coloca las fichas centrales.
-void init_table(char tablero[][DIM], char candidatas[][DIM])
+void tablero_inicializar(char tablero[][DIM], char candidatas[][DIM])
 {
     int i, j;
 
@@ -357,6 +360,43 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
         candidatas[f][c+1] = SI;
 }
 
+void reversi_inicializar(char candidatas[8][8]) {
+    tablero_inicializar(tablero, candidatas);
+}
+
+void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char columna) {
+
+	int done;     // la máquina ha conseguido mover o no
+	int move = 0; // el humano ha conseguido mover o no
+	int fin = 0;  // fin vale 1 si el humano no ha podido mover
+				  // (ha introducido un valor de movimiento con algún 8)
+				  // y luego la máquina tampoco puede
+	unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
+
+	// si la fila o columna son 8 asumimos que el jugador no puede mover
+	if (((fila) != DIM) && ((columna) != DIM))
+	{
+		tablero[fila][columna] = FICHA_NEGRA;
+		actualizar_tablero(tablero, fila, columna, FICHA_NEGRA);
+		actualizar_candidatas(candidatas, fila, columna);
+		move = 1;
+	}
+
+	// escribe el movimiento en las variables globales fila columna
+	done = elegir_mov(candidatas, tablero, &f, &c);
+	if (done == -1)
+	{
+		if (move == 0)
+			fin = 1;
+	}
+	else
+	{
+		tablero[(int)f][(int)c] = FICHA_BLANCA;
+		actualizar_tablero(tablero, f, c, FICHA_BLANCA);
+		actualizar_candidatas(candidatas, f, c);
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Proceso principal del juego
 // Utiliza el tablero,
@@ -369,59 +409,67 @@ void actualizar_candidatas(char candidatas[][DIM], unsigned char f, unsigned cha
 // Sólo que la máquina realice un movimiento correcto.
 void reversi_main()
 {
-
 	 ////////////////////////////////////////////////////////////////////
 	 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
-	// sólo se exploran las que están alrededor de las fichas colocadas
+	 // sólo se exploran las que están alrededor de las fichas colocadas
 	 ////////////////////////////////////////////////////////////////////
 	char __attribute__ ((aligned (8))) candidatas[DIM][DIM] =
+   {
+       {NO,NO,NO,NO,NO,NO,NO,NO},
+       {NO,NO,NO,NO,NO,NO,NO,NO},
+       {NO,NO,NO,NO,NO,NO,NO,NO},
+       {NO,NO,NO,NO,NO,NO,NO,NO},
+       {NO,NO,NO,NO,NO,NO,NO,NO},
+       {NO,NO,NO,NO,NO,NO,NO,NO},
+       {NO,NO,NO,NO,NO,NO,NO,NO},
+       {NO,NO,NO,NO,NO,NO,NO,NO}
+   };
+
+	unsigned char ahora;
+	enum {FILA, COLUMNA} tratando = FILA;
+	int D8led_value = -1;
+	unsigned char fila, columna;
+
+	reversi_inicializar(candidatas);
+
+    while (1)
     {
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO},
-        {NO,NO,NO,NO,NO,NO,NO,NO}
-    };
+    	// gestión dispositivos
 
+    	ahora = timer0_leer();
 
-    int done;     // la máquina ha conseguido mover o no
-    int move = 0; // el humano ha conseguido mover o no
-    int blancas, negras; // número de fichas de cada color
-    int fin = 0;  // fin vale 1 si el humano no ha podido mover
-                  // (ha introducido un valor de movimiento con algún 8)
-                  // y luego la máquina tampoco puede
-    unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
+    	//latido_gestionar();
 
-    init_table(tablero, candidatas);
-    while (fin == 0)
-    {
-        move = 0;
-        esperar_mov(&ready);
-        // si la fila o columna son 8 asumimos que el jugador no puede mover
-        if (((fila) != DIM) && ((columna) != DIM))
-        {
-            tablero[fila][columna] = FICHA_NEGRA;
-            actualizar_tablero(tablero, fila, columna, FICHA_NEGRA);
-            actualizar_candidatas(candidatas, fila, columna);
-            move = 1;
-        }
+    	enum pulsacion_button btn = antirebotes_gestionar(ahora);
 
-        // escribe el movimiento en las variables globales fila columna
-        done = elegir_mov(candidatas, tablero, &f, &c);
-        if (done == -1)
-        {
-            if (move == 0)
-                fin = 1;
-        }
-        else
-        {
-            tablero[(int)f][(int)c] = FICHA_BLANCA;
-            actualizar_tablero(tablero, f, c, FICHA_BLANCA);
-            actualizar_candidatas(candidatas, f, c);
-        }
+    	switch (btn) {
+    	case pulsacion_iz:
+    		D8led_value = (D8led_value + 1) % 8;
+    		break;
+    	case pulsacion_dr:
+    		if (tratando == FILA) {
+    			fila = D8led_value;
+    			tratando = COLUMNA;
+    		} else {
+    			columna = D8led_value;
+    			tratando = FILA;
+    		}
+    		D8led_value = -1;
+    		break;
+    	case pulsacion_none:
+    		break;
+    	}
+
+    	if (D8led_value >= 0 && D8led_value <= 7){
+    		D8led_gestionar(D8led_value);
+    	} else {
+    		if (tratando == FILA) {
+    			D8led_gestionar(15); /* 15 = F */
+    		} else {
+    			D8led_gestionar(15); /* 15 = C */
+    		}
+    	}
+
+        reversi_procesar(candidatas, fila, columna);
     }
-    contar(tablero, &blancas, &negras);
 }

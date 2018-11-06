@@ -36,7 +36,7 @@ enum {
 
 
 /*--- declaración de funciones visibles del módulo 8led.c/8led.h ---*/
-void D8Led_init(void);
-void D8Led_symbol(int value);
+void D8led_inicializar(void);
+void D8led_gestionar(int value);
 
 #endif /* _8LED_H_ */

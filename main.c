@@ -11,7 +11,7 @@
 #include "button.h"
 #include "botones_antirebotes.h"
 #include "push_debug.h"
-//#include "led.h"
+#include "8led.h"
 #include "44blib.h"
 #include "44b.h"
 #include "reversi_main.h"
@@ -32,6 +32,7 @@ void Main(void)
 	excepciones_inicializar(); // Inicialización del capturador de excepciones
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
+	D8led_inicializar();
 	push_iniciar();
 	button_iniciar();
 	antirebotes_iniciar();
