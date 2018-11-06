@@ -1,5 +1,5 @@
-#ifndef __BOTONES_ANTIREBOTES_H__
-#define __BOTONES_ANTIREBOTES_H__
+#ifndef __BOTONES_ANTIRREBOTES_H__
+#define __BOTONES_ANTIRREBOTES_H__
 
 /*
  * Estados del autómata para gestionar los rebotes de los botones:
@@ -9,7 +9,7 @@
  * wait_release: Se ha presinado un botón y se ha devuelto el valor, esperar a que se levante ese botón
  * wait_trd: Se ha levantado el botón, esperar trd ticks para volver a activarlo (rebotes salida)
  */
-enum antirebotes_estado {
+enum antirrebotes_estado {
 	unpressed, wait_trp, pressed, wait_release, wait_trd, MAX_STATES=5
 };
 
@@ -26,7 +26,7 @@ enum pulsacion_button {
 /**
  * @brief 	Inicia el autómata encargado de tratar los rebotes de los botones.
  */
-void antirebotes_iniciar(void);
+void antirrebotes_iniciar(void);
 
 /**
  * @brief	Actualiza el autómata para los rebotes de los botones
@@ -35,6 +35,6 @@ void antirebotes_iniciar(void);
  * 			pulsacion_dr si se ha pulsado el botón derecho,
  * 			o pulsacion_none en caso contrario.
  */
-enum pulsacion_button antirebotes_gestionar(unsigned int timeAhora);
+enum pulsacion_button antirrebotes_gestionar(unsigned int timeAhora);
 
-#endif /* __BOTONES_ANTIREBOTES_H__ */
+#endif /* __BOTONES_ANTIRREBOTES_H__ */

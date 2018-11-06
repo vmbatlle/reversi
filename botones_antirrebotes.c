@@ -1,9 +1,9 @@
-#include "botones_antirebotes.h"
+#include "botones_antirrebotes.h"
 #include "button.h"
 #include "timer0.h"
 
 /* Estado actual de la máquina de estados */
-static enum antirebotes_estado estadoActual;
+static enum antirrebotes_estado estadoActual;
 
 /* trp y trd en ticks (espera para los rebotes de entrada / salida) */
 static const unsigned int trp = 20;
@@ -28,7 +28,7 @@ static unsigned int timeAntes = 0;
 static enum pulsacion_button pulsacionRealizada;
 
 /* Almacena qué boton se ha pulsado (button), callback desde la ISR de los botones */
-void antirebotes_callback(enum estado_button button) {
+void antirrebotes_callback(enum estado_button button) {
 	if (estadoActual == unpressed) {
 		estadoActual = wait_trp;
 		pulsacionRealizada = button == button_iz ? pulsacion_iz : pulsacion_dr;
@@ -36,12 +36,12 @@ void antirebotes_callback(enum estado_button button) {
 	}
 }
 
-void antirebotes_iniciar(void) {
+void antirrebotes_iniciar(void) {
 	estadoActual = unpressed;
-	button_empezar(antirebotes_callback);
+	button_empezar(antirrebotes_callback);
 }
 
-enum pulsacion_button antirebotes_gestionar(unsigned int timeAhora) {
+enum pulsacion_button antirrebotes_gestionar(unsigned int timeAhora) {
 	if (estadoActual >= 0 && estadoActual < MAX_STATES) {
 		return tabla_estados[estadoActual](timeAhora);
 	} else {
@@ -86,7 +86,7 @@ enum pulsacion_button action_wait_release (unsigned int timeAhora) {
 /* wait_trd: Se ha levantado el botón, esperar trd ticks para volver a activarlo (rebotes salida) */
 enum pulsacion_button action_wait_trd (unsigned int timeAhora) {
 	if (timeAhora - timeAntes >= trd) {
-		button_empezar(antirebotes_callback);
+		button_empezar(antirrebotes_callback);
 		estadoActual = unpressed;
 	}
 	return pulsacion_none;

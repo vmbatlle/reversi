@@ -9,7 +9,7 @@
 #include "timer2.h"
 #include "exceptions.h"
 #include "button.h"
-#include "botones_antirebotes.h"
+#include "botones_antirrebotes.h"
 #include "push_debug.h"
 #include "8led.h"
 #include "44blib.h"
@@ -35,7 +35,7 @@ void Main(void)
 	D8led_inicializar();
 	push_iniciar();
 	button_iniciar();
-	antirebotes_iniciar();
+	antirrebotes_iniciar();
 
 	reversi_main();
 
