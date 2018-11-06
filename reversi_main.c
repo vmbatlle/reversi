@@ -7,6 +7,7 @@
 #include "timer0.h"
 #include "botones_antirrebotes.h"
 #include "8led.h"
+#include "latido.h"
 
 //#define ENVIRONMENT_EMULATOR
 
@@ -438,7 +439,7 @@ void reversi_main()
 
     	ahora = timer0_leer();
 
-    	//latido_gestionar();
+    	latido_gestionar(ahora);
 
     	enum pulsacion_button btn = antirrebotes_gestionar(ahora);
 

@@ -12,6 +12,7 @@
 #include "botones_antirrebotes.h"
 #include "push_debug.h"
 #include "8led.h"
+#include "latido.h"
 #include "44blib.h"
 #include "44b.h"
 #include "reversi_main.h"
@@ -32,6 +33,7 @@ void Main(void)
 	excepciones_inicializar(); // Inicialización del capturador de excepciones
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
+	latido_inicializar();
 	D8led_inicializar();
 	push_iniciar();
 	button_iniciar();
@@ -40,18 +42,9 @@ void Main(void)
 	reversi_main();
 
 #if defined(TEST_BENCH_TIMER0)
-	unsigned long int anterior = 0;
 	timer0_empezar();
 	while(1){
-		int ahora = timer0_leer();
-		if (anterior + 25 <= ahora) {
-			if (led1_status()){
-				led1_off();
-			} else {
-				led1_on();
-			}
-			anterior = ahora;
-		}
+		latido_gestionar(timer0_leer());
 	}
 #elif defined(TEST_BENCH_REBOTES)
 	button_empezar(insertar_pulsacion);
