@@ -1,13 +1,11 @@
 /*
- * @file reversi8_2018.h
+ * @file reversi_main.h
  * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
- * @date 2018/10/04
+ * @date 2018/11/06
  */
 
-#ifndef _REVERSI8_2018_H_
-#define _REVERSI8_2018_H_
-
-void reversi8();
+#ifndef _REVERSI_MAIN_H_
+#define _REVERSI_MAIN_H_
 
 void reversi_main();
 

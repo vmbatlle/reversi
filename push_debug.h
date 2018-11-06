@@ -8,7 +8,7 @@ enum evento_ID { evento_button=1 };
 /**
  * @brief TODO
  */
-void push_inciar();
+void push_iniciar();
 
 /**
  * @brief Apila un nuevo evento en la cima.
