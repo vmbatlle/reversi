@@ -67,6 +67,7 @@ void timer0_empezar(void) {
 unsigned long int timer0_leer(void) {
 #if defined(ENVIRONMENT_EMULATOR)
 	static volatile unsigned long int emular_timer0 = 0;
+	emular_timer0++;
 	return emular_timer0;
 #else
 	return timer0_num_int;
