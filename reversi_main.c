@@ -408,6 +408,11 @@ void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char c
 // en esta versión el humano lleva negras y la máquina blancas
 // no se comprueba que el humano mueva correctamente.
 // Sólo que la máquina realice un movimiento correcto.
+
+//TODO
+enum pulsacion_button btn_lista[] = {pulsacion_iz, pulsacion_iz, pulsacion_iz, pulsacion_iz, pulsacion_dr,
+								pulsacion_iz, pulsacion_iz, pulsacion_iz, pulsacion_dr};
+
 void reversi_main()
 {
 	 ////////////////////////////////////////////////////////////////////
@@ -430,7 +435,7 @@ void reversi_main()
 	enum {FILA, COLUMNA} tratando = FILA;
 	int D8led_value = -1;
 	unsigned char fila, columna;
-
+	static int i = 0;
 	reversi_inicializar(candidatas);
 
     while (1)
@@ -441,7 +446,8 @@ void reversi_main()
 
     	latido_gestionar(ahora);
 
-    	enum pulsacion_button btn = antirrebotes_gestionar(ahora);
+    	enum pulsacion_button btn = btn_lista[i];//antirrebotes_gestionar(ahora);
+    	i = (i + 1) % 9;
 
     	switch (btn) {
     	case pulsacion_iz:
@@ -454,6 +460,7 @@ void reversi_main()
     		} else {
     			columna = D8led_value;
     			tratando = FILA;
+    	        reversi_procesar(candidatas, fila, columna);
     		}
     		D8led_value = -1;
     		break;
@@ -461,16 +468,18 @@ void reversi_main()
     		break;
     	}
 
-    	if (D8led_value >= 0 && D8led_value <= 7){
-    		D8led_gestionar(D8led_value);
-    	} else {
-    		if (tratando == FILA) {
-    			D8led_gestionar(15); /* 15 = F */
-    		} else {
-    			D8led_gestionar(15); /* 15 = C */
-    		}
+    	// Solo actualizarlo cuando cambia el valor de D8led_value
+    	if (btn == pulsacion_iz || btn == pulsacion_dr) {
+			if (D8led_value >= 0 && D8led_value <= 7){
+				D8led_gestionar(D8led_value);
+			} else {
+				if (tratando == FILA) {
+					D8led_gestionar(15); /* 15 = F */
+				} else {
+					D8led_gestionar(12); /* 12 = C */
+				}
+			}
     	}
 
-        reversi_procesar(candidatas, fila, columna);
     }
 }
