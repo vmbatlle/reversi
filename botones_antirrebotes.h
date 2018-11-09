@@ -10,7 +10,7 @@
  * wait_trd: Se ha levantado el botón, esperar trd ticks para volver a activarlo (rebotes salida)
  */
 enum antirrebotes_estado {
-	unpressed, wait_trp, pressed, short_hold, long_hold, wait_trd, MAX_STATES=6
+	unpressed, wait_trp, pressed, short_hold, long_hold, wait_trd, MAX_STATES_BA=6
 };
 
 /*

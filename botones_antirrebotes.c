@@ -19,7 +19,7 @@ enum pulsacion_button action_short_hold (unsigned int);
 enum pulsacion_button action_long_hold (unsigned int);
 enum pulsacion_button action_wait_trd (unsigned int);
 /* Tabla que relaciona los estados con sus acciones */
-enum pulsacion_button (*const tabla_estados [MAX_STATES]) (unsigned int) = {
+static enum pulsacion_button (*const tabla_estados [MAX_STATES_BA]) (unsigned int) = {
 	action_unpressed, action_wait_trp, action_pressed, action_short_hold, action_long_hold, action_wait_trd
 };
 
@@ -45,7 +45,7 @@ void antirrebotes_iniciar(void) {
 }
 
 enum pulsacion_button antirrebotes_gestionar(unsigned int timeAhora) {
-	if (estadoActual >= 0 && estadoActual < MAX_STATES) {
+	if (estadoActual >= 0 && estadoActual < MAX_STATES_BA) {
 		return tabla_estados[estadoActual](timeAhora);
 	} else {
 		/* Estado inválido */

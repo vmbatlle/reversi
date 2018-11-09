@@ -4,9 +4,8 @@
  * @date 2018/11/06
  */
 
+#include "jugada_por_botones.h"
 #include "timer0.h"
-#include "botones_antirrebotes.h"
-#include "8led.h"
 #include "latido.h"
 
 //#define ENVIRONMENT_EMULATOR
@@ -427,12 +426,12 @@ void reversi_main()
    };
 
 	unsigned long int ahora;
-	enum {FILA, COLUMNA} tratando = FILA;
-	int D8led_value = -1;
-	unsigned char fila, columna;
+	char fila, columna;
+	int ready;
 	reversi_inicializar(candidatas);
+	jugada_por_botones_iniciar();
 	timer0_empezar();
-	D8led_gestionar(15); /* 15 = F */
+
 
     while (1)
     {
@@ -442,40 +441,9 @@ void reversi_main()
 
     	latido_gestionar(ahora);
 
-    	enum pulsacion_button btn = antirrebotes_gestionar(ahora);
-
-    	switch (btn) {
-    	case pulsacion_iz:
-    		D8led_value = (D8led_value + 1) % 8;
-    		break;
-    	case pulsacion_dr:
-    		if (D8led_value != -1) {
-        		if (tratando == FILA) {
-        			fila = D8led_value;
-        			tratando = COLUMNA;
-        		} else {
-        			columna = D8led_value;
-        			tratando = FILA;
-        	        reversi_procesar(candidatas, fila, columna);
-        		}
-        		D8led_value = -1;
-    		}
-    		break;
-    	case pulsacion_none:
-    		break;
-    	}
-
-    	// Solo actualizarlo cuando cambia el valor de D8led_value
-    	if (btn == pulsacion_iz || btn == pulsacion_dr) {
-			if (D8led_value >= 0 && D8led_value <= 7){
-				D8led_gestionar(D8led_value);
-			} else {
-				if (tratando == FILA) {
-					D8led_gestionar(15); /* 15 = F */
-				} else {
-					D8led_gestionar(12); /* 12 = C */
-				}
-			}
+    	jugada_por_botones_gestionar(ahora, &ready, &fila, &columna);
+    	if (ready) {
+            reversi_procesar(candidatas, fila, columna);
     	}
 
     }
