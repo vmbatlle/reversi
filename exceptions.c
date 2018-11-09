@@ -15,9 +15,8 @@ enum exception_type { exception_undef = 0, exception_swi = 1, exception_dabort =
 
 static volatile int error_variable = 0;
 void handler(enum exception_type type, int lr) {
-#if defined(ENVIRONMENT_EMULATOR)
 	error_variable = 1;
-#else
+#if !defined(ENVIRONMENT_EMULATOR)
 	D8led_inicializar();
 	while(1) {
 		D8led_gestionar(16);
@@ -31,19 +30,19 @@ void handler(enum exception_type type, int lr) {
 void  __attribute__((interrupt("UNDEF"))) handler_undef(void) {
 	volatile int lr;
 	asm("mov %[resultado], lr" : [resultado] "=r" (lr));
-	handler(exception_undef, lr - 4);
+	handler(exception_undef, lr - 4); // corregir lr para que apunte a la instrucción que causa la excepción
 }
 
 void  __attribute__((interrupt("SWI"))) handler_swi(void) {
 	volatile int lr;
 	asm("mov %[resultado], lr" : [resultado] "=r" (lr));
-	handler(exception_swi, lr - 4);
+	handler(exception_swi, lr - 4); // corregir lr para que apunte a la instrucción que causa la excepción
 }
 
 void  __attribute__((interrupt("ABORT"))) handler_dabort(void) {
 	volatile int lr;
 	asm("mov %[resultado], lr" : [resultado] "=r" (lr));
-	handler(exception_dabort, lr - 8);
+	handler(exception_dabort, lr - 8); // corregir lr para que apunte a la instrucción que causa la excepción
 }
 
 void excepciones_inicializar(void) {
