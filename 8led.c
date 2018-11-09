@@ -12,6 +12,8 @@
 
 #define ENVIRONMENT_EMULATOR
 
+volatile int emular_8led = 0;
+
 #if !defined(ENVIRONMENT_EMULATOR)
 /*--- variables globales del módulo ---*/
 /* tabla de segmentos */
@@ -29,8 +31,8 @@ void D8led_inicializar(void)
 void D8led_gestionar(int value)
 {
 #if defined(ENVIRONMENT_EMULATOR)
-	volatile int emular_8led = value;
-	asm("" : [none] "=r" (emular_8led) : );
+	emular_8led = value;
+	asm("" : [none] "=r" (emular_8led) : ); // TODO
 #else
 	/* muestra el Symbol[value] en el display (analogo al caso anterior) */
 	if ((value >= 0) && (value < size_8led)) {

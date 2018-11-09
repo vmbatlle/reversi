@@ -6,6 +6,8 @@
 
 #define ENVIRONMENT_EMULATOR
 
+volatile int emular_estado_button = 0;
+
 /* Función de callback */
 static void (*f_callback)(enum estado_button button);
 
@@ -89,11 +91,10 @@ enum estado_button button_estado(void)
 #if defined(ENVIRONMENT_EMULATOR)
 	/**
 	 * emular_estado_button:
-	 * 0 -> button_none
 	 * 1 -> button_iz
 	 * 2 -> button_dr
+	 * otro valor -> button_none
 	 */
-	static volatile int emular_estado_button = 0;
 	switch(emular_estado_button){
 	case 1:
 		return button_iz;
