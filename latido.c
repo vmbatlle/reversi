@@ -1,5 +1,6 @@
 #include "latido.h"
 #include "led.h"
+#include "push_debug.h"
 
 enum {
 	TIMER0_FRECUENCIA = 50 //Número de interrupciones del timer0 por segundo
@@ -43,7 +44,7 @@ void latido_gestionar(unsigned long int ahora){
 	static unsigned long int anterior = 0;
 	static unsigned long int periodo = TIMER0_FRECUENCIA/4;
 
-	if (ahora - anterior >= periodo) {
+	if ((ahora - anterior) >= periodo) {
 		if (led1_status()){
 			led1_off();
 		} else {

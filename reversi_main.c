@@ -426,7 +426,7 @@ void reversi_main()
        {NO,NO,NO,NO,NO,NO,NO,NO}
    };
 
-	unsigned char ahora;
+	unsigned long int ahora;
 	enum {FILA, COLUMNA} tratando = FILA;
 	int D8led_value = -1;
 	unsigned char fila, columna;

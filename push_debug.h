@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-enum evento_ID { evento_button=1 };
+enum evento_ID { evento_button=1, evento_timer0=2 };
 
 /**
  * @brief TODO
