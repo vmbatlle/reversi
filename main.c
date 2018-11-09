@@ -31,6 +31,9 @@ void Main(void)
 	/* Inicializa controladores */
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
 	excepciones_inicializar(); // Inicialización del capturador de excepciones
+
+	//asm volatile (".word 0xe7f000f0\n");
+
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
 	latido_inicializar();
@@ -38,8 +41,6 @@ void Main(void)
 	push_iniciar();
 	button_iniciar();
 	antirrebotes_iniciar();
-
-	reversi_main();
 
 #if defined(TEST_BENCH_TIMER0)
 	timer0_empezar();
@@ -49,5 +50,8 @@ void Main(void)
 #elif defined(TEST_BENCH_REBOTES)
 	button_empezar(insertar_pulsacion);
 	while(1);
+#else
+	// Ejecución normal
+	reversi_main();
 #endif
 }

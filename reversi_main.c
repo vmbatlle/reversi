@@ -375,7 +375,7 @@ void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char c
 	unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
 
 	// si la fila o columna son 8 asumimos que el jugador no puede mover
-	if (((fila) != DIM) && ((columna) != DIM))
+	if ((fila >= 0 && fila < DIM) && (columna >= 0 && columna < DIM))
 	{
 		tablero[fila][columna] = FICHA_NEGRA;
 		actualizar_tablero(tablero, fila, columna, FICHA_NEGRA);
@@ -408,11 +408,6 @@ void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char c
 // en esta versión el humano lleva negras y la máquina blancas
 // no se comprueba que el humano mueva correctamente.
 // Sólo que la máquina realice un movimiento correcto.
-
-//TODO
-enum pulsacion_button btn_lista[] = {pulsacion_iz, pulsacion_iz, pulsacion_iz, pulsacion_iz, pulsacion_dr,
-								pulsacion_iz, pulsacion_iz, pulsacion_iz, pulsacion_dr};
-
 void reversi_main()
 {
 	 ////////////////////////////////////////////////////////////////////
@@ -435,8 +430,9 @@ void reversi_main()
 	enum {FILA, COLUMNA} tratando = FILA;
 	int D8led_value = -1;
 	unsigned char fila, columna;
-	static int i = 0;
 	reversi_inicializar(candidatas);
+	timer0_empezar();
+	D8led_gestionar(15); /* 15 = F */
 
     while (1)
     {
@@ -446,23 +442,24 @@ void reversi_main()
 
     	latido_gestionar(ahora);
 
-    	enum pulsacion_button btn = btn_lista[i];//antirrebotes_gestionar(ahora);
-    	i = (i + 1) % 9;
+    	enum pulsacion_button btn = antirrebotes_gestionar(ahora);
 
     	switch (btn) {
     	case pulsacion_iz:
     		D8led_value = (D8led_value + 1) % 8;
     		break;
     	case pulsacion_dr:
-    		if (tratando == FILA) {
-    			fila = D8led_value;
-    			tratando = COLUMNA;
-    		} else {
-    			columna = D8led_value;
-    			tratando = FILA;
-    	        reversi_procesar(candidatas, fila, columna);
+    		if (D8led_value != -1) {
+        		if (tratando == FILA) {
+        			fila = D8led_value;
+        			tratando = COLUMNA;
+        		} else {
+        			columna = D8led_value;
+        			tratando = FILA;
+        	        reversi_procesar(candidatas, fila, columna);
+        		}
+        		D8led_value = -1;
     		}
-    		D8led_value = -1;
     		break;
     	case pulsacion_none:
     		break;

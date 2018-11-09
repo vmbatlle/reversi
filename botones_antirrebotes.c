@@ -6,18 +6,21 @@
 static enum antirrebotes_estado estadoActual;
 
 /* trp y trd en ticks (espera para los rebotes de entrada / salida) */
-static const unsigned int trp = 20;
-static const unsigned int trd = 20;
+static const unsigned int trp = 7; // 134ms
+static const unsigned int trd = 1; // 6ms
+static const unsigned int check_state = 2; // 20ms, se realiza varias veces
+static int numComprobaciones = 0; // veces que se TODO
 
 /* Acciones para cada estado del autómata */
 enum pulsacion_button action_unpressed (unsigned int);
 enum pulsacion_button action_wait_trp (unsigned int);
 enum pulsacion_button action_pressed (unsigned int);
-enum pulsacion_button action_wait_release (unsigned int);
+enum pulsacion_button action_short_hold (unsigned int);
+enum pulsacion_button action_long_hold (unsigned int);
 enum pulsacion_button action_wait_trd (unsigned int);
 /* Tabla que relaciona los estados con sus acciones */
 enum pulsacion_button (*const tabla_estados [MAX_STATES]) (unsigned int) = {
-	action_unpressed, action_wait_trp, action_pressed, action_wait_release, action_wait_trd
+	action_unpressed, action_wait_trp, action_pressed, action_short_hold, action_long_hold, action_wait_trd
 };
 
 
@@ -45,7 +48,7 @@ enum pulsacion_button antirrebotes_gestionar(unsigned int timeAhora) {
 	if (estadoActual >= 0 && estadoActual < MAX_STATES) {
 		return tabla_estados[estadoActual](timeAhora);
 	} else {
-		/* TODO: estado invalido. Tratamiento */
+		/* Estado inválido */
 		return pulsacion_none;
 	}
 }
@@ -60,7 +63,7 @@ enum pulsacion_button action_unpressed (unsigned int timeAhora) {
 /* wait_trp: Se ha presionado un botón, esperar trp ticks (rebotes entrada) */
 enum pulsacion_button action_wait_trp (unsigned int timeAhora) {
 	if (timeAhora - timeAntes >= trp) {
-		timeAntes = timeAhora; /* TODO: Ahora son 20 ticks, deberian ser 20 ms */
+		timeAntes = timeAhora;
 		estadoActual = pressed;
 	}
 	return pulsacion_none;
@@ -68,19 +71,44 @@ enum pulsacion_button action_wait_trp (unsigned int timeAhora) {
 
 /* pressed: Se ha presionado un botón, devolver el valor correspondiente de pulsacion_button */
 enum pulsacion_button action_pressed (unsigned int timeAhora) {
-	estadoActual = wait_release;
+	estadoActual = short_hold;
+	numComprobaciones = 0;
 	return pulsacionRealizada;
 }
 
-/* wait_release: Se ha presinado un botón y se ha devuelto el valor, esperar a que se levante ese botón */
-enum pulsacion_button action_wait_release (unsigned int timeAhora) {
-	if (timeAhora - timeAntes >= 20) { /* TODO ticks */
+/* short_hold: Se ha presinado un botón y se ha devuelto el valor, esperar a que se levante ese botón TODO */
+enum pulsacion_button action_short_hold (unsigned int timeAhora) {
+	if (timeAhora - timeAntes >= check_state) {
 		if (button_estado() == button_none) {
 			estadoActual = wait_trd;
+		} else {
+			numComprobaciones++;
+			if (numComprobaciones >= 25) { // TODO
+				numComprobaciones = 0;
+				estadoActual = long_hold;
+			}
 		}
 		timeAntes = timeAhora;
 	}
 	return pulsacion_none;
+}
+
+/* long_hold: Se ha presinado un botón y se ha devuelto el valor, esperar a que se levante ese botón TODO */
+enum pulsacion_button action_long_hold (unsigned int timeAhora) {
+	enum pulsacion_button returnValue = pulsacion_none;
+	if (timeAhora - timeAntes >= check_state) {
+		if (button_estado() == button_none) {
+			estadoActual = wait_trd;
+		} else {
+			numComprobaciones++;
+			if (numComprobaciones >= 10) { // TODO
+				numComprobaciones = 0;
+				returnValue = pulsacionRealizada;
+			}
+		}
+		timeAntes = timeAhora;
+	}
+	return returnValue;
 }
 
 /* wait_trd: Se ha levantado el botón, esperar trd ticks para volver a activarlo (rebotes salida) */

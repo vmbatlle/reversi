@@ -4,7 +4,7 @@
 #include "button.h"
 #include "8led.h"
 
-#define ENVIRONMENT_EMULATOR
+//#define ENVIRONMENT_EMULATOR
 
 volatile int emular_estado_button = 0;
 

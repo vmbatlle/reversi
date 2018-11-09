@@ -21,7 +21,7 @@ enum {
     tres      = ~0xEA,
     cuatro    = ~0x63,
     cinco     = ~0xAB,
-    seis      = ~0x2F,
+    seis      = ~0xAF, // antes ~0x2F
     siete     = ~0xE0,
     ocho      = ~0xEF,
     nueve     = ~0xE3,
