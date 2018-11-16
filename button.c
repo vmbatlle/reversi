@@ -3,6 +3,7 @@
 #include "44b.h"
 #include "button.h"
 #include "8led.h"
+#include "nested_interrupts.h"
 
 //#define ENVIRONMENT_EMULATOR
 
@@ -21,6 +22,14 @@ void button_ISR(void)
 	/* Desactivar las interrupciones para la línea correspondiente a EINT4/5/6/7 */
 	rINTMSK |= BIT_EINT4567; 		// Enmascarar interrupciones línea EINT4/5/6/7
 
+	/* La RSI debe poner a 0 el bit correspondiente de INTPND después de
+	 * limpiar los bits correspondientes de EXTINTPND */
+	rI_ISPC |= BIT_EINT4567;		// Poner a 0 el bit de INTPND
+									// correspondiente a la línea EINT4/5/6/7
+
+	/* Permitir interrupciones anidadas */
+	enableNestedInterrupts();
+
 	int which_int = rEXTINTPND;
 	/* Identificar qué boton se ha pulsado */
 	if (which_int & 0x8) {
@@ -31,11 +40,12 @@ void button_ISR(void)
 		f_callback(button_none);
 	}
 
-	/* La RSI debe poner a 0 el bit correspondiente de INTPND después de
-	 * limpiar los bits correspondientes de EXTINTPND */
+	int kk = 0;
+	kk++;
+
+	disableNestedInterrupts();
+
 	rEXTINTPND |= 0xF;				// Pone a 0 los bits de EXTINTPND escribiendo 1s en el propio registro
-	rI_ISPC |= BIT_EINT4567;		// Poner a 0 el bit de INTPND
-									// correspondiente a la línea EINT4/5/6/7
 
 }
 
