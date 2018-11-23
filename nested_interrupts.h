@@ -9,28 +9,28 @@
  * 		  y cambia a modo SYSTEM (bits 4-0 con valor 0x1F)
  */
 void __attribute__((always_inline)) enableNestedInterrupts() {
-	asm("MRS r1, SPSR");
+	unsigned int cpsr, spsr;
+	asm("MRS %[spsr], SPSR" : [spsr] "=r" (spsr));
 
-	asm("MRS r0, CPSR");
-	asm("ORR r0, #0x1F"); /* modo SYSTEM, bits de modo a 1 */
-	//asm("BIC r0, #0x1F");
-	//asm("ORR r0, #0x11");
-	asm("MSR CPSR_c, r0");
-	asm("BIC r0, #0x80"); /* activar IRQ */
-	asm("MSR CPSR_c, r0");
+	asm("MRS %[cpsr], CPSR" : [cpsr] "=r" (cpsr));
+	asm("ORR %[cpsr_out], %[cpsr_in], #0x1F" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr)); /* modo SYSTEM, bits de modo a 1 */
+	asm("MSR CPSR_c, %[cpsr]" : : [cpsr] "r" (cpsr));
+	asm("BIC %[cpsr_out], %[cpsr_in], #0x80" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr)); /* activar IRQ */
+	asm("MSR CPSR_c, %[cpsr]" : : [cpsr] "r" (cpsr));
 
-	asm("PUSH {r1}"); /* guardar el estado del CPSR y SPSR en pila del modo previo */
+	asm("PUSH {%[spsr]}" : : [spsr] "r" (spsr)); /* guardar el estado del CPSR y SPSR en pila del modo previo */
 }
 
 void __attribute__((always_inline)) disableNestedInterrupts() {
-	asm("MRS r0, CPSR");
-	asm("ORR r0, #0x80"); /* desactivar IRQ */
-	asm("MSR CPSR_c, r0");
-	asm("POP {r1}");
-	asm("BIC r0, #0x1F");
-	asm("ORR r0, #0x12");
-	asm("MSR CPSR_c, r0");
-	asm("MSR SPSR, r1"); /* recuperar el valor apilado del CPSR y SPSR */
+	unsigned int cpsr, spsr;
+	asm("MRS %[cpsr], CPSR" : [cpsr] "=r" (cpsr));
+	asm("ORR %[cpsr_out], %[cpsr_in], #0x80" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr)); /* desactivar IRQ */
+	asm("MSR CPSR_c, %[cpsr]" : : [cpsr] "r" (cpsr));
+	asm("POP {%[spsr]}" : [spsr] "=r" (spsr));
+	asm("BIC %[cpsr_out], %[cpsr_in], #0x1F" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr));
+	asm("ORR %[cpsr_out], %[cpsr_in], #0x12" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr)); /* modo IRQ (0b10010) */
+	asm("MSR CPSR_c, %[cpsr]" : : [cpsr] "r" (cpsr));
+	asm("MSR SPSR, %[spsr]" : : [spsr] "r" (spsr)); /* recuperar el valor apilado del CPSR y SPSR */
 }
 
 #endif /* _NESTED_INTERRUPTS_H_ */
