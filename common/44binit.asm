@@ -46,6 +46,7 @@
 .equ 	SVCMODE,	0x13
 .equ 	ABORTMODE,	0x17
 .equ 	UNDEFMODE,	0x1b
+.equ 	SYSMODE,	0x1f
 .equ 	MODEMASK,	0x1f
 .equ 	NOINT,		0xc0
 .equ    IRQ_MODE,	0x40       /* disable Interrupt Mode (IRQ) */
@@ -328,6 +329,11 @@ InitStacks:
     msr	    cpsr_cxsf,r1 	    /* FIQMode */
     ldr	    sp,=FIQStack
 
+	bic	    r0,r0,#MODEMASK
+    orr	    r1,r0,#SYSMODE
+    msr	    cpsr_cxsf,r1 	    /* SysMode */
+    ldr	    sp,=UserStack
+
     bic	    r0,r0,#MODEMASK
     orr	    r1,r0,#SVCMODE
     msr	    cpsr_cxsf,r1 	    /* SVCMode */
@@ -423,6 +429,7 @@ SMRDATA:
 .equ	AbortStack,	_ISR_STARTADDRESS-0xf00+256*3   /* c7ff300 */
 .equ	IRQStack,	_ISR_STARTADDRESS-0xf00+256*4   /* c7ff400 */
 .equ	FIQStack,	_ISR_STARTADDRESS-0xf00+256*5   /* c7ff500 */
+.equ	SysStack,	_ISR_STARTADDRESS-0xf00+256*6   /* c7ff600 */
 
 .equ	HandleReset,	_ISR_STARTADDRESS
 .equ	HandleUndef,	_ISR_STARTADDRESS+4
