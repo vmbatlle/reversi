@@ -1,8 +1,8 @@
 /*********************************************************************************************
-* File:	    44B.H
-* Author:	embest
-* Desc:	    Samsung 44B0X CPU register define
-* History:
+* File£º	44B.H
+* Author:	embest	
+* Desc£º	Samsung 44B0X CPU register define
+* History:	
 *********************************************************************************************/
 
 #ifndef __44B0X_H__
@@ -23,7 +23,7 @@ extern "C" {
 
 /* Bus control */
 #define rSBUSCON	(*(volatile unsigned *)0x1c40000)
-
+    
 /* Memory control */
 #define rBWSCON		(*(volatile unsigned *)0x1c80000)
 #define rBANKCON0	(*(volatile unsigned *)0x1c80004)
@@ -67,11 +67,11 @@ extern "C" {
 #define WrUTXH0(ch)	(*(volatile unsigned char *)(0x1d00023))=(unsigned char)(ch)
 #define WrUTXH1(ch)	(*(volatile unsigned char *)(0x1d04023))=(unsigned char)(ch)
 #define RdURXH0()	(*(volatile unsigned char *)(0x1d00027))
-#define RdURXH1()	(*(volatile unsigned char *)(0x1d04027))
+#define RdURXH1()	(*(volatile unsigned char *)(0x1d04027))  
 #define UTXH0		(0x1d00020+3)  //byte_access address by BDMA
 #define UTXH1		(0x1d04020+3)
-#define URXH0		(0x1d00024+3)
-#define URXH1		(0x1d04024+3)
+#define URXH0		(0x1d00024+3)  
+#define URXH1		(0x1d04024+3)  
 
 #else //Little Endian
 #define rUTXH0		(*(volatile unsigned char *)0x1d00020)
@@ -357,7 +357,7 @@ extern "C" {
 
 /* PENDING BIT */
 //CAUTION:You must clear the pending bit as general special register.
-//        it's different way with KS32C6x00
+//        it's different way with KS32C6x00 
 #define BIT_ADC		(0x1)
 #define BIT_RTC		(0x1<<1)
 #define BIT_UTXD1	(0x1<<2)

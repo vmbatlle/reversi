@@ -17,6 +17,12 @@
 #include "44b.h"
 #include "reversi_main.h"
 
+/*--- function declare ---*/
+void Main(void);
+
+/*--- extern function ---*/
+extern void Lcd_Test();
+
 //#define TEST_BENCH_TIMER0
 //#define TEST_BENCH_REBOTES
 
@@ -28,6 +34,20 @@ void insertar_pulsacion(enum estado_button button) {
 /*--- codigo de funciones ---*/
 void Main(void)
 {
+
+    sys_init();        /* Initial 44B0X's Interrupt,Port and UART */
+    _Link();           /* Print Misc info */
+
+	/******************/
+	/* user interface */
+	/******************/
+	Uart_Printf("\n\rEmbest 44B0X Evaluation Board(S3CEV40)");
+	Uart_Printf("\n\rLCD display Test Example(please look at LCD screen)\n");
+
+	Lcd_Test();
+	while(1);
+
+
 	/* Inicializa controladores */
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
 	excepciones_inicializar(); // Inicialización del capturador de excepciones

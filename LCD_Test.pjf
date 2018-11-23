@@ -1,0 +1,185 @@
+# Embest IDE Project File, Format Version 1.00
+# WARNING: DO NOT EDIT OR DELETE THIS PROJECT FILE!
+
+<BEGIN> PROJECT_NAME
+LCD_Test
+<END>
+
+<BEGIN> CONFIG
+
+	<BEGIN> CPU
+	MODULE=arm7.DLL
+	FAMILY=ARM7
+	FAMILYID=1
+	MEMBER=ARM7
+	MEMBERID=1
+	MAKER=SUMSUNG
+	CHIP=S3c44b0x
+	ENDIAN=0
+	<END>
+
+	<BEGIN> DEBUG
+	LINK=.\debug\LCD_Test.elf
+	SYMBOL=.\debug\LCD_Test.elf
+	DOWNLOAD=.\debug\LCD_Test.elf
+	DOWNLOADADDR=0xc000000
+	AUTODOWNLOAD=FALSE
+	AUTOSCRIPT=TRUE
+	VERIFY=FALSE
+	USEMEMMAP=FALSE
+	EXECFDOWN=TRUE
+	EXECFENTRY=FALSE
+	SCRIPT=..\common\ev40boot.cs
+	<END>
+
+	<BEGIN> REMOTE
+	DEVICE=PowerIceArm7.DLL
+	COMMTYPE=PARALLEL
+	PARALLEL=LPT1
+	SPEED=0
+	<END>
+
+	<BEGIN> DIR
+	SUBDIR=TRUE
+	SOURCE=..\..\S3CEV40;
+	<END>
+
+<END>
+
+<BEGIN> BUILD_CONFIG
+	CONFIG_DLL=GccArmSettingPage.dll
+	<BEGIN> COMPILE_COMMAND_LINE
+	-gdwarf -c -I../common/ $(SOURCE_FILE) -o.\debug\$(OBJ_FILE)
+	<END>
+	<BEGIN> ASSEMBLE_COMMAND_LINE
+	-gdwarf2 -I../common/ $(SOURCE_FILE) -o.\debug\$(OBJ_FILE)
+	<END>
+	<BEGIN> LINK_COMMAND_LINE
+	arm-elf-ld -T..\common\ram_ice.ld  -L..\..\..\..\Build\xgcc-arm-elf\arm-elf\lib -L..\..\..\..\Build\xgcc-arm-elf\lib\gcc-lib\arm-elf\3.0.2
+	 -o.\debug\LCD_Test.elf $(OBJ_FILES) ..\common\Hzk16.o -lc -lgcc
+	<END>
+<END>
+
+<BEGIN> PROJECT_FILES
+
+	<BEGIN> GROUP="source"
+		<PROP> GROUP_FILTER="*.c"
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\AscII6x8.c
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\AscII8x16.c
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\Bmp.c
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\lcd.c
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\main.c
+		STATUS=CLOSE
+		<END>
+
+	<END>
+
+	<BEGIN> GROUP="include"
+		<PROP> GROUP_FILTER="*.h"
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\44b.h
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\44blib.h
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\BMP.H
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\def.h
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\lcd.h
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\option.h
+		STATUS=CLOSE
+		<END>
+
+	<END>
+
+	<BEGIN> GROUP="common"
+		<PROP> GROUP_FILTER="*.s;*.c"
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\44binit.s
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\44blib.c
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\ev40boot.cs
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\flash.ld
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\Link.c
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\ram_ice.ld
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=..\common\uhal.c
+		STATUS=CLOSE
+		<END>
+
+	<END>
+
+	<BEGIN> SOURCE_FILE
+	SOURCE=.\debug\objdump
+	STATUS=CLOSE
+	<END>
+
+	<BEGIN> SOURCE_FILE
+	SOURCE=..\common\ProgramFlash.txt
+	STATUS=CLOSE
+	<END>
+
+	<BEGIN> SOURCE_FILE
+	SOURCE=.\readme.txt
+	STATUS=CLOSE
+	<END>
+
+<END>

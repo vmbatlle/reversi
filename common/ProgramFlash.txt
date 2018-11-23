@@ -1,0 +1,29 @@
+How to program onto FLASH ROM:
+
+ 1) modify the Project settings:
+   i) Flash run
+    use the startup file 44binit.s; use Flash.ld£»
+    Note: Linker page:
+            Imakkkkkkkkkkkkkkkkkkge Entry Options > Select entry file as:
+                   44binit.o, startup from 44binit.s
+            General > Linker script file as:
+                   ..\common\Flash.ld
+
+   ii) copy Flash to RAM to run
+    use the startup file 44binit_flash.s in stead of 44bint.s; use ram_ice.ld£»
+    Note: Linker page:
+            Image Entry Options > Select entry file as:
+                   44binit_flash.o, startup from 44binit_flash.s
+            General > Linker script file as:
+                   ..\common\ram_ice.ld
+ 
+use the startup file 44binit_flash.s in stead of 44bint.s;
+    (Note: modify the setting of Linker -> Image Entry Options, then
+           Select entry file as 44binit_flash.o)
+    
+ 2) rebuild the project, then "Tools -> elf2bin" (or excute command base DOS system)
+    to gerate the flat bin format file;
+
+ 3) "Tools -> Flash Programmer" (or excute command base DOS system), 
+    configure file use EmbestS3CEV40.cfg ("File -> Open")
+    which exist in the Disc ( it is layed in directory S3CEV40).
