@@ -8,7 +8,7 @@ static enum antirrebotes_estado estadoActual;
 /* trp y trd en ticks (espera para los rebotes de entrada / salida) */
 static const unsigned int trp = 7; // 134ms
 static const unsigned int trd = 1; // 6ms
-static const unsigned int check_state = 2; // 20ms, se realiza varias veces
+static const unsigned int check_state = 1; // 20ms, se realiza varias veces
 static int numComprobaciones = 0; // veces que se TODO
 
 /* Acciones para cada estado del autómata */
