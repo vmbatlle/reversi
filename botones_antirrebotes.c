@@ -1,3 +1,9 @@
+/**
+ * @file botones_antirrebotes.c
+ * Gestión de rebotes para los botones de la placa
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #include "botones_antirrebotes.h"
 #include "button.h"
 #include "timer0.h"
@@ -6,10 +12,20 @@
 static enum antirrebotes_estado estadoActual;
 
 /* trp y trd en ticks (espera para los rebotes de entrada / salida) */
-static const unsigned int trp = 7; // 134ms
-static const unsigned int trd = 1; // 6ms
-static const unsigned int check_state = 1; // 20ms, se realiza varias veces
-static int numComprobaciones = 0; // veces que se TODO
+static const unsigned int trp = 7; // Retardo para rebotes de entrada (ticks timer0), 134ms
+static const unsigned int trd = 1; // Retardo para rebotes de salida (ticks timer0), 6ms
+
+/* Comprobaciones mientras el botón se encuentra pulsado */
+static const unsigned int check_state = 1; 	// Tiempo entre comprobaciones mientras el botón
+											// se encuentra pulsado (ticks timer0), 20ms
+static int numComprobaciones = 0; 	// Número de comprobaciones realizadas mientras
+									// el botón se encontraba pulsado (estados {short|long}_hold)
+// Si las comprobaciones (check_state) se hacen cada 20ms, número de comprobaciones
+// necesarias hasta alcanzar 500 ms y 200 ms
+enum {
+	COMPROBACIONES_500_MS = 25,
+	COMPROBACIONES_200_MS = 10
+};
 
 /* Acciones para cada estado del autómata */
 enum pulsacion_button action_unpressed (unsigned int);
@@ -76,14 +92,15 @@ enum pulsacion_button action_pressed (unsigned int timeAhora) {
 	return pulsacionRealizada;
 }
 
-/* short_hold: Se ha presinado un botón y se ha devuelto el valor, esperar a que se levante ese botón TODO */
+/* short_hold: Se ha presinado un botón y se ha devuelto el valor de la pulsación realizada,
+ * esperar a que se levante o a que se mantenga pulsado durante más de 500ms */
 enum pulsacion_button action_short_hold (unsigned int timeAhora) {
 	if (timeAhora - timeAntes >= check_state) {
 		if (button_estado() == button_none) {
 			estadoActual = wait_trd;
 		} else {
 			numComprobaciones++;
-			if (numComprobaciones >= 25) { // TODO
+			if (numComprobaciones >= COMPROBACIONES_500_MS) {
 				numComprobaciones = 0;
 				estadoActual = long_hold;
 			}
@@ -93,7 +110,8 @@ enum pulsacion_button action_short_hold (unsigned int timeAhora) {
 	return pulsacion_none;
 }
 
-/* long_hold: Se ha presinado un botón y se ha devuelto el valor, esperar a que se levante ese botón TODO */
+/* long_hold: Se ha presinado un botón y se ha mantenido durante 500ms,
+ * volver a marcar el mismo valor de pulsación cada 200ms que siga pulsado hasta que se levante */
 enum pulsacion_button action_long_hold (unsigned int timeAhora) {
 	enum pulsacion_button returnValue = pulsacion_none;
 	if (timeAhora - timeAntes >= check_state) {
@@ -101,7 +119,7 @@ enum pulsacion_button action_long_hold (unsigned int timeAhora) {
 			estadoActual = wait_trd;
 		} else {
 			numComprobaciones++;
-			if (numComprobaciones >= 10) { // TODO
+			if (numComprobaciones >= COMPROBACIONES_200_MS) {
 				numComprobaciones = 0;
 				returnValue = pulsacionRealizada;
 			}

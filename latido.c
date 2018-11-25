@@ -1,3 +1,9 @@
+/**
+ * @file    latido.c
+ * @author  Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ * @brief   Funciones de control del latido
+ * @version 1.0.0
+ */
 #include "latido.h"
 #include "led.h"
 #include "push_debug.h"

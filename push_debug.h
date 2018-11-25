@@ -1,3 +1,9 @@
+/**
+ * @file push_debug.h
+ * Funciones de control para la pila de depuración
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #ifndef __PUSH_DEBUG_H__
 #define __PUSH_DEBUG_H__
 
@@ -6,7 +12,8 @@
 enum evento_ID { evento_button=1, evento_timer0=2 };
 
 /**
- * @brief TODO
+ * @brief Inicializa la pila de debug, inicia a 0 todos los
+ * 		  valores almacenados en esta.
  */
 void push_iniciar();
 

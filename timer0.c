@@ -7,10 +7,9 @@
 
 /*--- ficheros de cabecera ---*/
 #include "timer0.h"
+#include "options_environment.h"
 #include "44b.h"
 #include "44blib.h"
-
-//#define ENVIRONMENT_EMULATOR
 
 enum {
 	MIN_COUNT = 0, //0x0000

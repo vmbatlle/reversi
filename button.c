@@ -1,13 +1,20 @@
+/**
+ * @file button.c
+ * Funciones de control para los botones del s3c44b0x
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 /*--- ficheros de cabecera ---*/
+#include "button.h"
+#include "options_environment.h"
 #include "44blib.h"
 #include "44b.h"
-#include "button.h"
 #include "8led.h"
 #include "nested_interrupts.h"
 
-//#define ENVIRONMENT_EMULATOR
-
+#if defined(ENVIRONMENT_EMULATOR)
 volatile int emular_estado_button = 0;
+#endif
 
 /* Función de callback */
 static void (*f_callback)(enum estado_button button);
@@ -65,10 +72,7 @@ void button_iniciar(void)
 	/* Establece la rutina de servicio para Eint4567 */
 	pISR_EINT4567 = (unsigned) button_ISR;
 
-	/* TODO: sería más correcto configurar primero el puerto y luego las interrupciones o da igual? */
-	/* TODO: En 44blib.c existe una funcion Port_Init() que inicializa los puertos A-G y se llama desde sys_init()
-	 * 			Por lo tanto, estas dos instrucciones no hacen nada. */
-	/* Configuracion del puerto G */
+	/* Puerto G ya configurado en Port_Init() de 44blib.c, pero se vuelve a configurar */
 	rPCONG |= 0xF000;			// Establece la funcion de los pines 6 y 7 como EINT6-7
 	rPUPG &= ~(0xC0);			// Habilita el "pull up" de los puertos 6 y 7
 

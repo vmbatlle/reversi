@@ -1,3 +1,9 @@
+/**
+ * @file button.h
+ * Funciones de control para los botones del s3c44b0x
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #ifndef _BUTTON_H_
 #define _BUTTON_H_
 
@@ -9,10 +15,8 @@
  */
 enum estado_button {button_none, button_iz, button_dr};
 
-/* TODO: comprobar que el derecho es EINT6 y el izquierdo EINT7 */
-
 /**
- * @brief 	Configura los botones derecho e izquierdo
+ * @brief 	Configura los botones izquierdo y derecho
  * 			(interrupciones externas EINT6/7, respectivamente)
  * 			y activa su funcionamiento
  */

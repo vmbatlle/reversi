@@ -1,3 +1,9 @@
+/**
+ * @file push_debug.c
+ * Funciones de control para la pila de depuración
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #include "push_debug.h"
 #include "timer2.h"
 #include "option.h"

@@ -1,3 +1,9 @@
+/**
+ * @file botones_antirrebotes.h
+ * Gestión de rebotes para los botones de la placa
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #ifndef __BOTONES_ANTIRREBOTES_H__
 #define __BOTONES_ANTIRREBOTES_H__
 

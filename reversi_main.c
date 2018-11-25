@@ -5,10 +5,9 @@
  */
 
 #include "jugada_por_botones.h"
+#include "options_environment.h"
 #include "timer0.h"
 #include "latido.h"
-
-//#define ENVIRONMENT_EMULATOR
 
 // Tamaño del tablero
 enum { DIM=8 };
@@ -74,11 +73,7 @@ char __attribute__ ((aligned (8))) tablero[DIM][DIM] = {
 	        {CASILLA_VACIA,CASILLA_VACIA,CASILLA_VACIA,CASILLA_VACIA,CASILLA_VACIA,CASILLA_VACIA,CASILLA_VACIA,CASILLA_VACIA}
 	    };
 
-  ////////////////////////////////////////////////////////////////////
-     // VARIABLES PARA INTERACCIONAR CON LA ENTRADA SALIDA
-     // Pregunta: ¿hay que hacer algo con ellas para que esto funcione bien?
-     // (por ejemplo añadir alguna palabra clave para garantizar que la sincronización a través de esa variable funcione)
-
+// Implementación de patrón_volteo en ARM
 extern int patron_volteo(char tablero[][8], int *longitud,char f, char c, char SF, char SC, char color);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -425,16 +420,18 @@ void reversi_main()
        {NO,NO,NO,NO,NO,NO,NO,NO}
    };
 
-	unsigned long int ahora;
-	char fila, columna;
-	int ready;
+	unsigned long int ahora; // tiempo en ticks desde el inicio del timer0
+	char fila, columna; // fila y columna elegidas por el jugador
+	int ready; // indica si el jugador ha finalizado su elección de jugada
+
+	// Inicialización del juego
 	reversi_inicializar(candidatas);
 	jugada_por_botones_iniciar();
 	timer0_empezar();
 
-
     while (1)
     {
+
     	// gestión dispositivos
 
     	ahora = timer0_leer();
@@ -443,6 +440,7 @@ void reversi_main()
 
     	jugada_por_botones_gestionar(ahora, &ready, &fila, &columna);
     	if (ready) {
+    		// el jugador ha hecho su movimiento
             reversi_procesar(candidatas, fila, columna);
     	}
 
