@@ -48,6 +48,7 @@ void button_ISR(void)
 		f_callback(button_none);
 	}
 
+	/* Desactivar las interrupciones anidadas */
 	disableNestedInterrupts();
 
 	rEXTINTPND |= 0xF;				// Pone a 0 los bits de EXTINTPND escribiendo 1s en el propio registro

@@ -55,11 +55,14 @@ void antirrebotes_callback(enum estado_button button) {
 	}
 }
 
+/* Inicializa la gestión del botón */
 void antirrebotes_iniciar(void) {
 	estadoActual = unpressed;
 	button_empezar(antirrebotes_callback);
 }
 
+/* Llamado desde el bucle de gestión de periféricos para desencadenar
+ * las acciones necesarias en la máquina de estados. */
 enum pulsacion_button antirrebotes_gestionar(unsigned int timeAhora) {
 	if (estadoActual >= 0 && estadoActual < MAX_STATES_BA) {
 		return tabla_estados[estadoActual](timeAhora);

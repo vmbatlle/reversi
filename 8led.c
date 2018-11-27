@@ -1,6 +1,6 @@
 /*********************************************************************************************
 * Fichero:	8led.c
-* Autor:
+* Autor: Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
 * Descrip:	Funciones de control del display 8-segmentos
 * Version:
 *********************************************************************************************/
