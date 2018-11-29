@@ -16,11 +16,20 @@
 #include "44blib.h"
 #include "44b.h"
 #include "reversi_main.h"
+#include "tp.h"
 
 /* Tests posibles, solamente descomentar uno.
  * Todos comentados = ejecución normal del juego de reversi */
 //#define TEST_BENCH_TIMER0
 //#define TEST_BENCH_REBOTES
+#define TEST_BENCH_LCD
+
+static volatile char yn = 0;
+/*--- function declare ---*/
+void Main(void);
+
+/*--- extern function ---*/
+extern void Lcd_Test();
 
 
 // Registrar una pulsación de botón insertándola en la pila de debug
@@ -54,6 +63,22 @@ void Main(void)
 #elif defined(TEST_BENCH_REBOTES)
 	button_empezar(insertar_pulsacion);
 	while(1);
+#elif defined(TEST_BENCH_LCD)
+	//_Link();           /* Print Misc info */
+	/******************/
+	/* user interface */
+	/******************/
+	Lcd_Test();
+	TS_Test();
+
+	while(1)
+	 {
+	   //yn = Uart_Getch();
+
+	   if(yn == 0x52) TS_Test();// R to reset the XY REC
+	 }
+
+	TS_close();
 #else
 	// Ejecución normal
 	reversi_main();
