@@ -16,6 +16,7 @@
 #include "44blib.h"
 #include "44b.h"
 #include "reversi_main.h"
+#include "reversi_gui.h"
 #include "tp.h"
 
 /* Tests posibles, solamente descomentar uno.
@@ -53,6 +54,7 @@ void Main(void)
 	push_iniciar();			// Pila de debug
 	button_iniciar();		// Controlador de botones
 	antirrebotes_iniciar();	// Controlador de antirrebotes
+	gui_inicializar();      // Inicializar GUI
 
 #if defined(TEST_BENCH_TIMER0)
 	// Latido LED a 2hz
@@ -64,21 +66,12 @@ void Main(void)
 	button_empezar(insertar_pulsacion);
 	while(1);
 #elif defined(TEST_BENCH_LCD)
-	//_Link();           /* Print Misc info */
-	/******************/
-	/* user interface */
-	/******************/
-	Lcd_Test();
-	TS_Test();
 
-	while(1)
-	 {
-	   //yn = Uart_Getch();
-
-	   if(yn == 0x52) TS_Test();// R to reset the XY REC
-	 }
-
-	TS_close();
+	gui_limpiar_pantalla();
+	//gui_dibujar_tablero_vacio();
+	gui_calibrar();
+	while(1);
+	//TS_close();
 #else
 	// Ejecución normal
 	reversi_main();

@@ -9,6 +9,7 @@
 #include "def.h"
 #include "44b.h"
 #include "44blib.h"
+#include "stdlib.h"
 #include "lcd.h"
 #include "Bmp.h"
 
@@ -48,7 +49,7 @@ void Lcd_Init(void)
 	rPDATE=rPDATE&0x0e;
 	
 	//DMA ISR
-	rINTMSK &= ~(BIT_GLOBAL|BIT_ZDMA0);
+	rINTMSK &= ~(BIT_ZDMA0);
     pISR_ZDMA0 = (unsigned) Zdma0Done;
 }
 
@@ -185,19 +186,21 @@ void Lcd_Draw_Box(INT16 usLeft, INT16 usTop, INT16 usRight, INT16 usBottom, INT8
 }
 
 /*********************************************************************************************
-* name:		abs()
-* func:		Calculates the absolute value of a given number: |n|
-* para:		n -- number
-* ret:		|n|
+* name:		Lcd_Draw_Box_Width()
+* func:		Draw rectangle with appointed color and width
+* para:		usLeft,usTop,usRight,usBottom -- rectangle's acme coordinate
+*			ucColor -- appointed color value+
+*			usWidth -- border width
+* ret:		none
 * modify:
-* comment:		
+* comment:
 *********************************************************************************************/
-int abs(int n) {
-	if (n < 0) {
-		return -n;
-	} else {
-		return n;
-	}
+void Lcd_Draw_Box_Width(INT16 usLeft, INT16 usTop, INT16 usRight, INT16 usBottom, INT8U ucColor, INT16U usWidth)
+{
+	Lcd_Draw_HLine(usLeft, usRight,  usTop,    ucColor, usWidth);
+	Lcd_Draw_HLine(usLeft, usRight,  usBottom - usWidth + 1, ucColor, usWidth);
+	Lcd_Draw_VLine(usTop,  usBottom, usLeft,   ucColor, usWidth);
+	Lcd_Draw_VLine(usTop,  usBottom, usRight - usWidth + 1,  ucColor, usWidth);
 }
 
 /*********************************************************************************************
@@ -360,24 +363,6 @@ void Lcd_DisplayString(INT16U usX0, INT16U usY0, INT8U *pucStr){
 }
 
 /*********************************************************************************************
-* name:		strlen()
-* func:		counts number of chars of a null-terminated string
-* para:		s -- ASCII character string's start pointer
-* ret:		length of the string
-* modify:
-* comment:		
-*********************************************************************************************/
-int strlen(const char* s) {
-	int i = 0; // Contador de caracteres
-	const char* c = s; // Cursor
-	while (c != '\0') {
-		i++;
-		c++;
-	}
-	return i;
-}
-
-/*********************************************************************************************
 * name:		Lcd_DspAscII8x16()
 * func:		display 8x16 ASCII character string
 * para:		usX0,usY0 -- ASCII character string's start point coordinate
@@ -415,7 +400,7 @@ void Lcd_DspAscII8x16(INT16U x0, INT16U y0, INT8U ForeColor, INT8U * s)
             {
             	for( x = 0; x < 8; x++ ) 
                	{
-                	k = x % 8;
+                	k = x % 8; /* TODO: k vale lo mismo que x */
 			    	if( ywbuf[y]  & (0x80 >> k) )
 			       	{
 			       		xx = x0 + x + i*8;
@@ -496,7 +481,7 @@ void ReverseLine(INT32U ulHeight, INT32U ulY)
 volatile static INT8U ucZdma0Done=1;	//When DMA is finish,ucZdma0Done is cleared to Zero
 void Zdma0Done(void)
 {
-	rI_ISPC=BIT_ZDMA0;	    //clear pending
+	rI_ISPC|=BIT_ZDMA0;	    //clear pending
 	ucZdma0Done=0;
 }
 
@@ -555,8 +540,9 @@ void Lcd_Test(void)
     #ifdef Eng_v // english version
 	Lcd_DspAscII8x16(10,0,DARKGRAY,"Embest S3CEV40 ");
 	#else
-//	Lcd_DspHz16(10,0,DARKGRAY,"Ó¢ÝíÌØÈýÐÇÊµÑéÆÀ¹À°å");
+//	Lcd_DspHz16(10,0,DARKGRAY,"Ã“Â¢Ã�Ã­ÃŒÃ˜ÃˆÃ½Ã�Ã‡ÃŠÂµÃ‘Ã©Ã†Ã€Â¹Ã€Â°Ã¥");
 	#endif
+
 	Lcd_DspAscII8x16(10,20,BLACK,(INT8U*)"Codigo del puesto: ");
 	Lcd_Draw_Box(10,40,310,230,14);
 	Lcd_Draw_Box(20,45,300,225,13);
@@ -572,8 +558,6 @@ void Lcd_Test(void)
 	Lcd_Draw_Box(120,95,200,175,3);
 	Lcd_Draw_Box(130,100,190,170,2);
 	BitmapView(125,135,Stru_Bitmap_gbMouse);
-	Lcd_Dma_Trans();
-
 }
 
 

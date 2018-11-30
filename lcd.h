@@ -97,8 +97,8 @@ extern "C" {
 #define LCD_PutPixel(x, y, c)                                                  \
   (*(INT32U *)(LCD_VIRTUAL_BUFFER + (y)*SCR_XSIZE / 2 + ((x)) / 8 * 4)) =      \
       (*(INT32U *)(LCD_VIRTUAL_BUFFER + (y)*SCR_XSIZE / 2 + ((x)) / 8 * 4)) &  \
-          ((~(0xf0000000 >> ((((x)) % 8) * 4))) |                               \
-      ((c) << (7 - ((x)) % 8) * 4))
+          (~(0xf0000000 >> ((((x)) % 8) * 4))) |                               \
+      ((c) << (7 - ((x)) % 8) * 4)
 #define LCD_Active_PutPixel(x, y, c)                                           \
   (*(INT32U *)(LCD_ACTIVE_BUFFER + (y)*SCR_XSIZE / 2 + (319 - (x)) / 8 * 4)) = \
       (*(INT32U *)(LCD_ACTIVE_BUFFER + (y)*SCR_XSIZE / 2 +                     \
@@ -126,6 +126,8 @@ void LcdClrRect(INT16 usLeft, INT16 usTop, INT16 usRight, INT16 usBottom,
                 INT8U ucColor);
 void Lcd_Draw_Box(INT16 usLeft, INT16 usTop, INT16 usRight, INT16 usBottom,
                   INT8U ucColor);
+void Lcd_Draw_Box_Width(INT16 usLeft, INT16 usTop, INT16 usRight, INT16 usBottom,
+		INT8U ucColor, INT16U usWidth);
 void Lcd_Draw_Line(INT16 usX0, INT16 usY0, INT16 usX1, INT16 usY1,
                    INT8U ucColor, INT16U usWidth);
 void Lcd_Draw_HLine(INT16 usX0, INT16 usX1, INT16 usY0, INT8U ucColor,
