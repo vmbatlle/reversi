@@ -495,14 +495,8 @@ void Zdma0Done(void)
 *********************************************************************************************/
 void Lcd_Dma_Trans(void)
 {
-	INT8U err;
-	
 	ucZdma0Done=1;
-	//#define LCD_VIRTUAL_BUFFER	(0xc400000)
-	//#define LCD_ACTIVE_BUFFER	(LCD_VIRTUAL_BUFFER+(SCR_XSIZE*SCR_YSIZE/2))	//DMA ON
-	//#define LCD_ACTIVE_BUFFER	LCD_VIRTUAL_BUFFER								//DMA OFF
-	//#define LCD_BUF_SIZE		(SCR_XSIZE*SCR_YSIZE/2)
-	//So the Lcd Buffer Low area is from LCD_VIRTUAL_BUFFER to (LCD_ACTIVE_BUFFER+(SCR_XSIZE*SCR_YSIZE/2))
+
 	rNCACHBE1=(((unsigned)(LCD_ACTIVE_BUFFER)>>12) <<16 )|((unsigned)(LCD_VIRTUAL_BUFFER)>>12);
   	rZDISRC0=(DW<<30)|(1<<28)     |LCD_VIRTUAL_BUFFER; // inc
   	rZDIDES0=( 2<<30)|(1<<28)     |LCD_ACTIVE_BUFFER; // inc

@@ -25,12 +25,8 @@
 //#define TEST_BENCH_REBOTES
 #define TEST_BENCH_LCD
 
-static volatile char yn = 0;
 /*--- function declare ---*/
 void Main(void);
-
-/*--- extern function ---*/
-extern void Lcd_Test();
 
 
 // Registrar una pulsación de botón insertándola en la pila de debug

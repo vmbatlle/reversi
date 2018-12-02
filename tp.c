@@ -26,7 +26,6 @@ void TSInt(void) __attribute__((interrupt("IRQ")));
 void TSInt(void)
 {
     int   i;
-    char fail = 0;
     ULONG Pt[5];
 
     rINTMSK |= BIT_EINT2; // Desactivar interrupciones hasta que se vuelva a llamar a empezar

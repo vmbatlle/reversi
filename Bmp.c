@@ -62,7 +62,7 @@ void BitmapView (INT16U x, INT16U y, STRU_BITMAP Stru_Bitmap)
 		{
 			if ((ucColor = *(INT8U*)(Stru_Bitmap.pucStart + i * Stru_Bitmap.usWidth + j)) != TRANSPARENCY)
 			{
-				LCD_PutPixel(x + j, y + i, ucColor); 
+				(LCD_PutPixel(x + j, y + i, ucColor));
 			}
 		}
 	}
