@@ -17,6 +17,7 @@
 #include "44b.h"
 #include "reversi_main.h"
 #include "reversi_gui.h"
+#include "calibracion_tp.h"
 #include "tp.h"
 
 /* Tests posibles, solamente descomentar uno.
@@ -65,7 +66,7 @@ void Main(void)
 
 	gui_limpiar_pantalla();
 	//gui_dibujar_tablero_vacio();
-	gui_calibrar();
+	calibracion_empezar();
 	while(1);
 	//TS_close();
 #else

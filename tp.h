@@ -10,8 +10,6 @@
 #ifndef __TP_H__
 #define __TP_H__
 
-#endif /*__TP_H__*/
-
 /*--- global  variables ---*/
 volatile int CheckTSP,oneTouch;
 unsigned int  Vx, Vy;
@@ -26,3 +24,5 @@ void TS_empezar(void);
 void TS_leer(int* ready, ULONG* x, ULONG* y);
 void TS_parar(void);
 //void user_irq1(void);
+
+#endif /*__TP_H__*/
