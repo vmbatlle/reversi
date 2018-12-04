@@ -4,7 +4,7 @@
  * @date 2018/11/06
  */
 
-#include "jugada_por_botones.h"
+#include "jugada_por_pantalla.h"
 #include "options_environment.h"
 #include "timer0.h"
 #include "latido.h"
@@ -87,6 +87,7 @@ void tablero_inicializar(char tablero[][DIM], char candidatas[][DIM])
     {
         for (j = 0; j < DIM; j++)
             tablero[i][j] = CASILLA_VACIA;
+        	candidatas[i][j] = NO;
     }
 #if 0
     for (i = 3; i < 5; ++i) {
@@ -359,11 +360,11 @@ void reversi_inicializar(char candidatas[8][8]) {
     tablero_inicializar(tablero, candidatas);
 }
 
-void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char columna) {
+void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char columna, int* fin) {
 
 	int done;     // la máquina ha conseguido mover o no
 	int move = 0; // el humano ha conseguido mover o no
-	int fin = 0;  // fin vale 1 si el humano no ha podido mover
+	*fin = 0;  // fin vale 1 si el humano no ha podido mover
 				  // (ha introducido un valor de movimiento con algún 8)
 				  // y luego la máquina tampoco puede
 	unsigned char f, c;    // fila y columna elegidas por la máquina para su movimiento
@@ -382,7 +383,7 @@ void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char c
 	if (done == -1)
 	{
 		if (move == 0)
-			fin = 1;
+			*fin = 1;
 	}
 	else
 	{
@@ -404,45 +405,51 @@ void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char c
 // Sólo que la máquina realice un movimiento correcto.
 void reversi_main()
 {
-	 ////////////////////////////////////////////////////////////////////
-	 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
-	 // sólo se exploran las que están alrededor de las fichas colocadas
-	 ////////////////////////////////////////////////////////////////////
-	char __attribute__ ((aligned (8))) candidatas[DIM][DIM] =
-   {
-       {NO,NO,NO,NO,NO,NO,NO,NO},
-       {NO,NO,NO,NO,NO,NO,NO,NO},
-       {NO,NO,NO,NO,NO,NO,NO,NO},
-       {NO,NO,NO,NO,NO,NO,NO,NO},
-       {NO,NO,NO,NO,NO,NO,NO,NO},
-       {NO,NO,NO,NO,NO,NO,NO,NO},
-       {NO,NO,NO,NO,NO,NO,NO,NO},
-       {NO,NO,NO,NO,NO,NO,NO,NO}
-   };
+	while (1) {
+		 ////////////////////////////////////////////////////////////////////
+		 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
+		 // sólo se exploran las que están alrededor de las fichas colocadas
+		 ////////////////////////////////////////////////////////////////////
+		char __attribute__ ((aligned (8))) candidatas[DIM][DIM] =
+	   {
+		   {NO,NO,NO,NO,NO,NO,NO,NO},
+		   {NO,NO,NO,NO,NO,NO,NO,NO},
+		   {NO,NO,NO,NO,NO,NO,NO,NO},
+		   {NO,NO,NO,NO,NO,NO,NO,NO},
+		   {NO,NO,NO,NO,NO,NO,NO,NO},
+		   {NO,NO,NO,NO,NO,NO,NO,NO},
+		   {NO,NO,NO,NO,NO,NO,NO,NO},
+		   {NO,NO,NO,NO,NO,NO,NO,NO}
+	   };
 
-	unsigned long int ahora; // tiempo en ticks desde el inicio del timer0
-	char fila, columna; // fila y columna elegidas por el jugador
-	int ready; // indica si el jugador ha finalizado su elección de jugada
+		unsigned long int ahora; // tiempo en ticks desde el inicio del timer0
+		char fila, columna; // fila y columna elegidas por el jugador
+		int ready; // indica si el jugador ha finalizado su elección de jugada
 
-	// Inicialización del juego
-	reversi_inicializar(candidatas);
-	jugada_por_botones_iniciar();
-	timer0_empezar();
+		// Inicialización del juego
+		reversi_inicializar(candidatas);
+		//jugada_por_botones_iniciar();
+		jugada_por_pantalla_iniciar();
+		timer0_empezar();
 
-    while (1)
-    {
+		int fin = 0;
+		while (!fin)
+		{
 
-    	// gestión dispositivos
+			// gestión dispositivos
 
-    	ahora = timer0_leer();
+			ahora = timer0_leer();
 
-    	latido_gestionar(ahora);
+			latido_gestionar(ahora);
 
-    	jugada_por_botones_gestionar(ahora, &ready, &fila, &columna);
-    	if (ready) {
-    		// el jugador ha hecho su movimiento
-            reversi_procesar(candidatas, fila, columna);
-    	}
+			jugada_por_pantalla_gestionar(ahora, fin, &ready, &fila, &columna);
+			if (ready) {
+				// el jugador ha hecho su movimiento
+				reversi_procesar(candidatas, fila, columna, &fin);
+			}
 
-    }
+		}
+		timer0_parar();
+		// TODO: Revisar cambios necesarios para reempezar una partida
+	}
 }
