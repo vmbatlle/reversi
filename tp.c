@@ -13,6 +13,10 @@
 static volatile int touched = 0;
 static volatile ULONG pos_x, pos_y;
 
+enum {
+	NUM_MEDIDAS = 8
+};
+
 void TSInt(void) __attribute__((interrupt("IRQ")));
 
 /*********************************************************************************************
@@ -26,7 +30,6 @@ void TSInt(void) __attribute__((interrupt("IRQ")));
 void TSInt(void)
 {
     int   i;
-    ULONG Pt[5];
 
     rINTMSK |= BIT_EINT2; // Desactivar interrupciones hasta que se vuelva a llamar a empezar
 
@@ -37,15 +40,23 @@ void TSInt(void)
 	rADCCON=0x1<<2;			// AIN1
 	
 	DelayTime(1000);                // delay to set up the next channel
-	for( i=0; i<5; i++ )
+	pos_x = 0;
+	ULONG lectura_max = 0, lectura_min = 1000;
+	for( i=0; i<NUM_MEDIDAS + 2; i++ )
 	{
 		rADCCON |= 0x1;				// Start X-position A/D conversion
 	    while( rADCCON & 0x1 );		// Check if Enable_start is low
     	while( !(rADCCON & 0x40) );	// Check ECFLG
-	    Pt[i] = (0x3ff&rADCDAT);
+    	ULONG lectura = 0x3ff&rADCDAT;
+	    pos_x = pos_x + lectura;
+	    if (lectura > lectura_max) {
+	    	lectura_max = lectura;
+	    }
+	    if (lectura < lectura_min) {
+	    	lectura_min = lectura;
+	    }
 	}
-	// read X-position average value
-	pos_x = (Pt[0]+Pt[1]+Pt[2]+Pt[3]+Pt[4])/5;
+	pos_x = (pos_x - lectura_max - lectura_min) / NUM_MEDIDAS;
 	
     // <Y-Position Read>
 	// TSPX(GPE4_Q4(-)) TSPY(GPE5_Q3(+)) TSMY(GPE6_Q2(-)) TSMX(GPE7_Q1(+))
@@ -54,15 +65,25 @@ void TSInt(void)
 	rADCCON=0x0<<2;		        	// AIN0
 	
 	DelayTime(1000);                // delay to set up the next channel
-	for( i=0; i<5; i++ )
+	pos_y = 0;
+	lectura_max = 0;
+	lectura_min = 1000;
+	for( i=0; i<NUM_MEDIDAS + 2; i++ )
 	{
     	rADCCON |= 0x1;             // Start Y-position conversion
 	    while( rADCCON & 0x1 );     // Check if Enable_start is low
     	while( !(rADCCON & 0x40) ); // Check ECFLG
-	    Pt[i] = (0x3ff&rADCDAT);
+    	ULONG lectura = 0x3ff&rADCDAT;
+    	pos_y = pos_y + lectura;
+		if (lectura > lectura_max) {
+			lectura_max = lectura;
+		}
+		if (lectura < lectura_min) {
+			lectura_min = lectura;
+		}
 	}
 	// read Y-position average value
-	pos_y = (Pt[0]+Pt[1]+Pt[2]+Pt[3]+Pt[4])/5; // TODO división entre 4
+	pos_y = (pos_y - lectura_max - lectura_min) / NUM_MEDIDAS;
 
 	touched = 1;
 

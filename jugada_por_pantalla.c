@@ -6,52 +6,56 @@
  */
 #include "jugada_por_pantalla.h"
 #include "botones_antirrebotes.h"
+#include "calibracion_tp.h"
 #include "reversi_gui.h"
+#include "8led.h"
 
 /* TICKs de timer0 para esperar:
  *   - Timepo de cancelación: 2 segundos.
  *   - Tiempo de parpadeo: 250 ms.
  */
 enum {
-	RETARDO_2000_MS = 0, //TODO: Ajustar
-	RETARDO_250_MS = 0 //TODO: Ajustartoque_pantalla
-};
-
-enum toque_pantalla {
-	toque_none = 0,
-	toque_central = 1
+	RETARDO_2000_MS = 100,
+	RETARDO_350_MS = 17
 };
 
 /* Estado actual de la máquina de estados */
 static enum jugada_por_pantalla_estado estadoActual;
 
 /* Acciones para cada estado del autómata */
-void action_estado_bienvenida(unsigned long int ahora, int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
-void action_estado_seleccionar_movimiento(unsigned long int ahora, int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
-void action_estado_permitir_cancelar(unsigned long int ahora, int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
-void action_estado_partida_finalizada(unsigned long int ahora, int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
 /* Tabla que relaciona los estados con sus acciones */
-static void (*const tabla_estados [MAX_STATES_JPP]) (unsigned long int ahora, int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna) = {
+static void (*const tabla_estados [MAX_STATES_JPP]) (unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna) = {
 		action_estado_bienvenida, action_estado_seleccionar_movimiento,
-		action_estado_permitir_cancelar, action_estado_partida_finalizada
+		action_estado_permitir_cancelar, action_estado_movimiento_maquina,
+		action_estado_partida_finalizada
 };
 
-void private_parpadear(unsigned long int ahora);
+void private_parpadear(unsigned long int ahora, char tablero[][8]);
 
 static int _fila, _columna;
 static unsigned int timeAntes = 0;
+static unsigned int timeAntesParpadeo = 0;
 
 void jugada_por_pantalla_iniciar(void) {
+	calibracion_empezar();
+	gui_empezar();
 	estadoActual = estado_bienvenida;
-	// TODO: Limpiar pantalla y mostrar mensaje bienvenida
+	gui_limpiar_pantalla();
+	gui_dibujar_bienvenida();
+	gui_refrescar();
 }
 
-void jugada_por_pantalla_gestionar(unsigned long int ahora, int fin, int* ready, char* fila, char* columna) {
+void jugada_por_pantalla_gestionar(unsigned long int ahora, char tablero[][8], int fin, int* ready, char* fila, char* columna) {
 	if (estadoActual >= 0 && estadoActual < MAX_STATES_JPP) {
 		enum pulsacion_button pulsacion = antirrebotes_gestionar(ahora);
-		enum toque_pantalla toque = toque_none; //gui_touch_screen_gestionar(ahora);
+		enum toque_pantalla toque = gui_touch_screen_gestionar();
 		*ready = 0;
-		return tabla_estados[estadoActual](ahora, fin, pulsacion, toque, ready, fila, columna);
+		return tabla_estados[estadoActual](ahora, tablero, fin, pulsacion, toque, ready, fila, columna);
 	}
 }
 
@@ -59,33 +63,21 @@ void jugada_por_pantalla_gestionar(unsigned long int ahora, int fin, int* ready,
 
 /* estado_bienvenida: Muestra una pantalla inicial con las intrucciones básicas
  * para jugar y la leyenda "Toque la pantalla para jugar". */
-void action_estado_bienvenida(unsigned long int ahora, int fin,
+void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
+	D8led_gestionar(1);
 
-	int fire_transition = 0;
-
-	switch (pulsacion) {
-	case pulsacion_iz:
-	case pulsacion_dr:
-		fire_transition = 1;
-		break;
-	case pulsacion_none:
-		break;
-	}
-	switch (toque){
-	case toque_central: // TODO: Definir área de interacción.
-		fire_transition = 1;
-		break;
-	case toque_none:
-		break;
-	}
-
-	if (fire_transition) {
+	if (pulsacion != pulsacion_none || toque != toque_none) {
 		// Saltar pantalla de bienvenida
 		_fila = 0;
 		_columna = 0;
-		// TODO: Dibujar tablero inicial
+		gui_limpiar_pantalla();
+		gui_dibujar_tablero_completo(tablero);
+		gui_dibujar_ficha(_fila, _columna, FICHA_GRIS);
+		gui_escribir_leyenda("Pulse para jugar");
+		gui_refrescar();
+		timeAntesParpadeo = ahora;
 		estadoActual = estado_seleccionar_movimiento;
 	}
 }
@@ -93,22 +85,25 @@ void action_estado_bienvenida(unsigned long int ahora, int fin,
 /* estado_seleccionar_movimiento: Elección de número de fila y columna,
  * seleccionar la columna 0-7 con el botón izquierdo y la fila 0-7 con
  * el botón derecho. Confirmar la selección con un toque en la pantalla táctil. */
-void action_estado_seleccionar_movimiento(unsigned long int ahora, int fin,
+void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[][8], int fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
+	D8led_gestionar(2);
 
 	switch (pulsacion) {
 	case pulsacion_dr:
-		// TODO: Borrar ficha anterior
+		gui_dibujar_ficha(_fila, _columna, tablero[_fila][_columna]);
 		// Incrementar el número de fila seleccionado
 		_fila = (_fila + 1) % 8;
-		// TODO: Dibujar ficha
+		gui_dibujar_ficha(_fila, _columna, FICHA_GRIS);
+		gui_refrescar();
 		break;
 	case pulsacion_iz:
-		// TODO: Borrar ficha anterior
+		gui_dibujar_ficha(_fila, _columna, tablero[_fila][_columna]);
 		// Incrementar el número de columna seleccionado
 		_columna = (_columna + 1) % 8;
-		// TODO: Dibujar ficha
+		gui_dibujar_ficha(_fila, _columna, FICHA_GRIS);
+		gui_refrescar();
 		break;
 	case pulsacion_none:
 		break;
@@ -117,8 +112,8 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, int fin,
 	switch (toque) {
 	case toque_central:
 		// Confirmar la selección de fila y columna
-
-		// TODO: Mostrar leyenda de confirmación
+		gui_escribir_leyenda("Pulse para cancelar");
+		gui_refrescar();
 		timeAntes = ahora;
 		estadoActual = estado_permitir_cancelar;
 		break;
@@ -132,18 +127,21 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, int fin,
 	}
 
 	// Gestionar el parpadeo
-	private_parpadear(ahora);
+	private_parpadear(ahora, tablero);
 }
 
 /* estado_permitir_cancelar: Permitir al usuario cancelar su movimiento durante un determinado
  * tiempo antes de confirmar su elección. */
-void action_estado_permitir_cancelar(unsigned long int ahora, int fin,
+void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8], int fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 
+	D8led_gestionar(3);
 	switch (toque) {
 	case toque_central:
 		// Cancelar movimiento
+		gui_escribir_leyenda("Pulse para jugar");
+		gui_refrescar();
 		estadoActual = estado_seleccionar_movimiento;
 		break;
 	case toque_none:
@@ -155,21 +153,37 @@ void action_estado_permitir_cancelar(unsigned long int ahora, int fin,
 		*fila = _fila;
 		*columna = _columna;
 		*ready = 1;
-		estadoActual = estado_seleccionar_movimiento;
+		// Resetear los valores de fila y columna
+		_fila = 0;
+		_columna = 0;
+		estadoActual = estado_movimiento_maquina;
 	}
 
 	// Gestionar el parpadeo
-	private_parpadear(ahora); // TODO: conflicto de timeAntes entre 250 y 2000
+	private_parpadear(ahora, tablero); // TODO: conflicto de timeAntes entre 250 y 2000
+}
+
+/* estado_movimiento_maquina: TODO */
+void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8], int fin,
+		enum pulsacion_button pulsacion, enum toque_pantalla toque,
+		int* ready, char* fila, char* columna) {
+	D8led_gestionar(4);
+	gui_dibujar_tablero_completo(tablero);
+	gui_escribir_leyenda("Pulse para jugar");
+	gui_refrescar();
+	estadoActual = estado_seleccionar_movimiento;
 }
 
 /* action_estado_partida_finalizada: La partida actual ha terminado
  * por acción del usuario o por no poder realizar más movimientos */
-void action_estado_partida_finalizada(unsigned long int ahora, int fin,
+void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8], int fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
+	D8led_gestionar(5);
 	switch (pulsacion) {
 	case pulsacion_iz:
 	case pulsacion_dr:
+		// TODO ver si se puede quitar (si pasa por el estado bienvenida ya se encarga este)
 		_fila = 0;
 		_columna = 0;
 		// TODO: Dibujar tablero inicial
@@ -194,16 +208,17 @@ void action_estado_partida_finalizada(unsigned long int ahora, int fin,
 
 /* Hace parpadear la ficha colocada en [_fila, _columna]
  * a intervalos RETARDO_250_MS de tiempo. */
-void private_parpadear(unsigned long int ahora) {
-	static int status = 0;
-	if (ahora - timeAntes > RETARDO_250_MS) {
+void private_parpadear(unsigned long int ahora, char tablero[][8]) {
+	static int status = 1;
+	if (ahora - timeAntesParpadeo > RETARDO_350_MS) {
 		if (status) {
-			// TODO: Ocultar ficha
+			gui_dibujar_ficha(_fila, _columna, tablero[_fila][_columna]);
 			status = 0;
 		} else {
-			// TODO: Mostrar ficha
+			gui_dibujar_ficha(_fila, _columna, FICHA_GRIS);
 			status = 1;
 		}
-		timeAntes = ahora;
+		gui_refrescar();
+		timeAntesParpadeo = ahora;
 	}
 }

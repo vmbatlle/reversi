@@ -5,6 +5,7 @@
  */
 
 #include "jugada_por_pantalla.h"
+#include "reversi_gui.h"
 #include "options_environment.h"
 #include "timer0.h"
 #include "latido.h"
@@ -16,13 +17,6 @@ enum { DIM=8 };
 enum {
 	NO_HAY_PATRON = 0,
 	PATRON_ENCONTRADO = 1
-};
-
-// Estados de las casillas del tablero
-enum {
-	CASILLA_VACIA = 0,
-	FICHA_BLANCA = 1,
-	FICHA_NEGRA = 2
 };
 
 // candidatas: indica las posiciones a explorar
@@ -442,7 +436,7 @@ void reversi_main()
 
 			latido_gestionar(ahora);
 
-			jugada_por_pantalla_gestionar(ahora, fin, &ready, &fila, &columna);
+			jugada_por_pantalla_gestionar(ahora, tablero, fin, &ready, &fila, &columna);
 			if (ready) {
 				// el jugador ha hecho su movimiento
 				reversi_procesar(candidatas, fila, columna, &fin);

@@ -24,7 +24,7 @@
  * Todos comentados = ejecución normal del juego de reversi */
 //#define TEST_BENCH_TIMER0
 //#define TEST_BENCH_REBOTES
-#define TEST_BENCH_LCD
+//#define TEST_BENCH_LCD
 
 /*--- function declare ---*/
 void Main(void);

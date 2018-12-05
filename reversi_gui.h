@@ -6,19 +6,31 @@
 #ifndef __REVERSI_GUI__
 #define __REVERSI_GUI__
 
-/* TODO merge de este enum con el de reversi_main, decidir como hacerlo */
+// Estados de las casillas del tablero
 enum contenido_casilla {
-	VACIA = 0,
-	BLANCA = 1,
-	NEGRA = 2,
-	GRIS = 3
+	CASILLA_VACIA = 0,
+	FICHA_BLANCA = 1,
+	FICHA_NEGRA = 2,
+	FICHA_GRIS = 3
+};
+
+// Tipos de toque sobre panel táctil
+enum toque_pantalla {
+	toque_none = 0,
+	toque_central = 1
 };
 
 void gui_inicializar();
+void gui_empezar();
+void gui_refrescar();
 void gui_limpiar_pantalla();
+void gui_dibujar_bienvenida();
 void gui_dibujar_tablero_vacio();
 /* TODO cambiar el 8 por un enum */
-void gui_dibujar_tablero_completo(char* tablero[][8]);
-void gui_dibujar_ficha(int fila, int columna, enum contenido_casilla casilla);
+void gui_dibujar_tablero_completo(char tablero[][8]);
+void gui_dibujar_ficha(int fila, int columna, char casilla);
+void gui_escribir_leyenda(char* leyenda);
+
+enum toque_pantalla gui_touch_screen_gestionar();
 
 #endif /* __REVERSI_GUI__ */

@@ -15,7 +15,12 @@
  * estado_partida_finalizada: Partida finalizada
  */
 enum jugada_por_pantalla_estado {
-	estado_bienvenida, estado_seleccionar_movimiento, estado_permitir_cancelar, estado_partida_finalizada, MAX_STATES_JPP=4
+	estado_bienvenida,
+	estado_seleccionar_movimiento,
+	estado_permitir_cancelar,
+	estado_movimiento_maquina,
+	estado_partida_finalizada,
+	MAX_STATES_JPP=5
 };
 
 /**
@@ -32,6 +37,6 @@ void jugada_por_pantalla_iniciar(void);
  * @param fila Si ready = 1, toma el valor de la fila seleccionada (0-7)
  * @param columna Si ready = 1, toma el valor de la columna seleccionada (0-7)
  */
-void jugada_por_pantalla_gestionar(unsigned long int ahora, int fin, int* ready, char* fila, char* columna);
+void jugada_por_pantalla_gestionar(unsigned long int ahora, char tablero[][8], int fin, int* ready, char* fila, char* columna);
 
 #endif /* __JUGADA_POR_PANTALLA_H__ */
