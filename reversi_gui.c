@@ -148,6 +148,10 @@ void gui_empezar() {
 	TS_empezar();
 }
 
+void gui_parar() {
+	TS_parar();
+}
+
 void gui_refrescar() {
 	Lcd_Dma_Trans();
 }
@@ -177,35 +181,63 @@ void gui_dibujar_tablero_vacio() {
 						POS_X_TABLERO + (SIZE_CASILLA - 1) * i, BLACK, 1);
 	}
 
+	/*
+	 * TODO: pasar los numeros magicos (+1, +4) a constantes,
+	 * considerar tambien cambiar SIZE_X/Y_TEXTO a 7x9
+	 * vienen dados por la fuente empleada en ascii 8x16, por ejemplo el caracter '0':
+	 * ........
+	 * ........
+	 * ........
+	 * .#####..
+	 * ##...##.
+	 * ##..###.
+	 * ##.####.
+	 * ####.##.
+	 * ###..##.
+	 * ##...##.
+	 * ##...##.
+	 * .#####..
+	 * ........
+	 * ........
+	 * ........
+	 * ........
+	 */
 	char digito = '1';
 	/* Dibujar numeración de filas y columnas (1 - 8) */
 	for (i = 0; i < CASILLAS_TABLERO; i++) {
 		/* Número de fila */
-		Lcd_DspAscII8x16(POS_X_TABLERO - MARGEN_TEXTO - SIZE_X_TEXTO,
+		Lcd_DspAscII8x16(POS_X_TABLERO - MARGEN_TEXTO - SIZE_X_TEXTO + 1,
 							POS_Y_TABLERO + (SIZE_CASILLA - 1) * i + (SIZE_CASILLA - SIZE_Y_TEXTO) / 2,
 							BLACK,(INT8U*)&digito);
 		/* Número de columna */
 		Lcd_DspAscII8x16(POS_X_TABLERO + (SIZE_CASILLA - 1) * i + (SIZE_CASILLA - SIZE_X_TEXTO) / 2,
-							POS_Y_TABLERO - MARGEN_TEXTO - SIZE_Y_TEXTO,
+							POS_Y_TABLERO - MARGEN_TEXTO - SIZE_Y_TEXTO + 4,
 							BLACK,(INT8U*)&digito);
 		digito = digito + 1;
 	}
+
+	/* Botones para pasar turno y finalizar */
+	BitmapView(230, 10, BITMAP_BLACK_TILE); //BITMAP_BOTON_PASAR);
+	BitmapView(230, 180, BITMAP_BLACK_TILE); //BITMAP_BOTON_FINALIZAR);
+
+	/* Títulos para la información de profiling */
+	Lcd_DspAscII8x16(230, 65, BLACK,(INT8U*)"Tiempo ejecucion");
+	Lcd_DspAscII8x16(230, 80, BLACK,(INT8U*)"patron_volteo:");
+	Lcd_DspAscII8x16(230, 110, BLACK,(INT8U*)"Total calculos:");
+	Lcd_DspAscII8x16(230, 140, BLACK,(INT8U*)"Total ejecucion:");
 }
 
 /* TODO cambiar el 8 por un enum */
-void gui_dibujar_tablero_completo(char tablero[8][8]) {
-	gui_dibujar_tablero_vacio(); /* TODO necesario? */
-	int x = 0;
-	int y = 0;
+void gui_dibujar_contenido_tablero(char tablero[8][8]) {
+	int x, y;
 	for (x = 0; x < CASILLAS_TABLERO; x++) {
 		for (y = 0; y < CASILLAS_TABLERO; y++) {
-			/* TODO usar el enum correcto */
 			gui_dibujar_ficha(x, y, (enum contenido_casilla) tablero[x][y]);
 		}
 	}
 }
 
-void gui_dibujar_ficha(int fila, int columna, char casilla) {
+void gui_dibujar_ficha(int fila, int columna, enum contenido_casilla casilla) {
 	if (fila >= 0 && fila < CASILLAS_TABLERO && columna >= 0 && columna < CASILLAS_TABLERO) {
 		/* Calcular la posición de dibujo */
 		int pos_x = POS_X_TABLERO + (SIZE_CASILLA - 1) * fila + (SIZE_CASILLA - SIZE_FICHA) / 2;
@@ -229,6 +261,30 @@ void gui_dibujar_ficha(int fila, int columna, char casilla) {
 	}
 }
 
+void gui_escribir_profiling(int total, int calculos, int patron_volteo) {
+	// Obtener strings de tiempo (convertir total de ms a s)
+	char total_str[12], calculos_str[13], patron_volteo_str[13];
+	itoa(total / 1000, total_str, 10);
+	itoa(calculos, calculos_str, 10);
+	itoa(patron_volteo, patron_volteo_str, 10);
+	// Añadir ms o s al final
+	int total_len = strlen(total_str);
+	total_str[total_len] = 's';
+	total_str[total_len + 1] = '\0';
+	int calculos_len = strlen(calculos_str);
+	total_str[calculos_len] = 'm';
+	total_str[calculos_len + 1] = 's';
+	total_str[calculos_len + 2] = '\0';
+	int patron_volteo_len = strlen(patron_volteo_str);
+	total_str[patron_volteo_len] = 'm';
+	total_str[patron_volteo_len + 1] = 's';
+	total_str[patron_volteo_len + 2] = '\0';
+	// Escribir el texto por pantalla (TODO limpiar el texto anterior)
+	Lcd_DspAscII8x16(230, 95, BLACK,(INT8U*)patron_volteo_str);
+	Lcd_DspAscII8x16(230, 125, BLACK,(INT8U*)calculos_str);
+	Lcd_DspAscII8x16(230, 155, BLACK,(INT8U*)patron_volteo_str);
+}
+
 void gui_escribir_leyenda(char* leyenda) {
 	// Limpiar zona de pantalla asociada a la leyenda
 	/*Lcd_Draw_HLine(POS_X_TABLERO, POS_X_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO,
@@ -241,20 +297,38 @@ void gui_escribir_leyenda(char* leyenda) {
 
 enum toque_pantalla gui_touch_screen_gestionar() {
 	int ready;
-	ULONG x, y;
-	TS_leer(&ready, &x, &y);
+	ULONG ts_x, ts_y;
+	TS_leer(&ready, &ts_x, &ts_y);
 	if (ready) {
-		int x_, y_;
-		calibracion_convertir(x, y, &x_, &y_);
-		//BitmapView(x_ - BITMAP_WHITE_TILE.usWidth / 2, y_ - BITMAP_WHITE_TILE.usHeight / 2, BITMAP_WHITE_TILE);
-		//gui_refrescar();
-		TS_empezar();
-		if (x_ > 110 && x_ < 210 && y_ > 70 && y_ < 170) {
+		int lcd_x, lcd_y;
+		calibracion_convertir(ts_x, ts_y, &lcd_x, &lcd_y);
+		TS_empezar(); /* volver a activar interrupciones TS */
+		if (lcd_x > LCD_XSIZE / 2 - 50 && lcd_x < LCD_XSIZE / 2 + 50
+			&& lcd_y > LCD_YSIZE / 2 - 50 && lcd_y < LCD_YSIZE / 2 + 50) {
 			return toque_central;
+		} else if (lcd_x > LCD_XSIZE - 100) {
+			if (lcd_y > LCD_YSIZE / 2) {
+				return toque_finalizar;
+			} else {
+				return toque_pasar;
+			}
 		} else {
 			return toque_none;
 		}
 	} else {
 		return toque_none;
+	}
+}
+
+void gui_touch_screen_test() {
+	int ready;
+	ULONG ts_x, ts_y;
+	TS_leer(&ready, &ts_x, &ts_y);
+	if (ready) {
+		int lcd_x, lcd_y;
+		calibracion_convertir(ts_x, ts_y, &lcd_x, &lcd_y);
+		TS_empezar(); /* volver a activar interrupciones TS */
+		BitmapView(lcd_x - BITMAP_WHITE_TILE.usWidth / 2, lcd_y - BITMAP_WHITE_TILE.usHeight / 2, BITMAP_WHITE_TILE);
+		gui_refrescar();
 	}
 }

@@ -24,7 +24,7 @@
  * Todos comentados = ejecución normal del juego de reversi */
 //#define TEST_BENCH_TIMER0
 //#define TEST_BENCH_REBOTES
-//#define TEST_BENCH_LCD
+//#define TEST_BENCH_LCD_TS
 
 /*--- function declare ---*/
 void Main(void);
@@ -62,13 +62,13 @@ void Main(void)
 #elif defined(TEST_BENCH_REBOTES)
 	button_empezar(insertar_pulsacion);
 	while(1);
-#elif defined(TEST_BENCH_LCD)
-
-	gui_limpiar_pantalla();
-	//gui_dibujar_tablero_vacio();
+#elif defined(TEST_BENCH_LCD_TS)
+	gui_empezar();
 	calibracion_empezar();
-	while(1);
-	//TS_close();
+	while(1) {
+		gui_touch_screen_test();
+	}
+	gui_parar();
 #else
 	// Ejecución normal
 	reversi_main();

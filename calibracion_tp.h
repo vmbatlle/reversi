@@ -4,7 +4,9 @@
 /**
  * @brief Realiza el protocolo de calibración de la pantalla táctil
  *        mostrando varios sprites por pantalla y pidiendo al usuario
- *        que los pulse
+ *        que los pulse.
+ *        IMPORTANTE: Se debe haber inicializado el LCD y TS previamente
+ *        llamando a gui_empezar()
  */
 void calibracion_empezar();
 

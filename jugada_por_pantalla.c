@@ -12,7 +12,7 @@
 
 /* TICKs de timer0 para esperar:
  *   - Timepo de cancelación: 2 segundos.
- *   - Tiempo de parpadeo: 250 ms.
+ *   - Tiempo de parpadeo: 350 ms.
  */
 enum {
 	RETARDO_2000_MS = 100,
@@ -73,7 +73,8 @@ void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int fi
 		_fila = 0;
 		_columna = 0;
 		gui_limpiar_pantalla();
-		gui_dibujar_tablero_completo(tablero);
+		gui_dibujar_tablero_vacio();
+		gui_dibujar_contenido_tablero(tablero);
 		gui_dibujar_ficha(_fila, _columna, FICHA_GRIS);
 		gui_escribir_leyenda("Pulse para jugar");
 		gui_refrescar();
@@ -168,7 +169,7 @@ void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8]
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 	D8led_gestionar(4);
-	gui_dibujar_tablero_completo(tablero);
+	gui_dibujar_contenido_tablero(tablero);
 	gui_escribir_leyenda("Pulse para jugar");
 	gui_refrescar();
 	estadoActual = estado_seleccionar_movimiento;
