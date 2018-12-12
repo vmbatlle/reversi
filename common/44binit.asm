@@ -77,8 +77,8 @@
     b HandlerPabort     	/* handlerPAbort        */
     b HandlerDabort     	/* handlerDAbort        */
     b .                 	/* handlerReserved      */
-    b HandlerIRQ
-    b HandlerFIQ
+    subs pc,lr,#4 /* b HandlerIRQ */
+    subs pc,lr,#4 /* b HandlerFIQ */
 	#***IMPORTANT NOTE***
 	#If the H/W vectored interrutp mode is enabled, The above two instructions should
 	#be changed like below, to work-around with H/W bug of S3C44B0X interrupt controller. 
@@ -298,6 +298,8 @@ F2:
 
 	MRS	r0, CPSR
 	BIC	r0, r0, #NOINT /* enable interrupt */
+	BIC r0, r0, #MODEMASK
+	ORR r0, r0, #USERMODE  /* activación del modo usuario */
 	MSR	CPSR_cxsf, r0
 	/* jump to main() */
    	BL	Main
@@ -423,13 +425,13 @@ SMRDATA:
 	.long 0x20				/* MRSR7                                  */
 
 
-.equ 	UserStack,	_ISR_STARTADDRESS-0xf00    		/* c7ff000 */   	
 .equ	SVCStack,	_ISR_STARTADDRESS-0xf00+256    	/* c7ff100 */
 .equ	UndefStack,	_ISR_STARTADDRESS-0xf00+256*2   /* c7ff200 */
 .equ	AbortStack,	_ISR_STARTADDRESS-0xf00+256*3   /* c7ff300 */
 .equ	IRQStack,	_ISR_STARTADDRESS-0xf00+256*4   /* c7ff400 */
 .equ	FIQStack,	_ISR_STARTADDRESS-0xf00+256*5   /* c7ff500 */
 .equ	SysStack,	_ISR_STARTADDRESS-0xf00+256*6   /* c7ff600 */
+.equ 	UserStack,	_ISR_STARTADDRESS-0xf00+256*7	/* c7ff700 */
 
 .equ	HandleReset,	_ISR_STARTADDRESS
 .equ	HandleUndef,	_ISR_STARTADDRESS+4
