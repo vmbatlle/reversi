@@ -71,6 +71,11 @@ void Main(void)
 	gui_parar();
 #else
 	// Ejecución normal
+	unsigned int cpsr;
+	asm("MRS r0, CPSR" : [cpsr] "=r" (cpsr));
+	asm("BIC %[cpsr_out], %[cpsr_in], #0x1f" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr));
+	asm("ORR %[cpsr_out], %[cpsr_in], #0x10" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr));
+	asm("MSR CPSR_c, %[cpsr]" : : [cpsr] "r" (cpsr));
 	reversi_main();
 #endif
 }

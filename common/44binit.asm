@@ -298,8 +298,6 @@ F2:
 
 	MRS	r0, CPSR
 	BIC	r0, r0, #NOINT /* enable interrupt */
-	BIC r0, r0, #MODEMASK
-	ORR r0, r0, #USERMODE  /* activación del modo usuario */
 	MSR	CPSR_cxsf, r0
 	/* jump to main() */
    	BL	Main
