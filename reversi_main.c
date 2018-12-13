@@ -8,6 +8,7 @@
 #include "reversi_gui.h"
 #include "options_environment.h"
 #include "timer0.h"
+#include "timer2.h"
 #include "latido.h"
 
 // Tamaño del tablero
@@ -18,6 +19,11 @@ enum {
 	NO_HAY_PATRON = 0,
 	PATRON_ENCONTRADO = 1
 };
+
+// Variables para valores del profiling
+static unsigned long long int calculos = 0;
+static unsigned long long int patron_volteo_time = 0;
+static unsigned int patron_volteo_calls = 0;
 
 // candidatas: indica las posiciones a explorar
 // Se usa para no explorar todo el tablero innecesariamente
@@ -214,7 +220,11 @@ int actualizar_tablero(char tablero[][DIM], unsigned char f, unsigned char c, ch
         SC = vSC[i];
         // flip: numero de fichas a voltear
         flip = 0;
+        patron_volteo_calls = patron_volteo_calls + 1;
+        unsigned int antes = timer2_leer();
         patron = patron_volteo(tablero, &flip, f, c, SF, SC, color);
+        unsigned int ahora = timer2_leer();
+        patron_volteo_time = patron_volteo_time + (ahora - antes);
         //printf("Flip: %d \n", flip);
         if (patron == PATRON_ENCONTRADO )
         {
@@ -265,7 +275,11 @@ int elegir_mov(char candidatas[][DIM], char tablero[][DIM], unsigned char *f, un
 
                         // nos dice qué hay que voltear en cada dirección
                         longitud = 0;
+                        patron_volteo_calls = patron_volteo_calls + 1;
+                        unsigned int antes = timer2_leer();
                         patron = patron_volteo(tablero, &longitud, i, j, SF, SC, FICHA_BLANCA);
+                        unsigned int ahora = timer2_leer();
+                        patron_volteo_time = patron_volteo_time + (ahora - antes);
                         //  //printf("%d ", patron);
                         if (patron == PATRON_ENCONTRADO)
                         {
@@ -435,11 +449,15 @@ void reversi_main()
 			ahora = timer0_leer();
 
 			latido_gestionar(ahora);
+			gui_escribir_profiling(timer2_leer(), calculos, patron_volteo_time, patron_volteo_calls);
 
 			jugada_por_pantalla_gestionar(ahora, tablero, fin, &ready, &fila, &columna);
 			if (ready) {
 				// el jugador ha hecho su movimiento
+				unsigned int antes = timer2_leer();
 				reversi_procesar(candidatas, fila, columna, &fin);
+                unsigned int ahora = timer2_leer();
+                calculos = calculos + (ahora - antes);
 			}
 
 		}

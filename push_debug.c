@@ -20,8 +20,6 @@ void push_iniciar() {
 	for (i = 1; i < MAX_SIZE; i++) {
 		(*(stack - i)) = 0;
 	}
-	timer2_empezar();
-
 }
 
 void push_debug(uint8_t ID_evento, uint32_t auxData){

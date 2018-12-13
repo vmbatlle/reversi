@@ -33,7 +33,9 @@ void gui_dibujar_tablero_vacio();
 void gui_dibujar_contenido_tablero(char tablero[][8]);
 void gui_dibujar_ficha(int fila, int columna, enum contenido_casilla casilla);
 void gui_escribir_leyenda(char* leyenda);
-void gui_escribir_profiling(int total, int calculos, int patron_volteo);
+void gui_escribir_profiling(unsigned long long int total,
+		unsigned long long int calculos, unsigned long long int patron_volteo,
+		unsigned int patron_volteo_calls);
 
 enum toque_pantalla gui_touch_screen_gestionar();
 void gui_touch_screen_test();

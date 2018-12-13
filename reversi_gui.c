@@ -159,7 +159,15 @@ void gui_dibujar_ficha(int fila, int columna, enum contenido_casilla casilla) {
 	}
 }
 
-void gui_escribir_profiling(int total, int calculos, int patron_volteo) {
+void gui_escribir_profiling(unsigned long long int total,
+		unsigned long long int calculos, unsigned long long int patron_volteo,
+		unsigned int patron_volteo_calls) {
+
+	// Ajustar todos los tiempos a milisegundos
+	total /= 1000;
+	calculos /= 1000;
+	patron_volteo /= 1000;
+
 	// Obtener strings de tiempo (convertir total de ms a s)
 	char total_str[12], calculos_str[13], patron_volteo_str[13];
 	itoa(total / 1000, total_str, 10);
@@ -181,6 +189,7 @@ void gui_escribir_profiling(int total, int calculos, int patron_volteo) {
 	Lcd_DspAscII8x16(230, 95, BLACK,(INT8U*)patron_volteo_str);
 	Lcd_DspAscII8x16(230, 125, BLACK,(INT8U*)calculos_str);
 	Lcd_DspAscII8x16(230, 155, BLACK,(INT8U*)patron_volteo_str);
+	// TODO: Añadir número de invocaciones
 }
 
 void gui_escribir_leyenda(char* leyenda) {

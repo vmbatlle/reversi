@@ -46,6 +46,7 @@ void Main(void)
 
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
+	timer2_empezar();
 	latido_inicializar();	// Latido LED
 	D8led_inicializar();	// 8led
 	push_iniciar();			// Pila de debug

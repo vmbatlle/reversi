@@ -118,6 +118,12 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[
 		timeAntes = ahora;
 		estadoActual = estado_permitir_cancelar;
 		break;
+	case toque_finalizar:
+		// TODO: implementar
+		break;
+	case toque_pasar:
+		// TODO: implementar
+		break;
 	case toque_none:
 		break;
 	}
@@ -145,7 +151,7 @@ void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8],
 		gui_refrescar();
 		estadoActual = estado_seleccionar_movimiento;
 		break;
-	case toque_none:
+	default:
 		break;
 	}
 
@@ -202,7 +208,7 @@ void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8]
 		// TODO: Dibujar tablero inicial
 		estadoActual = estado_seleccionar_movimiento;
 		break;
-	case toque_none:
+	default:
 		break;
 	}
 }
