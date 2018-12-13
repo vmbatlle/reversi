@@ -37,7 +37,7 @@ void timer2_ISR(void)
 void timer2_inicializar(void)
 {
 	/* Configuraion controlador de interrupciones */
-	rINTMOD &= ~(BIT_TIMER2); // Configura la linea INT_TIMER2 como de tipo IRQ (bit 11 = 0)
+	rINTMOD |= BIT_TIMER2; // Configura la linea INT_TIMER2 como de tipo FIQ (bit 11 = 1)
 
 	/* NO se configura el vector de interrupciones. Ya se ha realizado en 44binit.asm. */
 	// rINTCON &= 0b001; // Habilita int. vectorizadas (bit 2 = 0) y la linea IRQ (bit 1 = 0)

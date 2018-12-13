@@ -242,8 +242,10 @@ void Cache_Flush(void)
 void sys_init()// Interrupt,Port and UART
 {
 	/* enable interrupt */
-	rINTMOD = 0x0;
-	rINTCON = 0x1;
+	rINTMOD = 0x0;  // All interrupt modes set to IRQ by default
+	rINTCON = 0x0;	// Bit 0 = 0 ==> Enables FIQ interrupts
+					// Bit 1 = 0 ==> Enables IRQ interrupts
+					// Bit 2 = 0 ==> Set Vectored mode for IRQ
 	rI_ISPC = 0xffffffff;			// clear all interrupt pend
 	rEXTINTPND = 0xf;				  // clear EXTINTPND reg
 	Port_Init();					    // Initial 44B0X's I/O port
