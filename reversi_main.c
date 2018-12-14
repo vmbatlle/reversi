@@ -21,6 +21,7 @@ enum {
 };
 
 // Variables para valores del profiling
+static unsigned long long int tiempo_inicio = 0;
 static unsigned long long int calculos = 0;
 static unsigned long long int patron_volteo_time = 0;
 static unsigned int patron_volteo_calls = 0;
@@ -380,10 +381,32 @@ void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char c
 	// si la fila o columna son 8 asumimos que el jugador no puede mover
 	if ((fila >= 0 && fila < DIM) && (columna >= 0 && columna < DIM))
 	{
-		tablero[fila][columna] = FICHA_NEGRA;
-		actualizar_tablero(tablero, fila, columna, FICHA_NEGRA);
-		actualizar_candidatas(candidatas, fila, columna);
-		move = 1;
+		int patron = NO_HAY_PATRON;
+		if (tablero[fila][columna] == CASILLA_VACIA) {
+			int k = 0;
+			while ((patron != PATRON_ENCONTRADO) && (k < DIM))
+			{
+				char SF = vSF[k];    // k representa la dirección que miramos
+				char SC = vSC[k];    // 1 es norte, 2 NE, 3 E ...
+				patron_volteo_calls = patron_volteo_calls + 1;
+				unsigned int antes = timer2_leer();
+				int flip = 0;
+				patron = patron_volteo(tablero, &flip, fila, columna, SF, SC, FICHA_NEGRA);
+				unsigned int ahora = timer2_leer();
+				patron_volteo_time = patron_volteo_time + (ahora - antes);
+
+				k++;
+			}
+		}
+
+		if (patron == PATRON_ENCONTRADO) {
+			tablero[fila][columna] = FICHA_NEGRA;
+			actualizar_tablero(tablero, fila, columna, FICHA_NEGRA);
+			actualizar_candidatas(candidatas, fila, columna);
+			move = 1;
+		} else {
+			move = 0;
+		}
 	}
 
 	// escribe el movimiento en las variables globales fila columna
@@ -413,6 +436,8 @@ void reversi_procesar(char candidatas[8][8], unsigned char fila, unsigned char c
 // Sólo que la máquina realice un movimiento correcto.
 void reversi_main()
 {
+
+	jugada_por_pantalla_iniciar();
 	while (1) {
 		 ////////////////////////////////////////////////////////////////////
 		 // Tablero candidatas: se usa para no explorar todas las posiciones del tablero
@@ -437,8 +462,14 @@ void reversi_main()
 		// Inicialización del juego
 		reversi_inicializar(candidatas);
 		//jugada_por_botones_iniciar();
-		jugada_por_pantalla_iniciar();
 		timer0_empezar();
+
+		// Resetear datos de profiling
+		tiempo_inicio = timer2_leer();
+		calculos = 0;
+		patron_volteo_time = 0;
+		patron_volteo_calls = 0;
+
 
 		int fin = 0;
 		while (!fin)
@@ -449,9 +480,9 @@ void reversi_main()
 			ahora = timer0_leer();
 
 			latido_gestionar(ahora);
-			gui_escribir_profiling(timer2_leer(), calculos, patron_volteo_time, patron_volteo_calls);
+			gui_escribir_profiling(timer2_leer() - tiempo_inicio, calculos, patron_volteo_time, patron_volteo_calls);
 
-			jugada_por_pantalla_gestionar(ahora, tablero, fin, &ready, &fila, &columna);
+			jugada_por_pantalla_gestionar(ahora, tablero, &fin, &ready, &fila, &columna);
 			if (ready) {
 				// el jugador ha hecho su movimiento
 				unsigned int antes = timer2_leer();
@@ -459,8 +490,9 @@ void reversi_main()
                 unsigned int ahora = timer2_leer();
                 calculos = calculos + (ahora - antes);
 			}
-
 		}
+		// Actualizar la máquina de estados si la IA ha decidido finalizar el juego
+		jugada_por_pantalla_gestionar(ahora, tablero, &fin, &ready, &fila, &columna);
 		timer0_parar();
 		// TODO: Revisar cambios necesarios para reempezar una partida
 	}

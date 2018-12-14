@@ -23,6 +23,7 @@
 /* Tests posibles, solamente descomentar uno.
  * Todos comentados = ejecución normal del juego de reversi */
 //#define TEST_BENCH_TIMER0
+//#define TEST_BENCH_TIMER2
 //#define TEST_BENCH_REBOTES
 //#define TEST_BENCH_LCD_TS
 
@@ -40,6 +41,7 @@ void insertar_pulsacion(enum estado_button button) {
 
 void Main(void)
 {
+
 	/* Inicializa controladores */
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
 	excepciones_inicializar(); // Inicialización del capturador de excepciones
@@ -47,9 +49,9 @@ void Main(void)
 	timer0_inicializar();	// Inicialización del timer 0
 	timer2_inicializar();	// Inicialización del timer 2
 	timer2_empezar();
+	push_iniciar();			// Pila de debug
 	latido_inicializar();	// Latido LED
 	D8led_inicializar();	// 8led
-	push_iniciar();			// Pila de debug
 	button_iniciar();		// Controlador de botones
 	antirrebotes_iniciar();	// Controlador de antirrebotes
 	gui_inicializar();      // Inicializar GUI
@@ -59,6 +61,13 @@ void Main(void)
 	timer0_empezar();
 	while(1){
 		latido_gestionar(timer0_leer());
+	}
+#elif defined(TEST_BENCH_TIMER2)
+	while(1){
+		int antes = timer2_leer();
+		Delay(40000);
+		volatile int kk = timer2_leer() - antes;
+		kk++;
 	}
 #elif defined(TEST_BENCH_REBOTES)
 	button_empezar(insertar_pulsacion);
@@ -73,7 +82,7 @@ void Main(void)
 #else
 	// Ejecución normal
 	unsigned int cpsr;
-	asm("MRS r0, CPSR" : [cpsr] "=r" (cpsr));
+	asm("MRS %[cpsr], CPSR" : [cpsr] "=r" (cpsr));
 	asm("BIC %[cpsr_out], %[cpsr_in], #0x1f" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr));
 	asm("ORR %[cpsr_out], %[cpsr_in], #0x10" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr));
 	asm("MSR CPSR_c, %[cpsr]" : : [cpsr] "r" (cpsr));

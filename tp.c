@@ -104,8 +104,7 @@ void TSInt(void)
 void TS_inicializar(void)
 {
     /* enable interrupt */
-	rINTMOD=0x0;
-	rINTCON=0x1;
+	rINTMOD &= ~(BIT_EINT2);
     rINTMSK |= BIT_EINT2;
     rI_ISPC |= BIT_EINT2;            // clear pending_bit
 	
@@ -113,7 +112,7 @@ void TS_inicializar(void)
 	//          1               1                0                 1
     rPUPE  = 0x0;	                 // Pull up
     rPDATE = 0xb8;                   // should be enabled	
-    DelayTime(100); 
+    //DelayTime(100);
     
     rEXTINT |= 0x200;                // falling edge trigger
     pISR_EINT2 = (unsigned) TSInt;       // set interrupt handler
@@ -132,6 +131,7 @@ void TS_empezar(void)
 void TS_leer(int* ready, ULONG* x, ULONG* y) {
 	*ready = touched;
 	if (*ready) {
+		Delay(1000);
 		touched = 0;
 		*x = pos_x;
 		*y = pos_y;

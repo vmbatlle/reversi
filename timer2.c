@@ -23,15 +23,15 @@ static volatile unsigned long int timer2_num_int = 0; // Número de ciclos compl
 
 /* declaración de función que es rutina de servicio de interrupción
  * https://gcc.gnu.org/onlinedocs/gcc/ARM-Function-Attributes.html */
-void timer2_ISR(void) __attribute__((interrupt("IRQ")));
+void timer2_ISR(void) __attribute__((interrupt("FIQ")));
 
 /*--- codigo de las funciones ---*/
 void timer2_ISR(void)
 {
 	timer2_num_int++;
 
-	/* borrar bit en I_ISPC para desactivar la solicitud de interrupción*/
-	rI_ISPC |= BIT_TIMER2; // BIT_TIMER2 está definido en 44b.h y pone un uno en el bit 11 que correponde al Timer2
+	/* borrar bit en F_ISPC para desactivar la solicitud de interrupción*/
+	rF_ISPC |= BIT_TIMER2; // BIT_TIMER2 está definido en 44b.h y pone un uno en el bit 11 que correponde al Timer2
 }
 
 void timer2_inicializar(void)
@@ -44,7 +44,7 @@ void timer2_inicializar(void)
 	rINTMSK &= ~(BIT_TIMER2); // habilitamos en vector de mascaras de interrupcion el Timer2 (bits 26 y 11, BIT_GLOBAL y BIT_TIMER2 están definidos en 44b.h)
 
 	/* Establece la rutina de servicio para TIMER2 */
-	pISR_TIMER2 = (unsigned) timer2_ISR;
+	pISR_FIQ = (unsigned) timer2_ISR;
 
 	/* Configura el Timer2 
 	 * Timer_input = MCLK / (preesclado + 1) / divisor */

@@ -49,6 +49,7 @@ void Lcd_Init(void)
 	rPDATE=rPDATE&0x0e;
 	
 	//DMA ISR
+	rINTMOD &= ~(BIT_ZDMA0); // Configura la linea INT_TIMER2 como de tipo IRQ (0)
 	rINTMSK &= ~(BIT_ZDMA0);
     pISR_ZDMA0 = (unsigned) Zdma0Done;
 }

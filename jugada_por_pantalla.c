@@ -23,13 +23,13 @@ enum {
 static enum jugada_por_pantalla_estado estadoActual;
 
 /* Acciones para cada estado del autómata */
-void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
-void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
-void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
-void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
-void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int *fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[][8], int *fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8], int *fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8], int *fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
+void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8], int *fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna);
 /* Tabla que relaciona los estados con sus acciones */
-static void (*const tabla_estados [MAX_STATES_JPP]) (unsigned long int ahora, char tablero[][8], int fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna) = {
+static void (*const tabla_estados [MAX_STATES_JPP]) (unsigned long int ahora, char tablero[][8], int *fin, enum pulsacion_button pulsacion, enum toque_pantalla toque, int* ready, char* fila, char* columna) = {
 		action_estado_bienvenida, action_estado_seleccionar_movimiento,
 		action_estado_permitir_cancelar, action_estado_movimiento_maquina,
 		action_estado_partida_finalizada
@@ -50,7 +50,7 @@ void jugada_por_pantalla_iniciar(void) {
 	gui_refrescar();
 }
 
-void jugada_por_pantalla_gestionar(unsigned long int ahora, char tablero[][8], int fin, int* ready, char* fila, char* columna) {
+void jugada_por_pantalla_gestionar(unsigned long int ahora, char tablero[][8], int *fin, int* ready, char* fila, char* columna) {
 	if (estadoActual >= 0 && estadoActual < MAX_STATES_JPP) {
 		enum pulsacion_button pulsacion = antirrebotes_gestionar(ahora);
 		enum toque_pantalla toque = gui_touch_screen_gestionar();
@@ -62,8 +62,8 @@ void jugada_por_pantalla_gestionar(unsigned long int ahora, char tablero[][8], i
 /** Acciones del autómata **/
 
 /* estado_bienvenida: Muestra una pantalla inicial con las intrucciones básicas
- * para jugar y la leyenda "Toque la pantalla para jugar". */
-void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int fin,
+ * para jugar y la leyenda "Toque para jugar". */
+void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int *fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 	D8led_gestionar(1);
@@ -86,7 +86,7 @@ void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int fi
 /* estado_seleccionar_movimiento: Elección de número de fila y columna,
  * seleccionar la columna 0-7 con el botón izquierdo y la fila 0-7 con
  * el botón derecho. Confirmar la selección con un toque en la pantalla táctil. */
-void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[][8], int fin,
+void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[][8], int *fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 	D8led_gestionar(2);
@@ -119,17 +119,27 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[
 		estadoActual = estado_permitir_cancelar;
 		break;
 	case toque_finalizar:
-		// TODO: implementar
+		*fin = 1;
+		gui_escribir_leyenda("Toque para jugar");
+		gui_refrescar();
+		estadoActual = estado_partida_finalizada;
 		break;
 	case toque_pasar:
-		// TODO: implementar
+		*ready = 1;
+		*fila = 8;
+		*columna =8;
+		_fila = 0;
+		_columna = 0;
+		estadoActual = estado_movimiento_maquina;
 		break;
 	case toque_none:
 		break;
 	}
 
-	if (fin) {
+	if (*fin) {
 		/* No se pueden seleccionar más movimientos */
+		gui_escribir_leyenda("Toque para jugar");
+		gui_refrescar();
 		estadoActual = estado_partida_finalizada;
 	}
 
@@ -139,7 +149,7 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[
 
 /* estado_permitir_cancelar: Permitir al usuario cancelar su movimiento durante un determinado
  * tiempo antes de confirmar su elección. */
-void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8], int fin,
+void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8], int *fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 
@@ -171,7 +181,7 @@ void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8],
 }
 
 /* estado_movimiento_maquina: TODO */
-void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8], int fin,
+void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8], int *fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 	D8led_gestionar(4);
@@ -179,21 +189,31 @@ void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8]
 	gui_escribir_leyenda("Pulse para jugar");
 	gui_refrescar();
 	estadoActual = estado_seleccionar_movimiento;
+
+	if (*fin) {
+		/* No se pueden seleccionar más movimientos */
+		gui_escribir_leyenda("Toque para jugar");
+		gui_refrescar();
+		estadoActual = estado_partida_finalizada;
+	}
 }
 
 /* action_estado_partida_finalizada: La partida actual ha terminado
  * por acción del usuario o por no poder realizar más movimientos */
-void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8], int fin,
+void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8], int *fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 	D8led_gestionar(5);
 	switch (pulsacion) {
 	case pulsacion_iz:
 	case pulsacion_dr:
-		// TODO ver si se puede quitar (si pasa por el estado bienvenida ya se encarga este)
 		_fila = 0;
 		_columna = 0;
-		// TODO: Dibujar tablero inicial
+		gui_dibujar_contenido_tablero(tablero);
+		gui_dibujar_ficha(_fila, _columna, FICHA_GRIS);
+		gui_escribir_leyenda("Pulse para jugar");
+		gui_refrescar();
+		timeAntesParpadeo = ahora;
 		estadoActual = estado_seleccionar_movimiento;
 		break;
 	case pulsacion_none:
@@ -201,11 +221,15 @@ void action_estado_partida_finalizada(unsigned long int ahora, char tablero[][8]
 	}
 
 	switch (toque){
-	case toque_central: // TODO: Definir área de interacción.
+	case toque_central:
 		// Saltar pantalla de bienvenida
 		_fila = 0;
 		_columna = 0;
-		// TODO: Dibujar tablero inicial
+		gui_dibujar_contenido_tablero(tablero);
+		gui_dibujar_ficha(_fila, _columna, FICHA_GRIS);
+		gui_escribir_leyenda("Pulse para jugar");
+		gui_refrescar();
+		timeAntesParpadeo = ahora;
 		estadoActual = estado_seleccionar_movimiento;
 		break;
 	default:

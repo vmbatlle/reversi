@@ -216,6 +216,7 @@ l2:
 #*	START											*
 #****************************************************
 ResetHandler:
+
     ldr	    r0,=WTCON	    	/* watch dog disable*/
     ldr	    r1,=0x0 		
     str	    r1,[r0]
@@ -223,6 +224,33 @@ ResetHandler:
     ldr	    r0,=INTMSK
     ldr	    r1,=0x07ffffff  	/* all interrupt disable */
     str	    r1,[r0]
+
+    #****************************************************
+    #*	Set memory control registers					*
+    #****************************************************
+    ldr	    r0,=(SMRDATA-0xc000000)
+    ldmia   r0,{r1-r13}
+    ldr	    r0,=0x01c80000  	/* BWSCON Address */
+    stmia   r0,{r1-r13}
+
+	LDR r0,=0x0
+	LDR r1,=Image_RO_Base
+	LDR r3,=Image_ZI_Base
+LoopRw:
+    cmp         r1, r3
+	ldrcc       r2, [r0], #4
+	strcc       r2, [r1], #4
+	bcc         LoopRw
+
+/* código nuevo (Darío) */
+        LDR r0, =Image_ZI_Base
+        LDR r1, =Image_ZI_Limit
+        mov r3, #0
+LoopZI:
+        cmp r0, r1
+        strcc r3, [r0], #4
+        bcc LoopZI
+/* fin código nuevo (Darío) */
 
     #****************************************************
     #*	Set clock control registers						*
@@ -251,14 +279,6 @@ ResetHandler:
     ldr     r0,=BDIDES1      
     ldr     r1,=0x40000000   	/* BDIDESn reset value should be 0x40000000 */	 
     str     r1,[r0]
-
-    #****************************************************
-    #*	Set memory control registers					* 	
-    #****************************************************
-    ldr	    r0,=SMRDATA
-    ldmia   r0,{r1-r13}
-    ldr	    r0,=0x01c80000  	/* BWSCON Address */
-    stmia   r0,{r1-r13}
 
     #;****************************************************
     #;*	Initialize stacks								* 
@@ -300,7 +320,11 @@ F2:
 	BIC	r0, r0, #NOINT /* enable interrupt */
 	MSR	CPSR_cxsf, r0
 	/* jump to main() */
-   	BL	Main
+    .extern Main
+
+    ldr r0,=Main
+    mov lr,pc
+    mov pc,r0
    	B   .	    
 
 #;****************************************************
@@ -423,13 +447,13 @@ SMRDATA:
 	.long 0x20				/* MRSR7                                  */
 
 
+.equ 	UserStack,	_ISR_STARTADDRESS-0xf00-256*2	/* c7fee00 */
 .equ	SVCStack,	_ISR_STARTADDRESS-0xf00+256    	/* c7ff100 */
 .equ	UndefStack,	_ISR_STARTADDRESS-0xf00+256*2   /* c7ff200 */
 .equ	AbortStack,	_ISR_STARTADDRESS-0xf00+256*3   /* c7ff300 */
 .equ	IRQStack,	_ISR_STARTADDRESS-0xf00+256*4   /* c7ff400 */
 .equ	FIQStack,	_ISR_STARTADDRESS-0xf00+256*5   /* c7ff500 */
-.equ	SysStack,	_ISR_STARTADDRESS-0xf00+256*6   /* c7ff600 */
-.equ 	UserStack,	_ISR_STARTADDRESS-0xf00+256*7	/* c7ff700 */
+# .equ	SysStack,	_ISR_STARTADDRESS-0xf00+256*6   /* c7ff600 */
 
 .equ	HandleReset,	_ISR_STARTADDRESS
 .equ	HandleUndef,	_ISR_STARTADDRESS+4

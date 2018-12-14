@@ -119,10 +119,9 @@ void gui_dibujar_tablero_vacio() {
 	Lcd_DspAscII8x16(240, 190, BLACK,(INT8U*)"Terminar");
 
 	/* Títulos para la información de profiling */
-	Lcd_DspAscII8x16(230, 65, BLACK,(INT8U*)"Tiempo ejecucion");
-	Lcd_DspAscII8x16(230, 80, BLACK,(INT8U*)"patron_volteo:");
-	Lcd_DspAscII8x16(230, 110, BLACK,(INT8U*)"Total calculos:");
-	Lcd_DspAscII8x16(230, 140, BLACK,(INT8U*)"Total ejecucion:");
+	Lcd_DspAscII8x16(230, 65, BLACK,(INT8U*)"patron:");
+	Lcd_DspAscII8x16(230, 110, BLACK,(INT8U*)"calculos:");
+	Lcd_DspAscII8x16(230, 140, BLACK,(INT8U*)"total:");
 }
 
 /* TODO cambiar el 8 por un enum */
@@ -138,8 +137,8 @@ void gui_dibujar_contenido_tablero(char tablero[8][8]) {
 void gui_dibujar_ficha(int fila, int columna, enum contenido_casilla casilla) {
 	if (fila >= 0 && fila < CASILLAS_TABLERO && columna >= 0 && columna < CASILLAS_TABLERO) {
 		/* Calcular la posición de dibujo */
-		int pos_x = POS_X_TABLERO + (SIZE_CASILLA - 1) * fila + (SIZE_CASILLA - SIZE_FICHA) / 2;
-		int pos_y = POS_Y_TABLERO + (SIZE_CASILLA - 1) * columna + (SIZE_CASILLA - SIZE_FICHA) / 2;
+		int pos_x = POS_X_TABLERO + (SIZE_CASILLA - 1) * columna + (SIZE_CASILLA - SIZE_FICHA) / 2;
+		int pos_y = POS_Y_TABLERO + (SIZE_CASILLA - 1) * fila + (SIZE_CASILLA - SIZE_FICHA) / 2;
 
 		/* Dibujar el sprite especificado por casilla */
 		switch (casilla) {
@@ -163,40 +162,38 @@ void gui_escribir_profiling(unsigned long long int total,
 		unsigned long long int calculos, unsigned long long int patron_volteo,
 		unsigned int patron_volteo_calls) {
 
-	// Ajustar todos los tiempos a milisegundos
-	total /= 1000;
-	calculos /= 1000;
-	patron_volteo /= 1000;
-
-	// Obtener strings de tiempo (convertir total de ms a s)
-	char total_str[12], calculos_str[13], patron_volteo_str[13];
-	itoa(total / 1000, total_str, 10);
-	itoa(calculos, calculos_str, 10);
-	itoa(patron_volteo, patron_volteo_str, 10);
+	// Obtener strings de tiempo (convertir total de us a s)
+	char total_str[11], calculos_str[11], patron_volteo_str[11], patron_volteo_calls_str[11];
+	itoa(total / 1000000, total_str, 9);
+	itoa(calculos, calculos_str, 8);
+	itoa(patron_volteo, patron_volteo_str, 8);
+	itoa(patron_volteo_calls, patron_volteo_calls_str, 10);
 	// Añadir ms o s al final
 	int total_len = strlen(total_str);
 	total_str[total_len] = 's';
 	total_str[total_len + 1] = '\0';
 	int calculos_len = strlen(calculos_str);
-	total_str[calculos_len] = 'm';
-	total_str[calculos_len + 1] = 's';
-	total_str[calculos_len + 2] = '\0';
+	calculos_str[calculos_len] = 'm';
+	calculos_str[calculos_len + 1] = 's';
+	calculos_str[calculos_len + 2] = '\0';
 	int patron_volteo_len = strlen(patron_volteo_str);
-	total_str[patron_volteo_len] = 'm';
-	total_str[patron_volteo_len + 1] = 's';
-	total_str[patron_volteo_len + 2] = '\0';
+	patron_volteo_str[patron_volteo_len] = 'm';
+	patron_volteo_str[patron_volteo_len + 1] = 's';
+	patron_volteo_str[patron_volteo_len + 2] = '\0';
 	// Escribir el texto por pantalla (TODO limpiar el texto anterior)
+	LcdClrRect(230, 80, 320, 80 + 15, WHITE);
+	LcdClrRect(230, 95, 320, 95 + 15, WHITE);
+	LcdClrRect(230, 125, 320, 125 + 15, WHITE);
+	LcdClrRect(230, 155, 320, 155 + 15, WHITE);
+	Lcd_DspAscII8x16(230, 80, BLACK,(INT8U*)patron_volteo_calls_str);
 	Lcd_DspAscII8x16(230, 95, BLACK,(INT8U*)patron_volteo_str);
 	Lcd_DspAscII8x16(230, 125, BLACK,(INT8U*)calculos_str);
-	Lcd_DspAscII8x16(230, 155, BLACK,(INT8U*)patron_volteo_str);
-	// TODO: Añadir número de invocaciones
+	Lcd_DspAscII8x16(230, 155, BLACK,(INT8U*)total_str);
 }
 
 void gui_escribir_leyenda(char* leyenda) {
 	// Limpiar zona de pantalla asociada a la leyenda
-	/*Lcd_Draw_HLine(POS_X_TABLERO, POS_X_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO,
-					POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + BORDE_TABLERO + 1, WHITE,
-					LCD_YSIZE - POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + BORDE_TABLERO + 1);*/
+	LcdClrRect(POS_X_TABLERO, POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + MARGEN_TEXTO, 200, POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + MARGEN_TEXTO + 15, WHITE);
 	Lcd_DspAscII8x16(POS_X_TABLERO,
 						POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + MARGEN_TEXTO,
 						BLACK,(INT8U*)leyenda);
