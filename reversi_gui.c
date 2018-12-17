@@ -17,6 +17,8 @@ enum {
 	BORDE_TABLERO = 2, // borde del tablero (tendrá BORDE_TABLERO + 1 píxeles)
 	SIZE_X_TEXTO = 8,
 	SIZE_Y_TEXTO = 16,
+	POS_X_TEXTO = 0, // Para ajustar la fuente a los pixeles concretos
+	POS_Y_TEXTO = 3,
 	// posicion X del pixel de mas arriba a la izquierda del tablero
 	// sin contar el borde
 	POS_X_TABLERO = SIZE_X_TEXTO + MARGEN_TEXTO + BORDE_TABLERO,
@@ -33,6 +35,7 @@ const STRU_BITMAP BITMAP_WHITE_TILE = {0x10, 4, SIZE_FICHA, SIZE_FICHA, TRANSPAR
 const STRU_BITMAP BITMAP_GREY_TILE = {0x10, 4, SIZE_FICHA, SIZE_FICHA, TRANSPARENCY, (INT8U *)ucGreyTileMap};
 const STRU_BITMAP BITMAP_EMPTY_TILE = {0x10, 4, SIZE_FICHA, SIZE_FICHA, TRANSPARENCY, (INT8U *)ucEmptyTileMap};
 const STRU_BITMAP BITMAP_BUTTON_BACKGROUND = {0x10, 4, 80, 50, TRANSPARENCY, (INT8U *)ucButtonBackgroundMap};
+const STRU_BITMAP BITMAP_TITLE_SCREEN = {0x10, 4, 320, 240, TRANSPARENCY, (INT8U *)ucTitleScreenMap};
 
 void gui_inicializar() {
 	Lcd_Init();
@@ -58,7 +61,8 @@ void gui_limpiar_pantalla() {
 }
 
 void gui_dibujar_bienvenida() {
-	Lcd_DspAscII8x16(POS_X_TABLERO, POS_Y_TABLERO, BLACK, (INT8U*)"Toque para jugar");
+	BitmapView(0, 0, BITMAP_TITLE_SCREEN);
+	Lcd_DspAscII8x16(10, LCD_YSIZE - 25, BLACK, (INT8U*)"Autores: Victor M. Batlle, Diego Royo. 2018/19.");
 }
 
 void gui_dibujar_tablero_vacio() {
@@ -77,37 +81,16 @@ void gui_dibujar_tablero_vacio() {
 						POS_X_TABLERO + (SIZE_CASILLA - 1) * i, BLACK, 1);
 	}
 
-	/*
-	 * TODO: pasar los numeros magicos (+1, +4) a constantes,
-	 * considerar tambien cambiar SIZE_X/Y_TEXTO a 7x9
-	 * vienen dados por la fuente empleada en ascii 8x16, por ejemplo el caracter '0':
-	 * ........
-	 * ........
-	 * ........
-	 * .#####..
-	 * ##...##.
-	 * ##..###.
-	 * ##.####.
-	 * ####.##.
-	 * ###..##.
-	 * ##...##.
-	 * ##...##.
-	 * .#####..
-	 * ........
-	 * ........
-	 * ........
-	 * ........
-	 */
 	char digito = '1';
 	/* Dibujar numeración de filas y columnas (1 - 8) */
 	for (i = 0; i < CASILLAS_TABLERO; i++) {
 		/* Número de fila */
-		Lcd_DspAscII8x16(POS_X_TABLERO - MARGEN_TEXTO - SIZE_X_TEXTO + 1,
+		Lcd_DspAscII8x16(POS_X_TABLERO - MARGEN_TEXTO - SIZE_X_TEXTO + POS_X_TEXTO,
 							POS_Y_TABLERO + (SIZE_CASILLA - 1) * i + (SIZE_CASILLA - SIZE_Y_TEXTO) / 2,
 							BLACK,(INT8U*)&digito);
 		/* Número de columna */
 		Lcd_DspAscII8x16(POS_X_TABLERO + (SIZE_CASILLA - 1) * i + (SIZE_CASILLA - SIZE_X_TEXTO) / 2,
-							POS_Y_TABLERO - MARGEN_TEXTO - SIZE_Y_TEXTO + 4,
+							POS_Y_TABLERO - MARGEN_TEXTO - SIZE_Y_TEXTO + POS_Y_TEXTO,
 							BLACK,(INT8U*)&digito);
 		digito = digito + 1;
 	}
@@ -193,7 +176,8 @@ void gui_escribir_profiling(unsigned long long int total,
 
 void gui_escribir_leyenda(char* leyenda) {
 	// Limpiar zona de pantalla asociada a la leyenda
-	LcdClrRect(POS_X_TABLERO, POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + MARGEN_TEXTO, 200, POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + MARGEN_TEXTO + 15, WHITE);
+	int pos_top = POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + MARGEN_TEXTO + BORDE_TABLERO * 2;
+	LcdClrRect(POS_X_TABLERO, pos_top, 200, pos_top + 15, WHITE);
 	Lcd_DspAscII8x16(POS_X_TABLERO,
 						POS_Y_TABLERO + (SIZE_CASILLA - 1) * CASILLAS_TABLERO + MARGEN_TEXTO,
 						BLACK,(INT8U*)leyenda);
