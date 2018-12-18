@@ -62,7 +62,7 @@ void gui_limpiar_pantalla() {
 
 void gui_dibujar_bienvenida() {
 	BitmapView(0, 0, BITMAP_TITLE_SCREEN);
-	Lcd_DspAscII8x16(10, LCD_YSIZE - 25, BLACK, (INT8U*)"Autores: Victor M. Batlle, Diego Royo. 2018/19.");
+	Lcd_DspAscII8x16(10, LCD_YSIZE - 25, BLACK, (INT8U*)"Autores: V. M., D. R,. Curso 2018/19.");
 }
 
 void gui_dibujar_tablero_vacio() {
@@ -97,9 +97,9 @@ void gui_dibujar_tablero_vacio() {
 
 	/* Botones para pasar turno y finalizar */
 	BitmapView(230, 10, BITMAP_BUTTON_BACKGROUND);
-	Lcd_DspAscII8x16(240, 20, BLACK,(INT8U*)"Pasar");
+	Lcd_DspAscII8x16(250, 22, BLACK,(INT8U*)"Pasar");
 	BitmapView(230, 180, BITMAP_BUTTON_BACKGROUND);
-	Lcd_DspAscII8x16(240, 190, BLACK,(INT8U*)"Terminar");
+	Lcd_DspAscII8x16(237, 192, BLACK,(INT8U*)"Terminar");
 
 	/* Títulos para la información de profiling */
 	Lcd_DspAscII8x16(230, 65, BLACK,(INT8U*)"patron:");

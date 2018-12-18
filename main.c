@@ -30,6 +30,7 @@
 /*--- function declare ---*/
 void Main(void);
 
+extern void modo_usuario(); // cambio a modo usuario
 
 // Registrar una pulsación de botón insertándola en la pila de debug
 // Útil para ver los rebotes producidos por el botón (TEST_BENCH_REBOTES)
@@ -41,7 +42,6 @@ void insertar_pulsacion(enum estado_button button) {
 
 void Main(void)
 {
-
 	/* Inicializa controladores */
 	sys_init();         // Inicializacion de la placa, interrupciones y puertos
 	excepciones_inicializar(); // Inicialización del capturador de excepciones
@@ -73,19 +73,23 @@ void Main(void)
 	button_empezar(insertar_pulsacion);
 	while(1);
 #elif defined(TEST_BENCH_LCD_TS)
-	gui_empezar();
 	calibracion_empezar();
+	gui_empezar();
 	while(1) {
 		gui_touch_screen_test();
 	}
+	D8led_gestionar(0xA);
 	gui_parar();
 #else
 	// Ejecución normal
+	modo_usuario();
+
+	D8led_gestionar(0xA);
 	unsigned int cpsr;
 	asm("MRS %[cpsr], CPSR" : [cpsr] "=r" (cpsr));
-	asm("BIC %[cpsr_out], %[cpsr_in], #0x1f" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr));
-	asm("ORR %[cpsr_out], %[cpsr_in], #0x10" : [cpsr_out] "=r" (cpsr) : [cpsr_in] "r" (cpsr));
-	asm("MSR CPSR_c, %[cpsr]" : : [cpsr] "r" (cpsr));
+	D8led_gestionar(cpsr & 0xF);
+	//D8led_gestionar(4 + ((cpsr & 0xC0) >> 6));
+
 	reversi_main();
 #endif
 }

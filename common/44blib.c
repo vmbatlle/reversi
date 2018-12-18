@@ -247,8 +247,9 @@ void sys_init()// Interrupt,Port and UART
 					// Bit 1 = 0 ==> Enables IRQ interrupts
 					// Bit 2 = 0 ==> Set Vectored mode for IRQ
 	rI_ISPC = 0xffffffff;			// clear all interrupt pend
+	rF_ISPC = 0xffffffff;			// clear all interrupt pend
 	rEXTINTPND = 0xf;				  // clear EXTINTPND reg
 	Port_Init();					    // Initial 44B0X's I/O port
-	Delay(0);						      // delay time				
+	Delay(0);						      // delay time
 	rINTMSK = ~(BIT_GLOBAL);  //enable interrupt mask vector
 }

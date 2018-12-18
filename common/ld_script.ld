@@ -3,15 +3,18 @@ SECTIONS
 	. = 0x0C000000;
 	Image_RO_Base = .;
 	.text : { *(.text) }
-     . = ALIGN (4);
+    . = ALIGN (4);
 	Image_RO_Limit = .;
+	. = ALIGN(4);
 	Image_RW_Base = .;
 	.data : { *(.data) }
 	.rodata : { *(.rodata) }
+	. = ALIGN(4);
 	Image_RW_Limit = .;
      . = ALIGN (4);
 	Image_ZI_Base = .;
 	.bss : { *(.bss) }
+	. = ALIGN(4);
 	Image_ZI_Limit = .;
 	__bss_start__ = .;
 	__bss_end__ = .;

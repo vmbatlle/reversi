@@ -1,7 +1,7 @@
 /*********************************************************************************************
-* FileÂ£Âº	tp.c
+* File:		tp.c
 * Author:	embest	
-* DescÂ£Âº	LCD touch screen control function
+* Desc:		LCD touch screen control function
 * History:	
 *********************************************************************************************/
 

@@ -12,6 +12,7 @@
 #include "stdlib.h"
 #include "lcd.h"
 #include "Bmp.h"
+#include "8led.h"
 
 /*--- definicion de macros ---*/
 #define DMA_Byte  (0)
@@ -50,8 +51,8 @@ void Lcd_Init(void)
 	
 	//DMA ISR
 	rINTMOD &= ~(BIT_ZDMA0); // Configura la linea INT_TIMER2 como de tipo IRQ (0)
-	rINTMSK &= ~(BIT_ZDMA0);
     pISR_ZDMA0 = (unsigned) Zdma0Done;
+	rINTMSK &= ~(BIT_ZDMA0);
 }
 
 /*********************************************************************************************
@@ -482,7 +483,7 @@ void ReverseLine(INT32U ulHeight, INT32U ulY)
 volatile static INT8U ucZdma0Done=1;	//When DMA is finish,ucZdma0Done is cleared to Zero
 void Zdma0Done(void)
 {
-	rI_ISPC|=BIT_ZDMA0;	    //clear pending
+	rI_ISPC |= BIT_ZDMA0;	    //clear pending
 	ucZdma0Done=0;
 }
 
@@ -502,11 +503,11 @@ void Lcd_Dma_Trans(void)
   	rZDISRC0=(DW<<30)|(1<<28)     |LCD_VIRTUAL_BUFFER; // inc
   	rZDIDES0=( 2<<30)|(1<<28)     |LCD_ACTIVE_BUFFER; // inc
     rZDICNT0=( 2<<28)|(1<<26)     |(3<<22)     |(0<<20)      |(LCD_BUF_SIZE);
-        //           |            |            |             |            |---->0 = Disable DMA
-        //           |            |            |             |------------>Int. whenever transferred
-        //           |            |            |-------------------->Write time on the fly
-        //           |            |---------------------------->Block(4-word) transfer mode
-        //           |------------------------------------>whole service
+	//           |            |            |             |            |---->0 = Disable DMA
+	//           |            |            |             |------------>Int. whenever transferred
+	//           |            |            |-------------------->Write time on the fly
+	//           |            |---------------------------->Block(4-word) transfer mode
+	//           |------------------------------------>whole service
 	    //reEnable ZDMA transfer
   	rZDICNT0 |= (1<<20);		//after ES3
     rZDCON0=0x1; // start!!!  

@@ -9,6 +9,7 @@
 #include "options_environment.h"
 #include "timer0.h"
 #include "timer2.h"
+#include "8led.h"
 #include "latido.h"
 
 // Tamaño del tablero

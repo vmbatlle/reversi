@@ -4,7 +4,7 @@
 #include "lcd.h"
 #include "Bmp.h"
 
-#define NO_REALIZAR_CALIBRACION
+//#define NO_REALIZAR_CALIBRACION
 
 /* Sprite de cruz empleado en la calibración */
 const INT8U ucCrossTileMap[] = {

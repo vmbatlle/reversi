@@ -23,6 +23,7 @@
 .equ 	INTMSK,		0x01e0000c
 .equ 	I_ISPR,		0x01e00020
 .equ 	I_CMST,		0x01e0001c
+.equ 	F_ISPC,		0x01e0003c
 
 #Watchdog timer
 .equ 	WTCON,		0x01d30000
@@ -77,8 +78,8 @@
     b HandlerPabort     	/* handlerPAbort        */
     b HandlerDabort     	/* handlerDAbort        */
     b .                 	/* handlerReserved      */
-    subs pc,lr,#4 /* b HandlerIRQ */
-    subs pc,lr,#4 /* b HandlerFIQ */
+    b HandlerIRQ
+    b HandlerFIQ
 	#***IMPORTANT NOTE***
 	#If the H/W vectored interrutp mode is enabled, The above two instructions should
 	#be changed like below, to work-around with H/W bug of S3C44B0X interrupt controller. 
@@ -212,6 +213,18 @@ l2:
 	add		sp,sp,#4
 	subs	pc,lr,#4
 
+IsrFIQ:						/* using F_ISPR register. */
+	subs	pc,lr,#4
+    #sub	sp,sp,#4
+    stmfd   sp!,{r8-r9}
+
+    ldr r9, =F_ISPC
+    mvn r8, #0
+    str r8, [r9]
+	ldmfd	sp!,{r8-r9}
+	#add	sp,sp,#4
+	subs	pc,lr,#4
+
 #****************************************************
 #*	START											*
 #****************************************************
@@ -243,13 +256,13 @@ LoopRw:
 	bcc         LoopRw
 
 /* código nuevo (Darío) */
-        LDR r0, =Image_ZI_Base
-        LDR r1, =Image_ZI_Limit
-        mov r3, #0
+    LDR r0, =Image_ZI_Base
+    LDR r1, =Image_ZI_Limit
+    mov r3, #0
 LoopZI:
-        cmp r0, r1
-        strcc r3, [r0], #4
-        bcc LoopZI
+    cmp r0, r1
+    strcc r3, [r0], #4
+    bcc LoopZI
 /* fin código nuevo (Darío) */
 
     #****************************************************
@@ -280,6 +293,14 @@ LoopZI:
     ldr     r1,=0x40000000   	/* BDIDESn reset value should be 0x40000000 */	 
     str     r1,[r0]
 
+    #****************************************************
+    #*	Set memory control registers					*
+    #****************************************************
+    ldr	    r0,=SMRDATA
+    ldmia   r0,{r1-r13}
+    ldr	    r0,=0x01c80000  	/* BWSCON Address */
+    stmia   r0,{r1-r13}
+
     #;****************************************************
     #;*	Initialize stacks								* 
     #;****************************************************
@@ -291,6 +312,13 @@ LoopZI:
     #;****************************************************
     ldr	    r0,=HandleIRQ		/* This routine is needed */
     ldr	    r1,=IsrIRQ			/* if there is not 'subs pc,lr,#4' at 0x18, 0x1c */
+    str	    r1,[r0]
+
+    #;****************************************************
+    #;*	Setup FIQ handler								*
+    #;****************************************************
+    ldr	    r0,=HandleFIQ		/* This routine is needed */
+    ldr	    r1,=IsrFIQ			/* if there is not 'subs pc,lr,#4' at 0x18, 0x1c */
     str	    r1,[r0]
 
     #********************************************************
@@ -353,13 +381,7 @@ InitStacks:
     msr	    cpsr_cxsf,r1 	    /* FIQMode */
     ldr	    sp,=FIQStack
 
-	bic	    r0,r0,#MODEMASK
-    orr	    r1,r0,#SYSMODE
-    msr	    cpsr_cxsf,r1 	    /* SysMode */
-    ldr	    sp,=UserStack
-
-    bic	    r0,r0,#MODEMASK
-    orr	    r1,r0,#SVCMODE
+    orr	    r1,r0,#SVCMODE|NOINT
     msr	    cpsr_cxsf,r1 	    /* SVCMode */
     ldr	    sp,=SVCStack
 
@@ -495,4 +517,16 @@ SMRDATA:
 .equ	HandleEINT1,	_ISR_STARTADDRESS+4*32
 .equ	HandleEINT0,	_ISR_STARTADDRESS+4*33		/* 0xc1(c7)fff84 */
 
-		.end
+.global modo_usuario
+
+modo_usuario:
+	mov r1, lr
+	mrs r0, cpsr
+	bic r0, r0, #NOINT
+	bic r0, r0, #MODEMASK
+	orr r0, r0, #USERMODE
+	msr cpsr_cxsf, r0
+	ldr sp, =UserStack
+	mov pc, r1
+
+.end

@@ -62,13 +62,13 @@ void jugada_por_pantalla_gestionar(unsigned long int ahora, char tablero[][8], i
 /** Acciones del autómata **/
 
 /* estado_bienvenida: Muestra una pantalla inicial con las intrucciones básicas
- * para jugar y la leyenda "Toque para jugar". */
+ * para jugar y la leyenda "Toque pant. para jugar". */
 void action_estado_bienvenida(unsigned long int ahora, char tablero[][8], int *fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
 	D8led_gestionar(1);
 
-	if (pulsacion != pulsacion_none || toque != toque_none) {
+	if (pulsacion != pulsacion_none || toque == toque_central) {
 		// Saltar pantalla de bienvenida
 		_fila = 0;
 		_columna = 0;
@@ -120,7 +120,7 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[
 		break;
 	case toque_finalizar:
 		*fin = 1;
-		gui_escribir_leyenda("Toque para jugar");
+		gui_escribir_leyenda("Toque pant. para jugar");
 		gui_refrescar();
 		estadoActual = estado_partida_finalizada;
 		break;
@@ -138,7 +138,7 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[
 
 	if (*fin) {
 		/* No se pueden seleccionar más movimientos */
-		gui_escribir_leyenda("Toque para jugar");
+		gui_escribir_leyenda("Toque pant. para jugar");
 		gui_refrescar();
 		estadoActual = estado_partida_finalizada;
 	}
@@ -152,7 +152,6 @@ void action_estado_seleccionar_movimiento(unsigned long int ahora, char tablero[
 void action_estado_permitir_cancelar(unsigned long int ahora, char tablero[][8], int *fin,
 		enum pulsacion_button pulsacion, enum toque_pantalla toque,
 		int* ready, char* fila, char* columna) {
-
 	D8led_gestionar(3);
 	switch (toque) {
 	case toque_central:
@@ -192,7 +191,7 @@ void action_estado_movimiento_maquina(unsigned long int ahora, char tablero[][8]
 
 	if (*fin) {
 		/* No se pueden seleccionar más movimientos */
-		gui_escribir_leyenda("Toque para jugar");
+		gui_escribir_leyenda("Toque pant. para jugar");
 		gui_refrescar();
 		estadoActual = estado_partida_finalizada;
 	}
