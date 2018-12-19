@@ -62,7 +62,7 @@ void gui_limpiar_pantalla() {
 
 void gui_dibujar_bienvenida() {
 	BitmapView(0, 0, BITMAP_TITLE_SCREEN);
-	Lcd_DspAscII8x16(10, LCD_YSIZE - 25, BLACK, (INT8U*)"Autores: V. M., D. R,. Curso 2018/19.");
+	Lcd_DspAscII8x16(10, LCD_YSIZE - 25, BLACK, (INT8U*)"Autores: V. M., D. R., Curso 2018/19.");
 }
 
 void gui_dibujar_tablero_vacio() {
@@ -107,7 +107,6 @@ void gui_dibujar_tablero_vacio() {
 	Lcd_DspAscII8x16(230, 140, BLACK,(INT8U*)"total:");
 }
 
-/* TODO cambiar el 8 por un enum */
 void gui_dibujar_contenido_tablero(char tablero[8][8]) {
 	int x, y;
 	for (x = 0; x < CASILLAS_TABLERO; x++) {
@@ -163,7 +162,6 @@ void gui_escribir_profiling(unsigned long long int total,
 	patron_volteo_str[patron_volteo_len] = 'm';
 	patron_volteo_str[patron_volteo_len + 1] = 's';
 	patron_volteo_str[patron_volteo_len + 2] = '\0';
-	// Escribir el texto por pantalla (TODO limpiar el texto anterior)
 	LcdClrRect(230, 80, 320, 80 + 15, WHITE);
 	LcdClrRect(230, 95, 320, 95 + 15, WHITE);
 	LcdClrRect(230, 125, 320, 125 + 15, WHITE);

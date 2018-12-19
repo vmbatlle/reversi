@@ -139,7 +139,7 @@ void TS_leer(int* ready, ULONG* x, ULONG* y) {
 }
 
 /*********************************************************************************************
-* name:		TS_close TODO
+* name:		TS_parar
 * func:		close TouchScreen
 * para:		none
 * ret:		none

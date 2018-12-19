@@ -495,6 +495,5 @@ void reversi_main()
 		// Actualizar la máquina de estados si la IA ha decidido finalizar el juego
 		jugada_por_pantalla_gestionar(ahora, tablero, &fin, &ready, &fila, &columna);
 		timer0_parar();
-		// TODO: Revisar cambios necesarios para reempezar una partida
 	}
 }

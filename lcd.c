@@ -402,7 +402,7 @@ void Lcd_DspAscII8x16(INT16U x0, INT16U y0, INT8U ForeColor, INT8U * s)
             {
             	for( x = 0; x < 8; x++ ) 
                	{
-                	k = x % 8; /* TODO: k vale lo mismo que x */
+                	k = x % 8;
 			    	if( ywbuf[y]  & (0x80 >> k) )
 			       	{
 			       		xx = x0 + x + i*8;

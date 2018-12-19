@@ -116,7 +116,6 @@ void calibracion_empezar() {
 
 void calibracion_convertir(int ts_x, int ts_y, int* lcd_x, int* lcd_y) {
 	if (esta_calibrado) {
-		// TODO ver si dejar este cambio o no, es la tecnica usada por las bibliotecas de la placa
 		if (ts_x < left) {
 			left = ts_x;
 		} else if (ts_x > right) {
@@ -130,6 +129,7 @@ void calibracion_convertir(int ts_x, int ts_y, int* lcd_x, int* lcd_y) {
 		// Invertir el eje Y, no hace falta invertir el X
 		*lcd_x = (ts_x - left) * LCD_XSIZE / (right - left);
 		*lcd_y = (top - ts_y) * LCD_YSIZE / (top - bottom);
+		// Método anterior, no hace falta que sea tan complejo
 		//*lcd_x = (ts_x - left + (100 * (ts_x - left) / (right - left))) * (LCD_WIDTH - 2 * SPRITE_MARGIN) / (right - left) + SPRITE_MARGIN;
 		//*lcd_y = (top - ts_y - (100 * (ts_y - bottom) / (top - bottom))) * (LCD_HEIGHT - 2 * SPRITE_MARGIN) / (top - bottom) + SPRITE_MARGIN;
 	} else {

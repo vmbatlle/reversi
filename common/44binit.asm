@@ -296,10 +296,10 @@ LoopZI:
     #****************************************************
     #*	Set memory control registers					*
     #****************************************************
-    ldr	    r0,=SMRDATA
-    ldmia   r0,{r1-r13}
-    ldr	    r0,=0x01c80000  	/* BWSCON Address */
-    stmia   r0,{r1-r13}
+#    ldr	    r0,=SMRDATA
+#    ldmia   r0,{r1-r13}
+#    ldr	    r0,=0x01c80000  	/* BWSCON Address */
+#    stmia   r0,{r1-r13}
 
     #;****************************************************
     #;*	Initialize stacks								* 

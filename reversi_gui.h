@@ -29,7 +29,6 @@ void gui_refrescar();
 void gui_limpiar_pantalla();
 void gui_dibujar_bienvenida();
 void gui_dibujar_tablero_vacio();
-/* TODO cambiar el 8 por un enum */
 void gui_dibujar_contenido_tablero(char tablero[][8]);
 void gui_dibujar_ficha(int fila, int columna, enum contenido_casilla casilla);
 void gui_escribir_leyenda(char* leyenda);
