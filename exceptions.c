@@ -11,7 +11,7 @@
 #include "44blib.h"
 
 #if defined(ENVIRONMENT_EMULATOR)
-static int error_variable = 0;
+static volatile int error_variable = 0;
 #endif
 
 enum exception_type { exception_undef = 0, exception_swi = 1, exception_dabort = 2 };

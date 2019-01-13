@@ -13,7 +13,7 @@
 #include "nested_interrupts.h"
 
 #if defined(ENVIRONMENT_EMULATOR)
-volatile int emular_estado_button = 0;
+static volatile int emular_estado_button = 0;
 #endif
 
 /* Función de callback */

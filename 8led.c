@@ -13,7 +13,7 @@
 
 /*--- variables globales del módulo ---*/
 #if defined(ENVIRONMENT_EMULATOR)
-static int emular_8led = 0;
+static volatile int emular_8led = 0;
 #else
 /* tabla de segmentos */
 static int Symbol[size_8led] = { cero, uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, A, B, C, D, E, F, blank};

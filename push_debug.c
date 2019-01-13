@@ -11,7 +11,7 @@
 enum {
 	MAX_SIZE = 256 / 4,
 };
-static volatile uint32_t *stack = (volatile uint32_t*)((_ISR_STARTADDRESS)-0xf00+0x100*6); /* 0xc7ff7600 */
+static volatile uint32_t *stack = (volatile uint32_t*)((_ISR_STARTADDRESS)-0xf00+0x100*6); /* 0xc7ff600 */
 static uint32_t size;
 
 void push_iniciar() {

@@ -70,7 +70,7 @@ unsigned int timer2_leer(void) {
 	unsigned int TCNTOX = rTCNTO2;
 	if (num_int != timer2_num_int) TCNTOX = rTCNTO2;
 	/* Obtener tiempo en microsegundos dada una frecuencia efectiva de 33MHz */
-	return (( MAX_COUNT - MIN_COUNT ) * num_int + (MAX_COUNT - TCNTOX)) / TICKS_PER_MICRO;
+	return (( MAX_COUNT - MIN_COUNT ) * timer2_num_int + (MAX_COUNT - TCNTOX)) / TICKS_PER_MICRO;
 }
 
 unsigned int timer2_parar(void) {
