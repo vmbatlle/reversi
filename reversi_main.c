@@ -1,7 +1,6 @@
 /*
  * @file reversi_main.c
  * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
- * @date 2018/11/06
  */
 
 #include "jugada_por_pantalla.h"

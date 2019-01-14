@@ -1,8 +1,11 @@
+/**
+ * @file nested_interrupts.h
+ * Protocolos para permitir la anidación de interrupciones IRQ dentro de una
+ * rutina de servicio.
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #ifndef _NESTED_INTERRUPTS_H_
 #define _NESTED_INTERRUPTS_H_
-
-/* Protocolos para permitir la anidación de interrupciones IRQ dentro de una
- * rutina de servicio. */
 
 /**
  * @brief Permite la anidación de interrupciones:

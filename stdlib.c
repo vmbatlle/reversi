@@ -1,3 +1,9 @@
+/**
+ * @file stdlib.c
+ * Implementación de varias funciones de la biblioteca estándar de C
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #include "stdlib.h"
 
 /*********************************************************************************************

@@ -1,3 +1,9 @@
+/**
+ * @file calibracion_tp.h
+ * Módulo auxiliar para la conversión de coordenadas del TP a coordenadas del LCD
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
+ */
 #ifndef __CALIBRACION_TP_H__
 #define __CALIBRACION_TP_H__
 

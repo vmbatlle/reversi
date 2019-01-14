@@ -78,18 +78,9 @@ void Main(void)
 	while(1) {
 		gui_touch_screen_test();
 	}
-	D8led_gestionar(0xA);
-	gui_parar();
 #else
 	// Ejecución normal
 	modo_usuario();
-
-	D8led_gestionar(0xA);
-	unsigned int cpsr;
-	asm("MRS %[cpsr], CPSR" : [cpsr] "=r" (cpsr));
-	D8led_gestionar(cpsr & 0xF);
-	//D8led_gestionar(4 + ((cpsr & 0xC0) >> 6));
-
 	reversi_main();
 #endif
 }

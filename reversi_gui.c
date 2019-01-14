@@ -1,6 +1,8 @@
 /**
+ * @file reversi_gui.c
  * Biblioteca para la interfaz gráfica del Reversi 8
- * @author Diego Royo Menese <>, Victor Martínez Batlle <>
+ *
+ * @author Victor M. Batlle <736478@unizar.es>, Diego Royo Meneses <740388@unizar.es>
  */
 #include "reversi_gui.h"
 #include "jugada_por_pantalla.h"
